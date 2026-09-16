@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, Search, RotateCcw, ChevronDown } from 'lucide-react';
+import { SlidersHorizontal, Search, RotateCcw, ChevronDown, X } from 'lucide-react';
 import { BRAND, formatPrice } from '../config/brand';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
+import FilterSidebar from '../components/FilterSidebar';
 
 export default function CatalogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,12 +15,26 @@ export default function CatalogPage() {
   // Active filter state synced from URL query params
   const activeCategory = searchParams.get('category') || 'all';
   const activeTexture = searchParams.get('texture') || 'all';
+  const activeLength = searchParams.get('length') || 'all';
+  const activeType = searchParams.get('type') || 'all';
+  const activeColor = searchParams.get('color') || 'all';
+  const activeProductType = searchParams.get('productType') || 'all';
   const activeSort = searchParams.get('sort') || 'newest';
   const searchQuery = searchParams.get('search') || '';
   const maxPriceParam = searchParams.get('maxPrice') || '';
 
   const [localMaxPrice, setLocalMaxPrice] = useState(maxPriceParam || '500000');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+
+  const hasActiveFilters =
+    activeCategory !== 'all' ||
+    activeTexture !== 'all' ||
+    activeLength !== 'all' ||
+    activeType !== 'all' ||
+    activeColor !== 'all' ||
+    activeProductType !== 'all' ||
+    Boolean(searchQuery) ||
+    Boolean(maxPriceParam);
 
   useEffect(() => {
     const fetchCatalog = async () => {
@@ -28,6 +43,10 @@ export default function CatalogPage() {
         const params = {};
         if (activeCategory && activeCategory !== 'all') params.category = activeCategory;
         if (activeTexture && activeTexture !== 'all') params.texture = activeTexture;
+        if (activeLength && activeLength !== 'all') params.length = activeLength;
+        if (activeType && activeType !== 'all') params.type = activeType;
+        if (activeColor && activeColor !== 'all') params.color = activeColor;
+        if (activeProductType && activeProductType !== 'all') params.productType = activeProductType;
         if (activeSort) params.sort = activeSort;
         if (searchQuery) params.search = searchQuery;
         if (maxPriceParam) params.maxPrice = maxPriceParam;
@@ -45,7 +64,17 @@ export default function CatalogPage() {
     };
 
     fetchCatalog();
-  }, [activeCategory, activeTexture, activeSort, searchQuery, maxPriceParam]);
+  }, [
+    activeCategory,
+    activeTexture,
+    activeLength,
+    activeType,
+    activeColor,
+    activeProductType,
+    activeSort,
+    searchQuery,
+    maxPriceParam
+  ]);
 
   const updateParam = (key, val) => {
     const newParams = new URLSearchParams(searchParams);
@@ -54,6 +83,22 @@ export default function CatalogPage() {
     } else {
       newParams.set(key, val);
     }
+    setSearchParams(newParams);
+  };
+
+  const handleCategoryChange = (catId) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (!catId || catId === 'all') {
+      newParams.delete('category');
+    } else {
+      newParams.set('category', catId);
+    }
+    // Clean up category-specific filters when switching category
+    newParams.delete('texture');
+    newParams.delete('length');
+    newParams.delete('type');
+    newParams.delete('color');
+    newParams.delete('productType');
     setSearchParams(newParams);
   };
 
@@ -122,7 +167,7 @@ export default function CatalogPage() {
           ].map(cat => (
             <button
               key={cat.id}
-              onClick={() => updateParam('category', cat.id)}
+              onClick={() => handleCategoryChange(cat.id)}
               style={{
                 backgroundColor: activeCategory === cat.id ? '#C9A876' : '#141312',
                 color: activeCategory === cat.id ? '#0E0D0C' : '#C0BAB0',
@@ -151,8 +196,26 @@ export default function CatalogPage() {
           flexWrap: 'wrap',
           gap: '16px'
         }}>
-          <div style={{ fontSize: '13px', color: '#A6A095' }}>
-            Displaying <strong style={{ color: '#F2EFEA' }}>{products.length}</strong> of {totalCount} exquisite pieces
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ fontSize: '13px', color: '#A6A095' }}>
+              Displaying <strong style={{ color: '#F2EFEA' }}>{products.length}</strong> of {totalCount} exquisite pieces
+            </div>
+
+            {/* Mobile Filter Trigger */}
+            <button
+              onClick={() => setMobileFilterOpen(true)}
+              className="btn-dark mobile-filter-btn"
+              style={{
+                display: 'none',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 14px',
+                fontSize: '12px'
+              }}
+            >
+              <SlidersHorizontal size={14} style={{ color: '#C9A876' }} />
+              <span>Filter ({activeCategory})</span>
+            </button>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -182,7 +245,7 @@ export default function CatalogPage() {
             </div>
 
             {/* Clear Filters Button if any filter is active */}
-            {(activeCategory !== 'all' || activeTexture !== 'all' || searchQuery || maxPriceParam) && (
+            {hasActiveFilters && (
               <button
                 onClick={clearAllFilters}
                 style={{
@@ -205,80 +268,21 @@ export default function CatalogPage() {
 
         {/* Main Grid & Filters Sidebar */}
         <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '32px' }} className="catalog-layout">
-          {/* Desktop Filters Sidebar */}
-          <aside style={{ backgroundColor: '#121110', border: '1px solid #24221F', padding: '24px', borderRadius: '4px', height: 'fit-content' }} className="catalog-sidebar">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', paddingBottom: '12px', borderBottom: '1px solid #1C1B19' }}>
-              <SlidersHorizontal size={16} style={{ color: '#C9A876' }} />
-              <h3 style={{ fontSize: '13px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#F2EFEA' }}>Refine Selection</h3>
-            </div>
-
-            {/* Hair Texture Filter */}
-            <div style={{ marginBottom: '28px' }}>
-              <h4 style={{ fontSize: '12px', color: '#C9A876', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '12px' }}>
-                Hair Texture
-              </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px' }}>
-                {[
-                  { id: 'all', label: 'All Textures' },
-                  { id: 'Bone Straight', label: 'Bone Straight' },
-                  { id: 'Deep Wave Curly', label: 'Deep Wave' },
-                  { id: 'Body Wave', label: 'Body Wave' },
-                  { id: 'Blunt Straight Bob', label: 'Blunt Cut Bob' },
-                  { id: 'Natural Straight / Blowout', label: 'Natural Blowout' }
-                ].map(tex => (
-                  <label key={tex.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: activeTexture === tex.id ? '#F2EFEA' : '#A6A095', cursor: 'pointer' }}>
-                    <input
-                      type="radio"
-                      name="texture"
-                      checked={activeTexture === tex.id}
-                      onChange={() => updateParam('texture', tex.id)}
-                      style={{ accentColor: '#C9A876' }}
-                    />
-                    <span>{tex.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Price Range Filter */}
-            <div style={{ marginBottom: '28px' }}>
-              <h4 style={{ fontSize: '12px', color: '#C9A876', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '12px' }}>
-                Maximum Price
-              </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <input
-                  type="range"
-                  min="20000"
-                  max="500000"
-                  step="10000"
-                  value={localMaxPrice}
-                  onChange={(e) => setLocalMaxPrice(e.target.value)}
-                  style={{ accentColor: '#C9A876', cursor: 'pointer' }}
-                />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#8A847A' }}>
-                  <span>{formatPrice(20000)}</span>
-                  <strong style={{ color: '#C9A876' }}>{formatPrice(localMaxPrice)}</strong>
-                </div>
-                <button
-                  onClick={handlePriceApply}
-                  className="btn-dark"
-                  style={{ padding: '8px', fontSize: '11px', textTransform: 'uppercase', width: '100%', marginTop: '4px' }}
-                >
-                  Apply Price Filter
-                </button>
-              </div>
-            </div>
-
-            {/* Authenticity Guarantee Callout */}
-            <div style={{ backgroundColor: '#161514', border: '1px solid #24221F', padding: '16px', borderRadius: '2px' }}>
-              <div style={{ fontSize: '11px', color: '#C9A876', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '4px' }}>
-                Concierge Promise
-              </div>
-              <p style={{ fontSize: '12px', color: '#8A847A', lineHeight: 1.5 }}>
-                Every unit is personally inspected in our Victoria Island salon before sealed dispatch.
-              </p>
-            </div>
-          </aside>
+          {/* Category-Specific Filters Sidebar (Desktop) */}
+          <FilterSidebar
+            activeCategory={activeCategory}
+            activeTexture={activeTexture}
+            activeLength={activeLength}
+            activeType={activeType}
+            activeColor={activeColor}
+            activeProductType={activeProductType}
+            localMaxPrice={localMaxPrice}
+            setLocalMaxPrice={setLocalMaxPrice}
+            handlePriceApply={handlePriceApply}
+            updateParam={updateParam}
+            clearAllFilters={clearAllFilters}
+            hasActiveFilters={hasActiveFilters}
+          />
 
           {/* Product Grid Area */}
           <div>
@@ -313,6 +317,69 @@ export default function CatalogPage() {
         </div>
       </div>
 
+      {/* Mobile Filter Drawer Overlay */}
+      {mobileFilterOpen && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1000,
+          backgroundColor: 'rgba(0,0,0,0.75)',
+          display: 'flex',
+          justifyContent: 'flex-end'
+        }}>
+          <div style={{
+            width: '100%',
+            maxWidth: '340px',
+            backgroundColor: '#121110',
+            height: '100%',
+            overflowY: 'auto',
+            padding: '24px',
+            borderLeft: '1px solid #24221F',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <SlidersHorizontal size={16} style={{ color: '#C9A876' }} />
+                <h3 style={{ fontSize: '14px', color: '#F2EFEA', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                  Filter ({activeCategory})
+                </h3>
+              </div>
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                style={{ color: '#A6A095', padding: '6px', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <FilterSidebar
+              activeCategory={activeCategory}
+              activeTexture={activeTexture}
+              activeLength={activeLength}
+              activeType={activeType}
+              activeColor={activeColor}
+              activeProductType={activeProductType}
+              localMaxPrice={localMaxPrice}
+              setLocalMaxPrice={setLocalMaxPrice}
+              handlePriceApply={() => {
+                handlePriceApply();
+                setMobileFilterOpen(false);
+              }}
+              updateParam={(key, val) => {
+                updateParam(key, val);
+                setMobileFilterOpen(false);
+              }}
+              clearAllFilters={() => {
+                clearAllFilters();
+                setMobileFilterOpen(false);
+              }}
+              hasActiveFilters={hasActiveFilters}
+            />
+          </div>
+        </div>
+      )}
+
       <style>{`
         @media (max-width: 900px) {
           .catalog-layout {
@@ -320,6 +387,9 @@ export default function CatalogPage() {
           }
           .catalog-sidebar {
             display: none !important;
+          }
+          .mobile-filter-btn {
+            display: inline-flex !important;
           }
         }
       `}</style>

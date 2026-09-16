@@ -13,6 +13,10 @@ router.get('/', async (req, res, next) => {
     const {
       category,
       texture,
+      length,
+      type,
+      color,
+      productType,
       minPrice,
       maxPrice,
       search,
@@ -21,33 +25,74 @@ router.get('/', async (req, res, next) => {
       limit = 20
     } = req.query;
 
-    const query = {};
+    const conditions = [];
 
     // Filter by category (wigs, attachments, hair-care)
     if (category && category !== 'all') {
-      query.category = category;
+      conditions.push({ category });
     }
 
-    // Filter by hair texture
+    // Filter by hair texture (Wigs)
     if (texture && texture !== 'all') {
-      query['specifications.texture'] = texture;
+      conditions.push({ 'specifications.texture': texture });
+    }
+
+    // Filter by hair length (Wigs)
+    if (length && length !== 'all') {
+      conditions.push({ 'variants.length': { $regex: length, $options: 'i' } });
+    }
+
+    // Filter by type (Attachments: Clip-In, Tape-In, Ponytail)
+    const attachmentType = type || req.query.attachmentType;
+    if (attachmentType && attachmentType !== 'all') {
+      const cleanType = attachmentType.replace('-', '[- ]?');
+      conditions.push({
+        $or: [
+          { name: { $regex: cleanType, $options: 'i' } },
+          { tags: { $in: [new RegExp(cleanType, 'i')] } },
+          { description: { $regex: cleanType, $options: 'i' } }
+        ]
+      });
+    }
+
+    // Filter by color (Attachments)
+    if (color && color !== 'all') {
+      conditions.push({ 'variants.color': { $regex: color, $options: 'i' } });
+    }
+
+    // Filter by product type (Hair Care: Oil, Spray, Serum)
+    const careType = productType || (category === 'hair-care' ? type : null);
+    if (careType && careType !== 'all') {
+      conditions.push({
+        $or: [
+          { name: { $regex: careType, $options: 'i' } },
+          { tags: { $in: [new RegExp(careType, 'i')] } },
+          { 'specifications.texture': { $regex: careType, $options: 'i' } },
+          { description: { $regex: careType, $options: 'i' } }
+        ]
+      });
     }
 
     // Filter by price range
     if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
+      const priceFilter = {};
+      if (minPrice) priceFilter.$gte = Number(minPrice);
+      if (maxPrice) priceFilter.$lte = Number(maxPrice);
+      conditions.push({ price: priceFilter });
     }
 
     // Full-text search on name and description
     if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { tags: { $in: [new RegExp(search, 'i')] } }
-      ];
+      conditions.push({
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } },
+          { tags: { $in: [new RegExp(search, 'i')] } }
+        ]
+      });
     }
+
+    const query = conditions.length > 0 ? { $and: conditions } : {};
 
     // Determine sorting logic
     let sortOptions = { createdAt: -1 }; // default newest
