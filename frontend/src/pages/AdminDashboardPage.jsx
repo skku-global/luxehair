@@ -264,7 +264,13 @@ export default function AdminDashboardPage() {
                         </div>
                         <div>
                           <div style={{ fontWeight: 600, color: '#F2EFEA' }}>{p.name}</div>
-                          <div style={{ fontSize: '11px', color: '#8A847A' }}>{p.specifications?.laceType || p.specifications?.hairGrade || ''}</div>
+                          <div style={{ fontSize: '11px', color: '#8A847A' }}>
+                            {p.category === 'wigs'
+                              ? `${p.specifications?.texture || 'Bone Straight'} • ${p.specifications?.laceType || 'HD Swiss Lace'}`
+                              : p.category === 'attachments'
+                              ? `${p.specifications?.attachmentType || 'Clip-In'} • ${p.specifications?.colorTone || p.variants?.[0]?.color || 'Natural Black #1B'}`
+                              : `${p.specifications?.productType || 'Botanical Oil'} • ${p.specifications?.volume || '100ml'}`}
+                          </div>
                         </div>
                       </td>
                       <td style={{ padding: '14px 16px', textTransform: 'capitalize', color: '#C0BAB0' }}>

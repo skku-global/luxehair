@@ -51,17 +51,21 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Description is required']
   },
-  // Hair specific technical specifications
+  // Category-specific technical specifications
   specifications: {
-    hairType: { type: String, default: '100% Unprocessed Raw Human Hair' },
-    origin: { type: String, default: 'Single Donor Southeast Asian' },
-    laceType: { type: String, default: 'Ultra-Thin HD Swiss Lace' },
-    hairGrade: { type: String, default: '14A Double Drawn' },
-    capSize: { type: String, default: 'Medium (22"-22.5") Adjustable' },
-    longevity: { type: String, default: '3 - 5 Years with Proper Care' },
-    texture: { type: String, default: 'Bone Straight' },
-    volume: { type: String, default: '' }, // for serums/care products e.g., '100ml / 3.4 fl oz'
-    keyIngredients: { type: String, default: '' } // for hair care products
+    hairType: { type: String, default: '' },
+    origin: { type: String, default: '' },
+    laceType: { type: String, default: '' },
+    hairGrade: { type: String, default: '' },
+    capSize: { type: String, default: '' },
+    longevity: { type: String, default: '' },
+    texture: { type: String, default: '' }, // For Wigs: Bone Straight, Deep Wave, Body Wave, Blunt Cut Bob, Natural Blowout
+    attachmentType: { type: String, default: '' }, // For Attachments: Clip-In, Tape-In, Ponytail
+    colorTone: { type: String, default: '' }, // For Attachments: Natural Black (#1B), Jet Black (#1), Honey Balayage (#27), Chocolate Brown (#4)
+    productType: { type: String, default: '' }, // For Hair Care: Oil, Spray, Serum
+    volume: { type: String, default: '' }, // e.g., '100ml / 3.4 fl oz'
+    keyIngredients: { type: String, default: '' }, // for hair care formulations
+    applicationMethod: { type: String, default: '' } // for attachments e.g. Silicone Weft, PU Tape, Velcro Wrap
   },
   images: [{
     type: String,

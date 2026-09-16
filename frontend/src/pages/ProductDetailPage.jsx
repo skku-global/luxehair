@@ -249,7 +249,11 @@ export default function ProductDetailPage() {
               <div style={{ marginBottom: '28px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                   <span style={{ fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#A6A095' }}>
-                    Select Specification / Length:
+                    {product.category === 'hair-care'
+                      ? 'Select Volume / Bottle Size:'
+                      : product.category === 'attachments'
+                      ? 'Select Type & Shade:'
+                      : 'Select Length & Density:'}
                   </span>
                   <span style={{ fontSize: '12px', color: '#C9A876', fontWeight: 600 }}>
                     {selectedVariant ? selectedVariant.name : 'Choose variant'}
@@ -473,42 +477,154 @@ export default function ProductDetailPage() {
 
           {/* Tab 1: Specs */}
           {activeTab === 'specs' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
-              <div>
-                <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Donor Origin</div>
-                <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>{product.specifications?.origin || 'Raw Southeast Asian'}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Lace Construction</div>
-                <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>{product.specifications?.laceType || '13x6 HD Swiss Invisible Lace'}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Hair Grade</div>
-                <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>{product.specifications?.hairGrade || '14A Double Drawn (Full Ends)'}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Cap Fit</div>
-                <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>{product.specifications?.capSize || '22.5" Adjustable Grip'}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Lifespan</div>
-                <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>{product.specifications?.longevity || '3 - 5 Years'}</div>
-              </div>
+            <div>
+              {product.category === 'wigs' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Hair Texture</div>
+                    <div style={{ fontSize: '14px', color: '#C9A876', fontWeight: 600 }}>{product.specifications?.texture || 'Bone Straight'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Lace Construction</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>{product.specifications?.laceType || '13x6 HD Swiss Invisible Lace'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Donor Origin</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>{product.specifications?.origin || 'Raw Southeast Asian'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Hair Grade</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>{product.specifications?.hairGrade || '14A Double Drawn (Full Ends)'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Cap Fit</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>{product.specifications?.capSize || '22.5" Adjustable Grip'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Expected Lifespan</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>{product.specifications?.longevity || '3 - 5 Years'}</div>
+                  </div>
+                </div>
+              )}
+
+              {product.category === 'attachments' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Attachment Type</div>
+                    <div style={{ fontSize: '14px', color: '#C9A876', fontWeight: 600 }}>
+                      {product.specifications?.attachmentType || (product.name?.toLowerCase().includes('clip') ? 'Clip-In' : product.name?.toLowerCase().includes('tape') ? 'Tape-In' : 'Ponytail')}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Color Tone / Shade</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>
+                      {product.specifications?.colorTone || selectedVariant?.color || 'Natural Black (#1B)'}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Application Method</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>
+                      {product.specifications?.applicationMethod || product.specifications?.laceType || 'Seamless Silicone Ultra-Flat Weft'}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Hair Material</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>
+                      {product.specifications?.hairType || '100% Raw Virgin Human Hair'}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Set Pieces & Weight</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>
+                      {product.specifications?.capSize || product.specifications?.hairGrade || '160 Grams Total'}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Reusable Lifespan</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>
+                      {product.specifications?.longevity || '18 - 24 Months'}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {product.category === 'hair-care' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Product Type</div>
+                    <div style={{ fontSize: '14px', color: '#C9A876', fontWeight: 600 }}>
+                      {product.specifications?.productType || (product.name?.toLowerCase().includes('oil') ? 'Botanical Hair Oil' : product.name?.toLowerCase().includes('spray') ? 'Hydration & Defense Spray' : 'Repair & Scalp Serum')}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Net Bottle Volume</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>
+                      {product.specifications?.volume || selectedVariant?.density || '100ml / 3.4 fl. oz'}
+                    </div>
+                  </div>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Key Botanical Actives</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>
+                      {product.specifications?.keyIngredients || 'Certified Organic Moroccan Argan Oil, Cold-Pressed Batana, Marula Oil, Camellia Seed Oil, Vitamin E'}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Formulation Standard</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>
+                      {product.specifications?.origin || 'Formulated in France • 100% Sulfate & Paraben Free'}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', marginBottom: '4px' }}>Thermal & UV Shield</div>
+                    <div style={{ fontSize: '14px', color: '#F2EFEA', fontWeight: 500 }}>
+                      {product.specifications?.longevity || 'Protects up to 450°F • Shelf life 24 Months'}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
           {/* Tab 2: Care Guide */}
           {activeTab === 'care' && (
             <div style={{ fontSize: '14px', color: '#C0BAB0', lineHeight: 1.8, maxWidth: '800px' }}>
-              <p style={{ marginBottom: '14px' }}>
-                Because this unit consists of 100% living cuticle hair with zero synthetic filler, it responds exquisitely to high-end salon products:
-              </p>
-              <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <li>Wash bi-weekly with sulfate-free hydrating shampoo and lukewarm water.</li>
-                <li>Apply our signature Moroccan Argan & Marula Elixir from mid-shaft to ends before blow-drying.</li>
-                <li>Safe for thermal flat-ironing and curling up to 450°F. Always use heat defense protection.</li>
-                <li>Store on a satin wig stand or inside the signature breathable {BRAND.name} dust pouch when not in rotation.</li>
-              </ul>
+              {product.category === 'hair-care' ? (
+                <div>
+                  <p style={{ marginBottom: '14px', color: '#F2EFEA', fontWeight: 500 }}>
+                    Atelier Botanical Ritual & Application Directions:
+                  </p>
+                  <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <li><strong>Daily Radiance & Seal:</strong> Dispense 2-3 drops into clean palms, warm between hands, and glide evenly from mid-shaft to hair ends.</li>
+                    <li><strong>Thermal Armor:</strong> Apply sparingly to damp or blow-dried hair before heat styling up to 450°F to prevent moisture evaporation and split ends.</li>
+                    <li><strong>Overnight Restoration:</strong> Massage a generous dropperful directly into biological scalp or unit base before sleep; wash out thoroughly in the morning.</li>
+                    <li><strong>Safe for Units & Extensions:</strong> Formulated with zero mineral oil, zero parabens, and lightweight dry-oil carrier agents that leave zero greasy residue on lace.</li>
+                  </ul>
+                </div>
+              ) : product.category === 'attachments' ? (
+                <div>
+                  <p style={{ marginBottom: '14px', color: '#F2EFEA', fontWeight: 500 }}>
+                    Extension Atelier Care & Longevity Ritual:
+                  </p>
+                  <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <li><strong>Brushing:</strong> Always detangle prior to washing using an extension loop brush, starting gently at the ends and working upwards.</li>
+                    <li><strong>Cleansing:</strong> Submerge pieces gently in lukewarm water with sulfate-free hydrating shampoo. Never rub or bunch wefts together.</li>
+                    <li><strong>Tape-In Maintenance:</strong> Re-tape every 6 to 8 weeks using medical-grade adhesive tabs after removing old residue with alcohol solvent.</li>
+                    <li><strong>Storage:</strong> Store dry pieces inside the {BRAND.name} breathable satin pouch to prevent environmental dust and friction.</li>
+                  </ul>
+                </div>
+              ) : (
+                <div>
+                  <p style={{ marginBottom: '14px' }}>
+                    Because this unit consists of 100% living cuticle hair with zero synthetic filler, it responds exquisitely to high-end salon products:
+                  </p>
+                  <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <li>Wash bi-weekly with sulfate-free hydrating shampoo and lukewarm water.</li>
+                    <li>Apply our signature Moroccan Argan & Marula Elixir from mid-shaft to ends before blow-drying.</li>
+                    <li>Safe for thermal flat-ironing and curling up to 450°F. Always use heat defense protection.</li>
+                    <li>Store on a satin wig stand or inside the signature breathable {BRAND.name} dust pouch when not in rotation.</li>
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 
