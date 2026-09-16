@@ -1,0 +1,339 @@
+/* ==========================================================================
+   LUXE HAIR CO — Bespoke Editorial Luxury Design System
+   Palette:
+     Canvas: Deep Charcoal-Black #0E0D0C
+     Surface Layer 1: #141312
+     Surface Layer 2: #1B1A18
+     Surface Border: #2A2824
+     Accent: Champagne-Gold #C9A876
+     Accent Hover: #DFC598
+     Accent Muted: rgba(201, 168, 118, 0.15)
+     Text Primary: Warm Off-White #F2EFEA
+     Text Secondary: Sand / Ash #A6A095
+     Text Muted: #6E6960
+   ========================================================================== */
+
+:root {
+  --bg-main: #0E0D0C;
+  --bg-surface-1: #141312;
+  --bg-surface-2: #1B1A18;
+  --bg-surface-glass: rgba(20, 19, 18, 0.85);
+  --border-subtle: #24221F;
+  --border-medium: #33302B;
+  --border-gold: rgba(201, 168, 118, 0.35);
+  
+  --gold-primary: #C9A876;
+  --gold-light: #E3CEAB;
+  --gold-hover: #DFC598;
+  --gold-dark: #8F7246;
+  --gold-gradient: linear-gradient(135deg, #C9A876 0%, #E3CEAB 50%, #A8844D 100%);
+  --gold-glow: 0 0 25px rgba(201, 168, 118, 0.18);
+
+  --text-primary: #F2EFEA;
+  --text-secondary: #A6A095;
+  --text-muted: #6E6960;
+  --text-gold: #C9A876;
+
+  --font-serif: 'Cormorant Garamond', 'Cinzel', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+
+  --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* CSS Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Custom Luxury Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0E0D0C;
+}
+::-webkit-scrollbar-thumb {
+  background: #2D2A24;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-primary);
+}
+
+/* Typography Standards */
+h1, h2, h3, h4, .font-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Utility Containers */
+.container {
+  width: 100%;
+  max-width: 1320px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.container-narrow {
+  width: 100%;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* Luxury Buttons */
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--gold-primary);
+  color: #0E0D0C;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-smooth);
+  cursor: pointer;
+  border: 1px solid var(--gold-primary);
+}
+.btn-gold:hover {
+  background: var(--gold-hover);
+  box-shadow: 0 4px 24px rgba(201, 168, 118, 0.3);
+  transform: translateY(-1px);
+}
+.btn-gold:active {
+  transform: translateY(0);
+}
+
+.btn-outline-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: transparent;
+  color: var(--gold-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 13px 26px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-gold);
+  transition: all var(--transition-smooth);
+  cursor: pointer;
+}
+.btn-outline-gold:hover {
+  border-color: var(--gold-primary);
+  background: rgba(201, 168, 118, 0.08);
+  color: var(--gold-light);
+}
+
+.btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 12px 22px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+.btn-dark:hover {
+  background: #242220;
+  border-color: var(--border-medium);
+}
+
+/* Glassmorphism & Cards */
+.card-luxury {
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-smooth), transform var(--transition-smooth);
+}
+.card-luxury:hover {
+  border-color: var(--border-medium);
+}
+
+.glass-panel {
+  background: var(--bg-surface-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Gold Accent Tag / Badge */
+.badge-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(201, 168, 118, 0.12);
+  color: var(--gold-primary);
+  border: 1px solid rgba(201, 168, 118, 0.25);
+}
+
+.badge-dark {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+}
+
+/* Luxury Input Fields */
+.input-luxury {
+  width: 100%;
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+.input-luxury:focus {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 0 1px rgba(201, 168, 118, 0.2);
+}
+.input-luxury::placeholder {
+  color: var(--text-muted);
+}
+
+/* Section Header Typography */
+.section-tag {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.section-title {
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.section-desc {
+  color: var(--text-secondary);
+  font-size: 15px;
+  max-width: 580px;
+  line-height: 1.7;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Responsive Grid Helpers */
+.grid-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 28px;
+}
+
+@media (max-width: 768px) {
+  .grid-products {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-products {
+    grid-template-columns: 1fr;
+  }
+}
