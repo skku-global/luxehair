@@ -323,16 +323,18 @@ img {
 
 /* 1. Trust Badge Row */
 .trust-badge-row {
-  background-color: var(--bg-surface-1);
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
-  padding: 32px 0;
+  background-color: rgba(18, 17, 16, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(201, 168, 118, 0.12);
+  border-bottom: 1px solid rgba(201, 168, 118, 0.12);
+  padding: 38px 0;
 }
 
 .trust-badge-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  gap: 28px;
 }
 
 .trust-badge-item {
@@ -340,14 +342,20 @@ img {
   align-items: center;
   gap: 16px;
   padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  transition: transform var(--transition-smooth);
+}
+
+.trust-badge-item:hover {
+  transform: translateY(-2px);
 }
 
 .trust-badge-icon-box {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: rgba(201, 168, 118, 0.08);
-  border: 1px solid rgba(201, 168, 118, 0.22);
+  border: 1px solid rgba(201, 168, 118, 0.24);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -356,16 +364,16 @@ img {
 }
 
 .trust-badge-item:hover .trust-badge-icon-box {
-  background: rgba(201, 168, 118, 0.16);
+  background: rgba(201, 168, 118, 0.18);
   border-color: var(--gold-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(201, 168, 118, 0.15);
+  box-shadow: 0 4px 18px rgba(201, 168, 118, 0.22);
 }
 
 /* 2. Scrolling Marquee / Ticker */
 .luxury-ticker {
-  background-color: #0E0D0C;
-  border-bottom: 1px solid var(--border-subtle);
+  background-color: #0B0A09;
+  border-top: 1px solid rgba(201, 168, 118, 0.15);
+  border-bottom: 1px solid rgba(201, 168, 118, 0.15);
   padding: 13px 0;
   overflow: hidden;
   position: relative;
@@ -385,7 +393,7 @@ img {
   display: flex;
   align-items: center;
   width: max-content;
-  animation: luxuryTickerScroll 28s linear infinite;
+  animation: luxuryTickerScroll 30s linear infinite;
 }
 
 .luxury-ticker-track:hover {
@@ -395,10 +403,10 @@ img {
 .luxury-ticker-item {
   display: inline-flex;
   align-items: center;
-  gap: 28px;
-  padding: 0 28px;
+  gap: 32px;
+  padding: 0 32px;
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.28em;
   color: var(--gold-primary);
@@ -408,12 +416,12 @@ img {
 .luxury-ticker-divider {
   color: var(--gold-light);
   font-size: 10px;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 /* 3. Category Banner Tiles */
 .category-banner-section {
-  padding: 70px 0 40px;
+  padding: 70px 0 50px;
 }
 
 .category-banner-grid {
@@ -424,22 +432,23 @@ img {
 
 .category-banner-tile {
   position: relative;
-  height: 480px;
+  height: 520px;
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 42px;
+  padding: 44px;
   text-decoration: none;
   background-color: var(--bg-surface-1);
-  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth), transform var(--transition-smooth);
 }
 
 .category-banner-tile:hover {
-  border-color: rgba(201, 168, 118, 0.45);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  border-color: rgba(201, 168, 118, 0.5);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.65);
+  transform: translateY(-2px);
 }
 
 .category-banner-img {
@@ -449,13 +458,13 @@ img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.7s ease;
-  filter: brightness(0.9);
+  transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), filter 0.75s ease;
+  filter: brightness(0.92);
 }
 
 .category-banner-tile:hover .category-banner-img {
-  transform: scale(1.05);
-  filter: brightness(0.96);
+  transform: scale(1.04);
+  filter: brightness(0.98);
 }
 
 .category-banner-overlay {
@@ -464,7 +473,7 @@ img {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to top, rgba(14, 13, 12, 0.92) 0%, rgba(14, 13, 12, 0.45) 45%, rgba(14, 13, 12, 0.1) 100%);
+  background: linear-gradient(to top, rgba(10, 9, 8, 0.92) 0%, rgba(10, 9, 8, 0.45) 45%, rgba(10, 9, 8, 0.05) 100%);
   pointer-events: none;
 }
 
@@ -475,12 +484,12 @@ img {
 
 .category-banner-title {
   font-family: var(--font-serif);
-  font-size: clamp(34px, 3.5vw, 44px);
+  font-size: clamp(40px, 4.2vw, 54px);
   font-weight: 400;
-  line-height: 1.15;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-  letter-spacing: 0.02em;
+  line-height: 1.1;
+  color: #FFFFFF;
+  margin-bottom: 14px;
+  letter-spacing: 0.01em;
 }
 
 .category-banner-link {
@@ -489,16 +498,19 @@ img {
   gap: 8px;
   color: var(--gold-primary);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  transition: gap var(--transition-smooth), color var(--transition-smooth);
+  border-bottom: 1px solid var(--gold-primary);
+  padding-bottom: 3px;
+  transition: all var(--transition-smooth);
 }
 
 .category-banner-tile:hover .category-banner-link {
   gap: 12px;
-  color: var(--gold-hover);
+  color: var(--gold-light);
+  border-color: var(--gold-light);
 }
 
 @media (max-width: 900px) {

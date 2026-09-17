@@ -141,56 +141,56 @@ export default function HomePage() {
           <div className="trust-badge-grid">
             <div className="trust-badge-item">
               <div className="trust-badge-icon-box">
-                <BadgeCheck size={20} style={{ color: 'var(--gold-primary)' }} />
+                <BadgeCheck size={22} style={{ color: 'var(--gold-primary)' }} />
               </div>
               <div>
-                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '2px' }}>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '3px' }}>
                   Original Products
                 </h4>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.4 }}>
-                  100% Raw Virgin Human Hair
+                  100% Certified Raw Virgin Hair
                 </p>
               </div>
             </div>
 
             <div className="trust-badge-item">
               <div className="trust-badge-icon-box">
-                <ShieldCheck size={20} style={{ color: 'var(--gold-primary)' }} />
+                <ShieldCheck size={22} style={{ color: 'var(--gold-primary)' }} />
               </div>
               <div>
-                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '2px' }}>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '3px' }}>
                   Satisfaction Guarantee
                 </h4>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.4 }}>
-                  Certified Donor Authenticity
+                  Concierge Quality & Authenticity
                 </p>
               </div>
             </div>
 
             <div className="trust-badge-item">
               <div className="trust-badge-icon-box">
-                <Sparkles size={20} style={{ color: 'var(--gold-primary)' }} />
+                <Sparkles size={22} style={{ color: 'var(--gold-primary)' }} />
               </div>
               <div>
-                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '2px' }}>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '3px' }}>
                   New Arrivals Weekly
                 </h4>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.4 }}>
-                  Bespoke Drops & Restocks
+                  Bespoke Haute Drops & Restocks
                 </p>
               </div>
             </div>
 
             <div className="trust-badge-item">
               <div className="trust-badge-icon-box">
-                <Truck size={20} style={{ color: 'var(--gold-primary)' }} />
+                <Truck size={22} style={{ color: 'var(--gold-primary)' }} />
               </div>
               <div>
-                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '2px' }}>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '3px' }}>
                   Free Delivery
                 </h4>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.4 }}>
-                  On Premium Orders Nationwide
+                  Complimentary Shipping on Luxury Orders
                 </p>
               </div>
             </div>
@@ -226,7 +226,7 @@ export default function HomePage() {
               className="category-banner-tile"
             >
               <img
-                src="/images/products/wig-bone-straight-1.jpg"
+                src="/images/banners/banner-wigs.jpg"
                 alt="Wigs Collection"
                 className="category-banner-img"
                 onError={(e) => {
@@ -240,7 +240,7 @@ export default function HomePage() {
                 </h3>
                 <span className="category-banner-link">
                   <span>Shop Now</span>
-                  <ArrowRight size={15} />
+                  <ArrowRight size={14} />
                 </span>
               </div>
             </Link>
@@ -251,7 +251,7 @@ export default function HomePage() {
               className="category-banner-tile"
             >
               <img
-                src="/images/products/attachment-clipin-1.jpg"
+                src="/images/banners/banner-attachments.jpg"
                 alt="Attachments Collection"
                 className="category-banner-img"
                 onError={(e) => {
@@ -265,7 +265,7 @@ export default function HomePage() {
                 </h3>
                 <span className="category-banner-link">
                   <span>Shop Now</span>
-                  <ArrowRight size={15} />
+                  <ArrowRight size={14} />
                 </span>
               </div>
             </Link>
