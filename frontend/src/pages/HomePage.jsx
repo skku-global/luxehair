@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, ShieldCheck, Gem, Compass, ChevronRight } from 'lucide-react';
+import { ArrowRight, Sparkles, ShieldCheck, Gem, Compass, ChevronRight, BadgeCheck, Truck } from 'lucide-react';
 import { BRAND, formatPrice } from '../config/brand';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
@@ -135,124 +135,138 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Category Tiles Section (Wigs / Attachments / Hair Products) */}
-      <section style={{ padding: '90px 0 60px' }}>
+      {/* 1. Trust Badge Row */}
+      <section className="trust-badge-row">
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <span className="section-tag">Distinct Categories</span>
-            <h2 className="section-title">The Three Pillars of Haute Hair</h2>
-            <p className="section-desc" style={{ margin: '0 auto' }}>
-              Specialized exclusively in high-grade raw human hair and clinical hair care.
-            </p>
-          </div>
+          <div className="trust-badge-grid">
+            <div className="trust-badge-item">
+              <div className="trust-badge-icon-box">
+                <BadgeCheck size={20} style={{ color: 'var(--gold-primary)' }} />
+              </div>
+              <div>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '2px' }}>
+                  Original Products
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.4 }}>
+                  100% Raw Virgin Human Hair
+                </p>
+              </div>
+            </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '24px'
-          }}>
+            <div className="trust-badge-item">
+              <div className="trust-badge-icon-box">
+                <ShieldCheck size={20} style={{ color: 'var(--gold-primary)' }} />
+              </div>
+              <div>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '2px' }}>
+                  Satisfaction Guarantee
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.4 }}>
+                  Certified Donor Authenticity
+                </p>
+              </div>
+            </div>
+
+            <div className="trust-badge-item">
+              <div className="trust-badge-icon-box">
+                <Sparkles size={20} style={{ color: 'var(--gold-primary)' }} />
+              </div>
+              <div>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '2px' }}>
+                  New Arrivals Weekly
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.4 }}>
+                  Bespoke Drops & Restocks
+                </p>
+              </div>
+            </div>
+
+            <div className="trust-badge-item">
+              <div className="trust-badge-icon-box">
+                <Truck size={20} style={{ color: 'var(--gold-primary)' }} />
+              </div>
+              <div>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '2px' }}>
+                  Free Delivery
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.4 }}>
+                  On Premium Orders Nationwide
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Scrolling Ticker / Marquee */}
+      <div className="luxury-ticker" aria-hidden="true">
+        <div className="luxury-ticker-track">
+          {[...Array(12)].map((_, i) => (
+            <div key={`ticker-1-${i}`} className="luxury-ticker-item">
+              <span>NEW COLLECTION</span>
+              <span className="luxury-ticker-divider">✦</span>
+            </div>
+          ))}
+          {[...Array(12)].map((_, i) => (
+            <div key={`ticker-2-${i}`} className="luxury-ticker-item">
+              <span>NEW COLLECTION</span>
+              <span className="luxury-ticker-divider">✦</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. Category Banner Tiles (Wigs & Attachments) */}
+      <section className="category-banner-section">
+        <div className="container">
+          <div className="category-banner-grid">
             {/* Tile 1: Wigs */}
             <Link
               to="/shop?category=wigs"
-              className="card-luxury"
-              style={{
-                position: 'relative',
-                height: '460px',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
-                padding: '36px',
-                backgroundImage: 'linear-gradient(to top, #0E0D0C 15%, rgba(14,13,12,0.4) 60%, transparent), url("https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=800&auto=format&fit=crop&q=80")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                textDecoration: 'none'
-              }}
+              className="category-banner-tile"
             >
-              <div style={{ position: 'relative', zIndex: 2 }}>
-                <span style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#C9A876', textTransform: 'uppercase' }}>
-                  Atelier Masterpieces
-                </span>
-                <h3 style={{ fontSize: '28px', color: '#F2EFEA', margin: '8px 0 10px' }}>
-                  Raw & Virgin Wigs
+              <img
+                src="/images/products/wig-bone-straight-1.jpg"
+                alt="Wigs Collection"
+                className="category-banner-img"
+                onError={(e) => {
+                  e.target.src = 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=1200&auto=format&fit=crop&q=85';
+                }}
+              />
+              <div className="category-banner-overlay" />
+              <div className="category-banner-content">
+                <h3 className="category-banner-title">
+                  Wigs
                 </h3>
-                <p style={{ fontSize: '13px', color: '#A6A095', lineHeight: 1.6, marginBottom: '18px', maxWidth: '300px' }}>
-                  13x6 HD Lace Frontals, Glueless Bob closures, and 250% density red carpet units.
-                </p>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#C9A876', fontSize: '13px', fontWeight: 600 }}>
-                  <span>Shop Wigs</span>
-                  <ChevronRight size={16} />
-                </div>
+                <span className="category-banner-link">
+                  <span>Shop Now</span>
+                  <ArrowRight size={15} />
+                </span>
               </div>
             </Link>
 
             {/* Tile 2: Attachments */}
             <Link
               to="/shop?category=attachments"
-              className="card-luxury"
-              style={{
-                position: 'relative',
-                height: '460px',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
-                padding: '36px',
-                backgroundImage: 'linear-gradient(to top, #0E0D0C 15%, rgba(14,13,12,0.4) 60%, transparent), url("https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800&auto=format&fit=crop&q=80")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                textDecoration: 'none'
-              }}
+              className="category-banner-tile"
             >
-              <div style={{ position: 'relative', zIndex: 2 }}>
-                <span style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#C9A876', textTransform: 'uppercase' }}>
-                  Volume & Length
-                </span>
-                <h3 style={{ fontSize: '28px', color: '#F2EFEA', margin: '8px 0 10px' }}>
-                  Hair Attachments
+              <img
+                src="/images/products/attachment-clipin-1.jpg"
+                alt="Attachments Collection"
+                className="category-banner-img"
+                onError={(e) => {
+                  e.target.src = 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=1200&auto=format&fit=crop&q=85';
+                }}
+              />
+              <div className="category-banner-overlay" />
+              <div className="category-banner-content">
+                <h3 className="category-banner-title">
+                  Attachments
                 </h3>
-                <p style={{ fontSize: '13px', color: '#A6A095', lineHeight: 1.6, marginBottom: '18px', maxWidth: '300px' }}>
-                  Invisible PU tape-ins, seamless silicone clip-ins, and couture wrap-around ponytails.
-                </p>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#C9A876', fontSize: '13px', fontWeight: 600 }}>
-                  <span>Shop Attachments</span>
-                  <ChevronRight size={16} />
-                </div>
-              </div>
-            </Link>
-
-            {/* Tile 3: Hair Care */}
-            <Link
-              to="/shop?category=hair-care"
-              className="card-luxury"
-              style={{
-                position: 'relative',
-                height: '460px',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
-                padding: '36px',
-                backgroundImage: 'linear-gradient(to top, #0E0D0C 15%, rgba(14,13,12,0.4) 60%, transparent), url("https://images.unsplash.com/photo-1608248597358-1e4277b21e90?w=800&auto=format&fit=crop&q=80")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                textDecoration: 'none'
-              }}
-            >
-              <div style={{ position: 'relative', zIndex: 2 }}>
-                <span style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#C9A876', textTransform: 'uppercase' }}>
-                  Botanical Formulations
+                <span className="category-banner-link">
+                  <span>Shop Now</span>
+                  <ArrowRight size={15} />
                 </span>
-                <h3 style={{ fontSize: '28px', color: '#F2EFEA', margin: '8px 0 10px' }}>
-                  Hair Care & Maintenance
-                </h3>
-                <p style={{ fontSize: '13px', color: '#A6A095', lineHeight: 1.6, marginBottom: '18px', maxWidth: '300px' }}>
-                  Cold-pressed Moroccan Argan oils, HD lace melting mists, and keratin masques.
-                </p>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#C9A876', fontSize: '13px', fontWeight: 600 }}>
-                  <span>Shop Care</span>
-                  <ChevronRight size={16} />
-                </div>
               </div>
             </Link>
           </div>

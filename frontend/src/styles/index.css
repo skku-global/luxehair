@@ -321,6 +321,193 @@ img {
   gap: 28px;
 }
 
+/* 1. Trust Badge Row */
+.trust-badge-row {
+  background-color: var(--bg-surface-1);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 32px 0;
+}
+
+.trust-badge-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.trust-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 12px;
+}
+
+.trust-badge-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(201, 168, 118, 0.08);
+  border: 1px solid rgba(201, 168, 118, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-smooth);
+}
+
+.trust-badge-item:hover .trust-badge-icon-box {
+  background: rgba(201, 168, 118, 0.16);
+  border-color: var(--gold-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(201, 168, 118, 0.15);
+}
+
+/* 2. Scrolling Marquee / Ticker */
+.luxury-ticker {
+  background-color: #0E0D0C;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 13px 0;
+  overflow: hidden;
+  position: relative;
+  white-space: nowrap;
+}
+
+@keyframes luxuryTickerScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.luxury-ticker-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: luxuryTickerScroll 28s linear infinite;
+}
+
+.luxury-ticker-track:hover {
+  animation-play-state: paused;
+}
+
+.luxury-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  padding: 0 28px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+}
+
+.luxury-ticker-divider {
+  color: var(--gold-light);
+  font-size: 10px;
+  opacity: 0.85;
+}
+
+/* 3. Category Banner Tiles */
+.category-banner-section {
+  padding: 70px 0 40px;
+}
+
+.category-banner-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.category-banner-tile {
+  position: relative;
+  height: 480px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 42px;
+  text-decoration: none;
+  background-color: var(--bg-surface-1);
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.category-banner-tile:hover {
+  border-color: rgba(201, 168, 118, 0.45);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+}
+
+.category-banner-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.7s ease;
+  filter: brightness(0.9);
+}
+
+.category-banner-tile:hover .category-banner-img {
+  transform: scale(1.05);
+  filter: brightness(0.96);
+}
+
+.category-banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(14, 13, 12, 0.92) 0%, rgba(14, 13, 12, 0.45) 45%, rgba(14, 13, 12, 0.1) 100%);
+  pointer-events: none;
+}
+
+.category-banner-content {
+  position: relative;
+  z-index: 2;
+}
+
+.category-banner-title {
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 3.5vw, 44px);
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  letter-spacing: 0.02em;
+}
+
+.category-banner-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gold-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: gap var(--transition-smooth), color var(--transition-smooth);
+}
+
+.category-banner-tile:hover .category-banner-link {
+  gap: 12px;
+  color: var(--gold-hover);
+}
+
+@media (max-width: 900px) {
+  .trust-badge-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
 @media (max-width: 768px) {
   .grid-products {
     grid-template-columns: repeat(2, 1fr);
@@ -330,10 +517,23 @@ img {
     padding-left: 16px;
     padding-right: 16px;
   }
+  .category-banner-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .category-banner-tile {
+    height: 380px;
+    padding: 28px;
+  }
 }
 
 @media (max-width: 480px) {
   .grid-products {
     grid-template-columns: 1fr;
   }
+  .trust-badge-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
+
