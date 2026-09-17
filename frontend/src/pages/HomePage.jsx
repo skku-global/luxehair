@@ -37,21 +37,22 @@ export default function HomePage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundImage: 'linear-gradient(to bottom, rgba(14, 13, 12, 0.4), rgba(14, 13, 12, 0.95)), url("https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1600&auto=format&fit=crop&q=85")',
+        backgroundImage: 'linear-gradient(to bottom, rgba(14, 13, 12, 0.45) 0%, rgba(14, 13, 12, 0.25) 35%, rgba(14, 13, 12, 0.65) 80%, #0E0D0C 100%), url("/images/banners/hero-banner.jpg")',
         backgroundSize: 'cover',
-        backgroundPosition: 'center 25%',
+        backgroundPosition: 'center 30%',
+        backgroundRepeat: 'no-repeat',
         borderBottom: '1px solid #1C1B19',
         overflow: 'hidden'
       }}>
         {/* Subtle Ambient Radial Glow */}
         <div style={{
           position: 'absolute',
-          top: '30%',
+          top: '35%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: '600px',
-          height: '600px',
-          background: 'radial-gradient(circle, rgba(201, 168, 118, 0.12) 0%, transparent 70%)',
+          width: '750px',
+          height: '750px',
+          background: 'radial-gradient(circle, rgba(201, 168, 118, 0.10) 0%, transparent 70%)',
           pointerEvents: 'none'
         }} />
 
@@ -60,15 +61,16 @@ export default function HomePage() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            backgroundColor: 'rgba(20, 19, 18, 0.75)',
-            border: '1px solid rgba(201, 168, 118, 0.3)',
-            padding: '6px 16px',
+            backgroundColor: 'rgba(14, 13, 12, 0.75)',
+            border: '1px solid rgba(201, 168, 118, 0.4)',
+            padding: '6px 18px',
             borderRadius: '2px',
             marginBottom: '24px',
-            backdropFilter: 'blur(8px)'
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)'
           }}>
             <Sparkles size={14} style={{ color: '#C9A876' }} />
-            <span style={{ fontSize: '11px', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#E3CEAB' }}>
+            <span style={{ fontSize: '11px', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#E3CEAB', fontWeight: 500 }}>
               The 2026 Haute Coiffure Collection
             </span>
           </div>
@@ -79,10 +81,11 @@ export default function HomePage() {
             fontWeight: 300,
             lineHeight: 1.1,
             letterSpacing: '0.04em',
-            maxWidth: '920px',
+            maxWidth: '960px',
             margin: '0 auto 24px',
             textTransform: 'none',
-            color: '#F9F7F5'
+            color: '#FFFFFF',
+            textShadow: '0 2px 24px rgba(0, 0, 0, 0.85), 0 4px 45px rgba(0, 0, 0, 0.7)'
           }}>
             Single-Donor Raw Virgin Hair & Bespoke HD Masterpieces
           </h1>
@@ -90,11 +93,12 @@ export default function HomePage() {
           <p style={{
             fontFamily: "'Plus Jakarta Sans', sans-serif",
             fontSize: 'clamp(15px, 1.8vw, 18px)',
-            color: '#C0BAB0',
-            maxWidth: '640px',
+            color: '#E0DDD7',
+            maxWidth: '660px',
             margin: '0 auto 36px',
             lineHeight: 1.7,
-            fontWeight: 300
+            fontWeight: 300,
+            textShadow: '0 2px 14px rgba(0, 0, 0, 0.85)'
           }}>
             Unprocessed, 100% cuticle-intact hair sourced directly from single donors. 
             Meticulously crafted for natural movement, longevity, and effortless glamour.
