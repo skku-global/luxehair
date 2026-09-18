@@ -7,6 +7,209 @@ const Order = require('../models/Order');
 const sampleProducts = [
   // --- WIGS ---
   {
+    name: "The Aurora Icy Platinum Deep Wave Frontal Wig",
+    category: "wigs",
+    price: 345000,
+    compareAtPrice: 410000,
+    shortDescription: "Signature icy silver platinum curls with bespoke 13x6 HD Swiss frontal, styled for royal high-fashion glamour.",
+    description: "An awe-inspiring masterpiece of haute coiffure. Crafted from rare single-donor hair, gently lifted to a pristine, incandescent icy platinum silver while maintaining 100% cuticle integrity. Styled into luxurious, cascading ocean-deep curls that catch light from every angle. Melted undetectable onto ultra-thin HD lace and pre-plucked with microscopic bleached knots.",
+    specifications: {
+      hairType: "100% Single Donor Virgin Human Hair",
+      origin: "Northern Slavic / European Raw",
+      laceType: "13x6 Ultra-Thin HD Swiss Lace",
+      hairGrade: "14A Double Drawn",
+      capSize: "Medium (22.5\") with elastic band & combs",
+      longevity: "3 - 5 Years with proper maintenance",
+      texture: "Deep Wave Curly",
+      colorName: "Icy Platinum Silver #60",
+      colorHex: "#E5E7EB",
+      availableColors: [
+        { name: "Platinum Silver #60", hex: "#E5E7EB" },
+        { name: "Smokey Charcoal Grey", hex: "#9CA3AF" }
+      ]
+    },
+    images: [
+      "/images/products/wig-platinum-model.jpg",
+      "/images/products/wig-platinum-bust.jpg",
+      "/images/products/wig-platinum-bust2.jpg",
+      "/images/products/wig-deep-wave-1.jpg"
+    ],
+    variants: [
+      { name: '24" / 200% Density / Icy Platinum #60', length: '24"', density: '200%', color: 'Icy Platinum #60', texture: 'Deep Wave', price: 345000, stock: 8 },
+      { name: '28" / 250% Density / Icy Platinum #60', length: '28"', density: '250%', color: 'Icy Platinum #60', texture: 'Deep Wave', price: 410000, stock: 5 },
+      { name: '26" / 200% Density / Smokey Slate Grey', length: '26"', density: '200%', color: 'Smokey Slate Grey', texture: 'Deep Wave', price: 370000, stock: 4 }
+    ],
+    inStock: true,
+    stockQuantity: 17,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 5.0,
+    reviewsCount: 42,
+    tags: ["platinum", "white hair", "silver curls", "deep wave", "hd lace", "luxury"]
+  },
+  {
+    name: "The Riviera Magenta Rose Silk Straight Wig",
+    category: "wigs",
+    price: 295000,
+    compareAtPrice: 350000,
+    shortDescription: "Vibrant high-fashion ruby magenta silk straight hair crafted from single-donor virgin hair with invisible HD lace.",
+    description: "Turn heads on every red carpet. Dyed in a multi-tonal, jewel-toned ruby magenta rose hue that emits an intoxicating mirror-like glass reflection. Crafted with our signature bone-straight raw donor hair that falls with liquid drape. Includes pre-cut invisible HD Swiss frontal and pre-customized hairline.",
+    specifications: {
+      hairType: "100% Single-Donor Raw Virgin Hair",
+      origin: "Vietnamese Mountain Hair",
+      laceType: "13x4 Melt HD Swiss Frontal",
+      hairGrade: "13A Double Drawn",
+      capSize: "Medium (22.5\") Breathable Silk Cap",
+      longevity: "3+ Years",
+      texture: "Bone Straight",
+      colorName: "Vibrant Ruby Magenta Pink",
+      colorHex: "#BE185D",
+      availableColors: [
+        { name: "Ruby Magenta Pink", hex: "#BE185D" },
+        { name: "Pastel Blush Rose", hex: "#F472B6" }
+      ]
+    },
+    images: [
+      "/images/products/wig-magenta-model.jpg",
+      "/images/products/wig-magenta-bust.jpg",
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&auto=format&fit=crop&q=80",
+      "/images/products/wig-bone-straight-2.jpg"
+    ],
+    variants: [
+      { name: '22" / 200% Density / Ruby Magenta', length: '22"', density: '200%', color: 'Ruby Magenta Pink', texture: 'Bone Straight', price: 295000, stock: 9 },
+      { name: '26" / 250% Density / Ruby Magenta', length: '26"', density: '250%', color: 'Ruby Magenta Pink', texture: 'Bone Straight', price: 360000, stock: 6 },
+      { name: '20" / 180% Density / Pastel Rose', length: '20"', density: '180%', color: 'Pastel Blush Rose', texture: 'Bone Straight', price: 275000, stock: 4 }
+    ],
+    inStock: true,
+    stockQuantity: 19,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 4.9,
+    reviewsCount: 38,
+    tags: ["magenta", "pink hair", "ruby", "bone straight", "hd lace", "runway"]
+  },
+  {
+    name: "The Côte d'Azur Royal Sapphire Blue Wave Wig",
+    category: "wigs",
+    price: 330000,
+    compareAtPrice: 390000,
+    shortDescription: "Opulent midnight sapphire blue body waves with radiant light-reflecting glass shine and pre-plucked HD hairline.",
+    description: "Deep, mysterious, and effortlessly captivating. Sourced from single-donor raw hair and saturated with high-pigment sapphire midnight blue tones with subtle teal undertones that illuminate under ambient lights. Features ultra-soft undulating body wave pattern that retains high bounce.",
+    specifications: {
+      hairType: "100% Raw Virgin Hair",
+      origin: "Burmese Raw Hair",
+      laceType: "13x6 Bespoke HD Swiss Lace",
+      hairGrade: "14A Double Drawn",
+      capSize: "Medium (22.5\") with velvet grip band",
+      longevity: "3 - 5 Years",
+      texture: "Body Wave",
+      colorName: "Royal Sapphire Blue",
+      colorHex: "#1D4ED8",
+      availableColors: [
+        { name: "Royal Sapphire Blue", hex: "#1D4ED8" },
+        { name: "Ocean Cyan Highlights", hex: "#0EA5E9" }
+      ]
+    },
+    images: [
+      "/images/products/wig-sapphire-model.jpg",
+      "/images/products/wig-sapphire-bust.jpg",
+      "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&auto=format&fit=crop&q=80",
+      "/images/products/wig-deep-wave-2.jpg"
+    ],
+    variants: [
+      { name: '24" / 200% Density / Sapphire Blue', length: '24"', density: '200%', color: 'Royal Sapphire Blue', texture: 'Body Wave', price: 330000, stock: 8 },
+      { name: '28" / 250% Density / Sapphire Blue', length: '28"', density: '250%', color: 'Royal Sapphire Blue', texture: 'Body Wave', price: 395000, stock: 5 }
+    ],
+    inStock: true,
+    stockQuantity: 13,
+    isFeatured: true,
+    isBestseller: false,
+    rating: 4.9,
+    reviewsCount: 29,
+    tags: ["sapphire", "blue hair", "body wave", "ocean", "hd lace"]
+  },
+  {
+    name: "The Sovereign Emerald Jewel Body Wave Wig",
+    category: "wigs",
+    price: 320000,
+    compareAtPrice: 380000,
+    shortDescription: "Enchanting deep forest emerald jewel green undulating body waves with luxury couture velvet finish.",
+    description: "An aristocratic shade of jewel green designed for the modern queen. Rich, lustrous forest tones combined with the softest Cambodian raw hair cuticles. The 13x6 HD Swiss frontal melts seamlessly into the hairline, giving the illusion of hair growing directly from the scalp.",
+    specifications: {
+      hairType: "100% Raw Cambodian Hair",
+      origin: "Cambodian Highlands",
+      laceType: "13x6 HD Swiss Frontal",
+      hairGrade: "14A Double Drawn",
+      capSize: "Medium Adjustable Cap",
+      longevity: "3 - 5 Years",
+      texture: "Body Wave",
+      colorName: "Emerald Jewel Green",
+      colorHex: "#047857",
+      availableColors: [
+        { name: "Emerald Forest Green", hex: "#047857" },
+        { name: "Olive Bronze Sheen", hex: "#65A30D" }
+      ]
+    },
+    images: [
+      "/images/products/wig-emerald-model.jpg",
+      "/images/products/wig-emerald-bust.jpg",
+      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80",
+      "/images/products/wig-body-wave-1.jpg"
+    ],
+    variants: [
+      { name: '24" / 200% Density / Emerald Green', length: '24"', density: '200%', color: 'Emerald Jewel Green', texture: 'Body Wave', price: 320000, stock: 7 },
+      { name: '28" / 250% Density / Emerald Green', length: '28"', density: '250%', color: 'Emerald Jewel Green', texture: 'Body Wave', price: 385000, stock: 4 }
+    ],
+    inStock: true,
+    stockQuantity: 11,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 5.0,
+    reviewsCount: 31,
+    tags: ["emerald", "green hair", "jewel tone", "body wave", "cambodian"]
+  },
+  {
+    name: "The Saint-Tropez Honey Lemon Blonde Bob",
+    category: "wigs",
+    price: 185000,
+    compareAtPrice: 220000,
+    shortDescription: "Ultra-sharp 12-inch precision blunt cut in luminous honey lemon platinum blonde #613 with pre-cut glueless HD closure.",
+    description: "The epitome of chic French Riviera elegance. Features a high-gloss 12-inch blunt perimeter cut with 100% virgin cuticle-intact hair pre-bleached to clean #613 honey lemon blonde. Fitted with our glueless dome cap and velvet grip band for effortless, zero-glue 60-second installations.",
+    specifications: {
+      hairType: "100% Virgin Cuticle-Intact Human Hair",
+      origin: "Brazilian Raw Donors",
+      laceType: "5x5 Pre-Cut HD Glueless Closure",
+      hairGrade: "12A Double Drawn",
+      capSize: "Small-Medium with Snug Grip Band",
+      longevity: "2 - 3 Years",
+      texture: "Blunt Cut Bob",
+      colorName: "Honey Lemon Blonde #613",
+      colorHex: "#FACC15",
+      availableColors: [
+        { name: "Honey Lemon #613", hex: "#FACC15" },
+        { name: "Champagne Cream", hex: "#FEF08A" }
+      ]
+    },
+    images: [
+      "/images/products/wig-lemon-model.jpg",
+      "/images/products/wig-lemon-bust.jpg",
+      "https://images.unsplash.com/photo-1595959183082-7b570b7e08cf?w=600&auto=format&fit=crop&q=80",
+      "/images/products/wig-bob-1.jpg"
+    ],
+    variants: [
+      { name: '10" / 180% Density / Honey Lemon #613', length: '10"', density: '180%', color: 'Honey Lemon #613', texture: 'Blunt Bob', price: 175000, stock: 8 },
+      { name: '12" / 200% Density / Honey Lemon #613', length: '12"', density: '200%', color: 'Honey Lemon #613', texture: 'Blunt Bob', price: 185000, stock: 12 },
+      { name: '14" / 200% Density / Honey Lemon #613', length: '14"', density: '200%', color: 'Honey Lemon #613', texture: 'Blunt Bob', price: 205000, stock: 5 }
+    ],
+    inStock: true,
+    stockQuantity: 25,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 4.9,
+    reviewsCount: 26,
+    tags: ["blonde", "lemon", "613 hair", "glueless", "bob", "short hair"]
+  },
+  {
     name: "The Parisian Bone Straight HD Frontal Unit",
     category: "wigs",
     price: 320000,
@@ -20,12 +223,19 @@ const sampleProducts = [
       hairGrade: "14A Double Drawn (Full to the ends)",
       capSize: "Medium (22.5\") with elastic band & combs",
       longevity: "3 - 5 Years with proper maintenance",
-      texture: "Bone Straight"
+      texture: "Bone Straight",
+      colorName: "Natural Jet Black #1B",
+      colorHex: "#18181B",
+      availableColors: [
+        { name: "Natural Black #1B", hex: "#18181B" },
+        { name: "Espresso Brown #2", hex: "#3E2723" }
+      ]
     },
     images: [
       "/images/products/wig-bone-straight-1.jpg",
       "/images/products/wig-bone-straight-2.jpg",
-      "/images/products/wig-bone-straight-3.jpg"
+      "/images/products/wig-bone-straight-3.jpg",
+      "https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=600&auto=format&fit=crop&q=80"
     ],
     variants: [
       { name: '24" / 200% Density / Natural Black #1B', length: '24"', density: '200%', color: 'Natural Black #1B', texture: 'Bone Straight', price: 320000, stock: 12 },
@@ -38,105 +248,7 @@ const sampleProducts = [
     isBestseller: true,
     rating: 5.0,
     reviewsCount: 34,
-    tags: ["bone straight", "hd lace", "raw hair", "vietnamese", "luxury"]
-  },
-  {
-    name: "Monaco Deep Wave Virgin Frontal Wig",
-    category: "wigs",
-    price: 285000,
-    compareAtPrice: 330000,
-    shortDescription: "Voluminous, glistening beach curls with high-definition moisture retention and zero frizz.",
-    description: "Indulge in luscious, hydrated curls that bounce back with water and botanical leave-in. Sourced from Burmese raw donors, these natural deep curls hold high elasticity, zero tangling, and maintain their curl pattern even after repetitive washing. Styled with a transparent 13x4 HD frontal offering versatile parting across the crown.",
-    specifications: {
-      hairType: "100% Unprocessed Raw Burmese Hair",
-      origin: "Burma / Myanmar",
-      laceType: "13x4 Bespoke HD Lace",
-      hairGrade: "13A Double Drawn",
-      capSize: "Medium (22.5\") Breathable Silk Cap",
-      longevity: "3+ Years",
-      texture: "Deep Wave Curly"
-    },
-    images: [
-      "/images/products/wig-deep-wave-1.jpg",
-      "/images/products/wig-deep-wave-2.jpg"
-    ],
-    variants: [
-      { name: '22" / 200% Density / Natural Brown', length: '22"', density: '200%', color: 'Natural Dark Brown', texture: 'Deep Wave', price: 285000, stock: 10 },
-      { name: '26" / 250% Density / Natural Brown', length: '26"', density: '250%', color: 'Natural Dark Brown', texture: 'Deep Wave', price: 340000, stock: 6 },
-      { name: '30" / 250% Density / Natural Brown', length: '30"', density: '250%', color: 'Natural Dark Brown', texture: 'Deep Wave', price: 395000, stock: 4 }
-    ],
-    inStock: true,
-    stockQuantity: 20,
-    isFeatured: true,
-    isBestseller: true,
-    rating: 4.9,
-    reviewsCount: 27,
-    tags: ["deep wave", "curly", "frontal", "burmese", "volume"]
-  },
-  {
-    name: "Milan Luxury Glueless Bob Unit",
-    category: "wigs",
-    price: 165000,
-    compareAtPrice: 195000,
-    shortDescription: "Chic blunt cut 12-inch bob featuring pre-cut HD lace and secure elastic grip for 60-second wear.",
-    description: "The ultimate ready-to-wear luxury investment. Designed for effortless glamour with zero adhesive required. Equipped with our 3D dome cap and velvet adjustable grip band, this blunt-cut bob frames the jawline with razor-sharp precision. 100% virgin human hair that can be straightened or curled in minutes.",
-    specifications: {
-      hairType: "100% Virgin Cuticle-Intact Human Hair",
-      origin: "Brazilian Highlands",
-      laceType: "5x5 Pre-Cut HD Closure (Glueless)",
-      hairGrade: "12A Double Drawn",
-      capSize: "Small-Medium with Snug Grip Band",
-      longevity: "2 - 3 Years",
-      texture: "Blunt Straight Bob"
-    },
-    images: [
-      "/images/products/wig-bob-1.jpg",
-      "/images/products/wig-bob-2.jpg"
-    ],
-    variants: [
-      { name: '10" / 180% Density / Jet Black', length: '10"', density: '180%', color: 'Jet Black #1', texture: 'Blunt Bob', price: 155000, stock: 8 },
-      { name: '12" / 180% Density / Natural Black', length: '12"', density: '180%', color: 'Natural Black #1B', texture: 'Blunt Bob', price: 165000, stock: 14 },
-      { name: '14" / 200% Density / Chocolate Brown #4', length: '14"', density: '200%', color: 'Chocolate Brown #4', texture: 'Blunt Bob', price: 185000, stock: 5 }
-    ],
-    inStock: true,
-    stockQuantity: 27,
-    isFeatured: true,
-    isBestseller: false,
-    rating: 4.8,
-    reviewsCount: 19,
-    tags: ["glueless", "bob", "short hair", "closure", "ready to wear"]
-  },
-  {
-    name: "Silk Velvet Body Wave Lace Masterpiece",
-    category: "wigs",
-    price: 310000,
-    compareAtPrice: 360000,
-    shortDescription: "Cascading S-pattern body waves with royal volume and unmatched movement.",
-    description: "Crafted for red carpet moments and high-society occasions. Our Silk Velvet Body Wave showcases gentle, opulent undulations that catch light from every angle. Made with full cuticles flowing in the same direction to resist all shedding and tangling.",
-    specifications: {
-      hairType: "100% Raw Cambodian Hair",
-      origin: "Cambodia",
-      laceType: "13x6 HD Swiss Frontal",
-      hairGrade: "14A Double Drawn",
-      capSize: "Medium Adjustable Cap",
-      longevity: "3 - 5 Years",
-      texture: "Body Wave"
-    },
-    images: [
-      "/images/products/wig-body-wave-1.jpg",
-      "/images/products/wig-body-wave-2.jpg"
-    ],
-    variants: [
-      { name: '24" / 200% Density / Natural Black', length: '24"', density: '200%', color: 'Natural Black', texture: 'Body Wave', price: 310000, stock: 11 },
-      { name: '28" / 250% Density / Natural Black', length: '28"', density: '250%', color: 'Natural Black', texture: 'Body Wave', price: 375000, stock: 7 }
-    ],
-    inStock: true,
-    stockQuantity: 18,
-    isFeatured: false,
-    isBestseller: true,
-    rating: 4.9,
-    reviewsCount: 22,
-    tags: ["body wave", "cambodian", "hd lace", "luxury"]
+    tags: ["bone straight", "hd lace", "raw hair", "vietnamese", "luxury", "black hair"]
   },
 
   // --- ATTACHMENTS ---
@@ -154,24 +266,33 @@ const sampleProducts = [
       hairGrade: "12A Double Drawn (160 Grams Total)",
       capSize: "7 Multi-Width Pieces (1x 4-clip, 2x 3-clip, 2x 2-clip, 2x 1-clip)",
       longevity: "18 - 24 Months",
-      texture: "Natural Straight / Blowout"
+      texture: "Natural Straight / Blowout",
+      colorName: "Multi-Color Collection",
+      colorHex: "#18181B",
+      availableColors: [
+        { name: "Natural Black #1B", hex: "#18181B" },
+        { name: "Emerald Jewel Green", hex: "#047857" },
+        { name: "Honey Blonde #613", hex: "#FACC15" }
+      ]
     },
     images: [
-      "/images/products/attachment-clipin-1.jpg",
-      "/images/products/attachment-clipin-2.jpg"
+      "/images/products/attachment-clipin-emerald.jpg",
+      "/images/products/attachment-clipin-blonde.jpg",
+      "/images/products/attachment-tapein-natural.jpg",
+      "/images/products/attachment-clipin-texture.jpg"
     ],
     variants: [
       { name: '20" / 160g / Natural Black #1B', length: '20"', density: '160g', color: 'Natural Black #1B', texture: 'Natural Straight', price: 95000, stock: 15 },
-      { name: '24" / 200g / Natural Black #1B', length: '24"', density: '200g', color: 'Natural Black #1B', texture: 'Natural Straight', price: 125000, stock: 12 },
-      { name: '24" / 200g / Honey Blonde Balayage', length: '24"', density: '200g', color: 'Balayage #1B/27', texture: 'Natural Straight', price: 140000, stock: 8 }
+      { name: '24" / 200g / Emerald Green', length: '24"', density: '200g', color: 'Emerald Jewel Green', texture: 'Natural Straight', price: 140000, stock: 8 },
+      { name: '24" / 200g / Honey Blonde #613', length: '24"', density: '200g', color: 'Honey Blonde #613', texture: 'Natural Straight', price: 140000, stock: 10 }
     ],
     inStock: true,
-    stockQuantity: 35,
+    stockQuantity: 33,
     isFeatured: true,
     isBestseller: true,
     rating: 4.9,
     reviewsCount: 42,
-    tags: ["clip-ins", "seamless", "extensions", "natural straight"]
+    tags: ["clip-ins", "seamless", "extensions", "colored", "natural straight"]
   },
   {
     name: "Skin-Weft Invisible Tape-In Extensions",
@@ -187,31 +308,40 @@ const sampleProducts = [
       hairGrade: "13A Double Drawn (40 Sandwiches)",
       capSize: "Universal 4cm x 0.8cm Tabs",
       longevity: "Reusable for up to 2 Years with re-taping",
-      texture: "Silky Straight"
+      texture: "Silky Straight",
+      colorName: "Multi-Color Collection",
+      colorHex: "#18181B",
+      availableColors: [
+        { name: "Natural Black #1B", hex: "#18181B" },
+        { name: "Royal Sapphire Blue", hex: "#1D4ED8" }
+      ]
     },
     images: [
-      "/images/products/attachment-tapein-1.jpg",
-      "/images/products/attachment-tapein-2.jpg"
+      "/images/products/attachment-tapein-natural.jpg",
+      "/images/products/attachment-tapein-sapphire.jpg",
+      "/images/products/attachment-clipin-texture.jpg",
+      "/images/products/attachment-clipin-1.jpg"
     ],
     variants: [
       { name: '22" / 100g (40 pcs) / Natural Black', length: '22"', density: '100g', color: 'Natural Black', texture: 'Straight', price: 140000, stock: 14 },
-      { name: '26" / 120g (40 pcs) / Natural Black', length: '26"', density: '120g', color: 'Natural Black', texture: 'Straight', price: 175000, stock: 10 }
+      { name: '26" / 120g (40 pcs) / Natural Black', length: '26"', density: '120g', color: 'Natural Black', texture: 'Straight', price: 175000, stock: 10 },
+      { name: '22" / 100g (40 pcs) / Sapphire Blue', length: '22"', density: '100g', color: 'Royal Sapphire Blue', texture: 'Straight', price: 165000, stock: 8 }
     ],
     inStock: true,
-    stockQuantity: 24,
-    isFeatured: false,
+    stockQuantity: 32,
+    isFeatured: true,
     isBestseller: true,
     rating: 4.8,
     reviewsCount: 16,
-    tags: ["tape-in", "semi-permanent", "extensions", "luxury"]
+    tags: ["tape-in", "semi-permanent", "extensions", "luxury", "blue hair"]
   },
   {
     name: "The Sovereign Sleek Wrap-Around Ponytail",
     category: "attachments",
     price: 85000,
     compareAtPrice: 105000,
-    shortDescription: "Dramatic runway-length ponytail attachment with hidden comb and velcro wrap lock.",
-    description: "Elevate your everyday high or low ponytail into a dramatic fashion editorial statement. Constructed on an ergonomic curved pocket with an integrated steel comb and matching hair-wrap tail that effortlessly hides all hair bands.",
+    shortDescription: "Dramatic runway-length ponytail attachment with hidden comb and velcro wrap lock. Available in 4 vivid colors.",
+    description: "Elevate your everyday high or low ponytail into a dramatic fashion editorial statement. Constructed on an ergonomic curved pocket with an integrated steel comb and matching hair-wrap tail that effortlessly hides all hair bands. Available in Natural Black, Icy Platinum Silver, Ruby Magenta, and Honey Lemon Blonde.",
     specifications: {
       hairType: "100% Raw Virgin Hair",
       origin: "Burma",
@@ -219,15 +349,28 @@ const sampleProducts = [
       hairGrade: "13A Double Drawn",
       capSize: "One size fits all buns",
       longevity: "2+ Years",
-      texture: "Bone Straight"
+      texture: "Bone Straight",
+      colorName: "Multi-Color Collection",
+      colorHex: "#18181B",
+      availableColors: [
+        { name: "Natural Black #1B", hex: "#18181B" },
+        { name: "Icy Platinum Silver", hex: "#E5E7EB" },
+        { name: "Ruby Magenta Pink", hex: "#BE185D" },
+        { name: "Honey Lemon Blonde", hex: "#FACC15" }
+      ]
     },
     images: [
-      "/images/products/attachment-ponytail-1.jpg",
-      "/images/products/attachment-ponytail-2.jpg"
+      "/images/products/attachment-ponytail-black.jpg",
+      "/images/products/attachment-ponytail-platinum.jpg",
+      "/images/products/attachment-ponytail-magenta.jpg",
+      "/images/products/attachment-ponytail-lemon.jpg"
     ],
     variants: [
       { name: '26" / 150g / Natural Black #1B', length: '26"', density: '150g', color: 'Natural Black #1B', texture: 'Bone Straight', price: 85000, stock: 20 },
-      { name: '30" / 180g / Natural Black #1B', length: '30"', density: '180g', color: 'Natural Black #1B', texture: 'Bone Straight', price: 105000, stock: 12 }
+      { name: '30" / 180g / Natural Black #1B', length: '30"', density: '180g', color: 'Natural Black #1B', texture: 'Bone Straight', price: 105000, stock: 12 },
+      { name: '26" / 150g / Platinum Silver', length: '26"', density: '150g', color: 'Icy Platinum Silver', texture: 'Bone Straight', price: 95000, stock: 8 },
+      { name: '26" / 150g / Ruby Magenta', length: '26"', density: '150g', color: 'Ruby Magenta Pink', texture: 'Bone Straight', price: 95000, stock: 10 },
+      { name: '26" / 150g / Honey Lemon Blonde', length: '26"', density: '150g', color: 'Honey Lemon Blonde', texture: 'Bone Straight', price: 95000, stock: 9 }
     ],
     inStock: true,
     stockQuantity: 32,

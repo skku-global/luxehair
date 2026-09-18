@@ -65,7 +65,13 @@ const productSchema = new mongoose.Schema({
     productType: { type: String, default: '' }, // For Hair Care: Oil, Spray, Serum
     volume: { type: String, default: '' }, // e.g., '100ml / 3.4 fl oz'
     keyIngredients: { type: String, default: '' }, // for hair care formulations
-    applicationMethod: { type: String, default: '' } // for attachments e.g. Silicone Weft, PU Tape, Velcro Wrap
+    applicationMethod: { type: String, default: '' }, // for attachments e.g. Silicone Weft, PU Tape, Velcro Wrap
+    colorName: { type: String, default: 'Natural Black #1B' },
+    colorHex: { type: String, default: '#1A1817' },
+    availableColors: [{
+      name: { type: String, default: '' },
+      hex: { type: String, default: '' }
+    }]
   },
   images: [{
     type: String,

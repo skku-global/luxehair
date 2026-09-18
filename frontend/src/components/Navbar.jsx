@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, User, Search, Menu, X, ShieldCheck, LogOut } from 'lucide-react';
+import { ShoppingBag, User, Search, Menu, X, ShieldCheck, LogOut, Sun, Moon } from 'lucide-react';
 import { BRAND } from '../config/brand';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -15,6 +16,7 @@ export default function Navbar() {
   const { totalItemsCount, setIsCartOpen } = useCart();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { currency, setCurrency, isUsd } = useCurrency();
+  const { theme, setTheme, isDark } = useTheme();
   const navigate = useNavigate();
 
   const handleSearchSubmit = (e) => {
@@ -28,19 +30,20 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Top Announcement & Currency Switcher Bar */}
+      {/* Top Announcement, Currency & Theme Switcher Bar */}
       <div style={{
-        backgroundColor: '#070606',
-        borderBottom: '1px solid #1C1B19',
+        backgroundColor: 'var(--bg-surface-2)',
+        borderBottom: '1px solid var(--border-subtle)',
         fontSize: '11px',
         letterSpacing: '0.08em',
-        color: '#A6A095',
+        color: 'var(--text-secondary)',
         padding: '6px 24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '10px'
+        gap: '12px',
+        transition: 'background-color 0.3s ease, color 0.3s ease'
       }}>
         <div style={{ textTransform: 'uppercase', flex: 1, textAlign: 'center' }}>
           {isUsd ? (
@@ -49,43 +52,108 @@ export default function Navbar() {
             </span>
           ) : (
             <span>
-              Complimentary Lagos Delivery Above ₦250,000 • Privilege Code <strong style={{ color: '#C9A876' }}>LUXE10</strong> for 10% Off
+              Complimentary Lagos Delivery Above ₦250,000 • Privilege Code <strong style={{ color: 'var(--gold-primary)' }}>LUXE10</strong> for 10% Off
             </span>
           )}
         </div>
 
-        {/* Currency Switcher Toggle */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid #2A2824', borderRadius: '2px', backgroundColor: '#141312', overflow: 'hidden' }}>
-          <button
-            type="button"
-            onClick={() => setCurrency('NGN')}
-            style={{
-              padding: '3px 8px',
-              fontSize: '10px',
-              fontWeight: currency === 'NGN' ? 700 : 400,
-              backgroundColor: currency === 'NGN' ? '#C9A876' : 'transparent',
-              color: currency === 'NGN' ? '#0E0D0C' : '#8A847A',
-              cursor: 'pointer',
-              border: 'none'
-            }}
-          >
-            🇳🇬 ₦ NGN
-          </button>
-          <button
-            type="button"
-            onClick={() => setCurrency('USD')}
-            style={{
-              padding: '3px 8px',
-              fontSize: '10px',
-              fontWeight: currency === 'USD' ? 700 : 400,
-              backgroundColor: currency === 'USD' ? '#C9A876' : 'transparent',
-              color: currency === 'USD' ? '#0E0D0C' : '#8A847A',
-              cursor: 'pointer',
-              border: 'none'
-            }}
-          >
-            🌐 $ USD
-          </button>
+        {/* Right Controls: Theme Toggle & Currency Switcher */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
+          {/* Theme Switcher Toggle (Noir / Blanc) */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            border: '1px solid var(--border-medium)',
+            borderRadius: '2px',
+            backgroundColor: 'var(--bg-surface-1)',
+            overflow: 'hidden'
+          }}>
+            <button
+              type="button"
+              onClick={() => setTheme('dark')}
+              title="Noir Luxury Aesthetic"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '3px 8px',
+                fontSize: '10px',
+                fontWeight: isDark ? 700 : 400,
+                backgroundColor: isDark ? 'var(--gold-primary)' : 'transparent',
+                color: isDark ? '#0E0D0C' : 'var(--text-muted)',
+                cursor: 'pointer',
+                border: 'none',
+                transition: 'all 0.2s'
+              }}
+            >
+              <Moon size={11} />
+              <span>Noir</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTheme('light')}
+              title="Clean Parisian White Luxury Aesthetic"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '3px 8px',
+                fontSize: '10px',
+                fontWeight: !isDark ? 700 : 400,
+                backgroundColor: !isDark ? 'var(--gold-primary)' : 'transparent',
+                color: !isDark ? '#0E0D0C' : 'var(--text-muted)',
+                cursor: 'pointer',
+                border: 'none',
+                transition: 'all 0.2s'
+              }}
+            >
+              <Sun size={11} />
+              <span>Blanc</span>
+            </button>
+          </div>
+
+          {/* Currency Switcher Toggle */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            border: '1px solid var(--border-medium)',
+            borderRadius: '2px',
+            backgroundColor: 'var(--bg-surface-1)',
+            overflow: 'hidden'
+          }}>
+            <button
+              type="button"
+              onClick={() => setCurrency('NGN')}
+              style={{
+                padding: '3px 8px',
+                fontSize: '10px',
+                fontWeight: currency === 'NGN' ? 700 : 400,
+                backgroundColor: currency === 'NGN' ? 'var(--gold-primary)' : 'transparent',
+                color: currency === 'NGN' ? '#0E0D0C' : 'var(--text-muted)',
+                cursor: 'pointer',
+                border: 'none',
+                transition: 'all 0.2s'
+              }}
+            >
+              🇳🇬 ₦ NGN
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrency('USD')}
+              style={{
+                padding: '3px 8px',
+                fontSize: '10px',
+                fontWeight: currency === 'USD' ? 700 : 400,
+                backgroundColor: currency === 'USD' ? 'var(--gold-primary)' : 'transparent',
+                color: currency === 'USD' ? '#0E0D0C' : 'var(--text-muted)',
+                cursor: 'pointer',
+                border: 'none',
+                transition: 'all 0.2s'
+              }}
+            >
+              🌐 $ USD
+            </button>
+          </div>
         </div>
       </div>
 
@@ -94,10 +162,11 @@ export default function Navbar() {
         position: 'sticky',
         top: 0,
         zIndex: 40,
-        backgroundColor: 'rgba(14, 13, 12, 0.94)',
+        backgroundColor: 'var(--bg-surface-glass)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid #1C1B19'
+        borderBottom: '1px solid var(--border-subtle)',
+        transition: 'background-color 0.3s ease, border-color 0.3s ease'
       }}>
         <div className="container" style={{
           display: 'flex',
@@ -108,7 +177,7 @@ export default function Navbar() {
           {/* Mobile Menu Trigger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{ display: 'none', color: '#F2EFEA', padding: '6px' }}
+            style={{ display: 'none', color: 'var(--text-primary)', padding: '6px' }}
             className="mobile-toggle-btn"
             aria-label="Toggle navigation menu"
           >
@@ -117,16 +186,16 @@ export default function Navbar() {
 
           {/* Desktop Nav Links (Left) */}
           <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-            <Link to="/shop" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#C0BAB0' }}>
+            <Link to="/shop" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
               The Collection
             </Link>
-            <Link to="/shop?category=wigs" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#C0BAB0' }}>
+            <Link to="/shop?category=wigs" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
               Virgin Wigs
             </Link>
-            <Link to="/shop?category=attachments" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#C0BAB0' }}>
+            <Link to="/shop?category=attachments" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
               Attachments
             </Link>
-            <Link to="/shop?category=hair-care" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#C0BAB0' }}>
+            <Link to="/shop?category=hair-care" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
               Hair Care
             </Link>
           </nav>
@@ -138,20 +207,20 @@ export default function Navbar() {
               fontSize: '22px',
               letterSpacing: '0.22em',
               fontWeight: 600,
-              color: '#F2EFEA',
+              color: 'var(--text-primary)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
               justifyContent: 'center'
             }}>
-              <span style={{ color: '#C9A876', fontSize: '16px' }}>✦</span>
+              <span style={{ color: 'var(--gold-primary)', fontSize: '16px' }}>✦</span>
               <span>{BRAND.name}</span>
-              <span style={{ color: '#C9A876', fontSize: '16px' }}>✦</span>
+              <span style={{ color: 'var(--gold-primary)', fontSize: '16px' }}>✦</span>
             </div>
             <div style={{
               fontSize: '9px',
               letterSpacing: '0.3em',
-              color: '#8F7246',
+              color: 'var(--gold-dark, #8F7246)',
               textTransform: 'uppercase',
               marginTop: '2px'
             }}>
@@ -164,7 +233,7 @@ export default function Navbar() {
             {/* Search Trigger */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              style={{ color: '#C0BAB0', padding: '6px', transition: 'color 0.2s' }}
+              style={{ color: 'var(--text-secondary)', padding: '6px', transition: 'color 0.2s' }}
               title="Search Catalog"
               aria-label="Search"
             >

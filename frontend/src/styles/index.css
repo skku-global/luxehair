@@ -46,6 +46,28 @@
   --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+[data-theme="light"] {
+  --bg-main: #FAF8F5;
+  --bg-surface-1: #FFFFFF;
+  --bg-surface-2: #F2EDE4;
+  --bg-surface-glass: rgba(255, 255, 255, 0.92);
+  --border-subtle: #E8E2D8;
+  --border-medium: #D6CEC2;
+  --border-gold: rgba(184, 142, 76, 0.45);
+  
+  --gold-primary: #B88E4C;
+  --gold-light: #C9A876;
+  --gold-hover: #A07838;
+  --gold-dark: #7A5B26;
+  --gold-gradient: linear-gradient(135deg, #B88E4C 0%, #D8BE8E 50%, #946E33 100%);
+  --gold-glow: 0 4px 20px rgba(184, 142, 76, 0.18);
+
+  --text-primary: #181716;
+  --text-secondary: #5C564E;
+  --text-muted: #8A8275;
+  --text-gold: #9C7738;
+}
+
 /* CSS Reset & Base */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -58,6 +80,10 @@ html {
   color-scheme: dark;
 }
 
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
 body {
   background-color: var(--bg-main);
   color: var(--text-primary);
@@ -68,6 +94,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   min-height: 100vh;
+  transition: background-color var(--transition-smooth), color var(--transition-smooth);
 }
 
 /* Custom Luxury Scrollbars */

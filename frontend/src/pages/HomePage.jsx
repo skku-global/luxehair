@@ -29,7 +29,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div style={{ backgroundColor: '#0E0D0C', color: '#F2EFEA' }}>
+    <div style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-primary)', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
       {/* Editorial Luxury Hero Section */}
       <section style={{
         position: 'relative',
@@ -314,9 +314,10 @@ export default function HomePage() {
       {/* Editorial Luxury Feature: The Raw Hair Standard */}
       <section style={{
         padding: '90px 0',
-        backgroundColor: '#121110',
-        borderTop: '1px solid #1C1B19',
-        borderBottom: '1px solid #1C1B19'
+        backgroundColor: 'var(--bg-surface-2)',
+        borderTop: '1px solid var(--border-subtle)',
+        borderBottom: '1px solid var(--border-subtle)',
+        transition: 'background-color 0.3s ease, border-color 0.3s ease'
       }}>
         <div className="container">
           <div style={{

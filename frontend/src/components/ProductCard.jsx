@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Star, Eye } from 'lucide-react';
+import { ShoppingBag, Star, Eye, Sparkles } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
 
 export default function ProductCard({ product }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { addToCart } = useCart();
   const { format } = useCurrency();
 
@@ -16,11 +17,18 @@ export default function ProductCard({ product }) {
   const primaryImage = product.images?.[0] || '/images/products/placeholder-hair.jpg';
   const secondaryImage = product.images?.[1] || primaryImage;
 
+  const hasMannequinView = product.images && product.images.length > 1;
+  const displayImage = isHovered && hasMannequinView ? secondaryImage : primaryImage;
+
   const handleQuickAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
     addToCart(product, defaultVariant, 1);
   };
+
+  const availableColors = product.specifications?.availableColors || (
+    product.specifications?.colorHex ? [{ name: product.specifications.colorName, hex: product.specifications.colorHex }] : []
+  );
 
   return (
     <div
@@ -32,8 +40,10 @@ export default function ProductCard({ product }) {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        backgroundColor: '#121110',
-        transition: 'transform 0.3s ease, border-color 0.3s ease'
+        backgroundColor: 'var(--bg-surface-1)',
+        border: '1px solid var(--border-subtle)',
+        borderRadius: '3px',
+        transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease'
       }}
     >
       {/* Product Image Frame */}
@@ -42,14 +52,14 @@ export default function ProductCard({ product }) {
         style={{
           position: 'relative',
           width: '100%',
-          paddingTop: '125%', // 4:5 editorial portrait ratio
-          backgroundColor: '#161514',
+          paddingTop: '128%', // 4:5 editorial portrait ratio
+          backgroundColor: 'var(--bg-surface-2)',
           overflow: 'hidden',
           display: 'block'
         }}
       >
         <img
-          src={isHovered ? secondaryImage : primaryImage}
+          src={displayImage}
           alt={product.name}
           style={{
             position: 'absolute',
@@ -58,13 +68,39 @@ export default function ProductCard({ product }) {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease',
-            transform: isHovered ? 'scale(1.06)' : 'scale(1)'
+            transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease',
+            transform: isHovered ? 'scale(1.04)' : 'scale(1)'
           }}
           onError={(e) => {
             e.target.src = 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&auto=format&fit=crop&q=80';
           }}
         />
+
+        {/* View Mode Indicator Badge */}
+        {hasMannequinView && (
+          <div style={{
+            position: 'absolute',
+            bottom: isHovered ? '56px' : '10px',
+            left: '10px',
+            zIndex: 2,
+            backgroundColor: 'rgba(14, 13, 12, 0.78)',
+            border: '1px solid var(--border-gold)',
+            color: '#F2EFEA',
+            fontSize: '9px',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            padding: '3px 8px',
+            borderRadius: '2px',
+            backdropFilter: 'blur(6px)',
+            transition: 'bottom 0.3s ease, opacity 0.3s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
+            <Sparkles size={10} style={{ color: 'var(--gold-primary)' }} />
+            <span>{isHovered ? 'Mannequin Atelier Display' : 'Model Wear'}</span>
+          </div>
+        )}
 
         {/* Badges */}
         <div style={{
@@ -102,7 +138,7 @@ export default function ProductCard({ product }) {
           bottom: 0,
           left: 0,
           right: 0,
-          padding: '12px',
+          padding: '10px 12px',
           background: 'linear-gradient(to top, rgba(14, 13, 12, 0.95), transparent)',
           transform: isHovered ? 'translateY(0)' : 'translateY(100%)',
           transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -113,12 +149,12 @@ export default function ProductCard({ product }) {
             className="btn-gold"
             style={{
               width: '100%',
-              padding: '10px 16px',
+              padding: '9px 14px',
               fontSize: '11px',
               letterSpacing: '0.12em'
             }}
           >
-            <ShoppingBag size={14} />
+            <ShoppingBag size={13} />
             <span>Quick Add to Bag</span>
           </button>
         </div>
@@ -126,14 +162,15 @@ export default function ProductCard({ product }) {
 
       {/* Product Details Section */}
       <div style={{
-        padding: '18px 16px 20px',
+        padding: '16px 14px 18px',
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        backgroundColor: 'var(--bg-surface-1)'
       }}>
         <div>
-          {/* Category & Rating */}
+          {/* Category & Color Swatches Row */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -141,30 +178,45 @@ export default function ProductCard({ product }) {
             marginBottom: '6px'
           }}>
             <span style={{
-              fontSize: '11px',
-              color: '#C9A876',
+              fontSize: '10px',
+              color: 'var(--gold-primary)',
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
+              letterSpacing: '0.12em',
               fontWeight: 600
             }}>
               {product.category}
             </span>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#A6A095' }}>
-              <Star size={12} fill="#C9A876" stroke="#C9A876" />
-              <span>{product.rating || 4.9}</span>
-              <span style={{ color: '#6E6960' }}>({product.reviewsCount || 12})</span>
-            </div>
+            {/* Color Swatch Dots */}
+            {availableColors.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                {availableColors.map((col, idx) => (
+                  <span
+                    key={idx}
+                    title={col.name}
+                    style={{
+                      width: '11px',
+                      height: '11px',
+                      borderRadius: '50%',
+                      backgroundColor: col.hex || '#18181B',
+                      border: '1px solid var(--border-medium)',
+                      display: 'inline-block',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Title */}
           <Link to={`/product/${product.slug || product._id}`}>
             <h3 style={{
               fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: '18px',
+              fontSize: '17px',
               fontWeight: 500,
               lineHeight: 1.3,
-              color: '#F2EFEA',
+              color: 'var(--text-primary)',
               marginBottom: '6px',
               transition: 'color 0.2s'
             }}>
@@ -172,12 +224,19 @@ export default function ProductCard({ product }) {
             </h3>
           </Link>
 
-          {/* Hair specs bullet */}
-          {product.specifications?.laceType && (
-            <p style={{ fontSize: '12px', color: '#8A847A', marginBottom: '10px' }}>
-              {product.specifications.laceType} • {product.specifications.origin || 'Raw Hair'}
-            </p>
-          )}
+          {/* Color & Hair Specs bullet */}
+          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+            {product.specifications?.colorName && (
+              <span style={{ color: 'var(--text-muted)' }}>
+                {product.specifications.colorName}
+              </span>
+            )}
+            {product.specifications?.texture && (
+              <span style={{ color: 'var(--text-muted)' }}>
+                • {product.specifications.texture}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Price & Action */}
@@ -185,22 +244,22 @@ export default function ProductCard({ product }) {
           display: 'flex',
           alignItems: 'baseline',
           justifyContent: 'space-between',
-          marginTop: '12px',
-          borderTop: '1px solid #1C1B19',
-          paddingTop: '12px'
+          marginTop: '10px',
+          borderTop: '1px solid var(--border-subtle)',
+          paddingTop: '10px'
         }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
             <span style={{
-              fontSize: '16px',
+              fontSize: '15px',
               fontWeight: 600,
-              color: '#C9A876'
+              color: 'var(--gold-primary)'
             }}>
               {format(displayPrice)}
             </span>
             {product.compareAtPrice > displayPrice && (
               <span style={{
-                fontSize: '13px',
-                color: '#6E6960',
+                fontSize: '12px',
+                color: 'var(--text-muted)',
                 textDecoration: 'line-through'
               }}>
                 {format(product.compareAtPrice)}
@@ -211,11 +270,12 @@ export default function ProductCard({ product }) {
           <Link
             to={`/product/${product.slug || product._id}`}
             style={{
-              fontSize: '12px',
-              color: '#A6A095',
+              fontSize: '11px',
+              color: 'var(--text-secondary)',
               display: 'flex',
               alignItems: 'center',
-              gap: '4px'
+              gap: '4px',
+              letterSpacing: '0.04em'
             }}
           >
             <span>Details</span>
@@ -226,3 +286,4 @@ export default function ProductCard({ product }) {
     </div>
   );
 }
+

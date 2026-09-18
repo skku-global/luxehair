@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import { CartProvider } from './context/CartContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
@@ -21,12 +22,13 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 export default function App() {
   return (
     <Router>
-      <CurrencyProvider>
-        <AuthProvider>
-          <CartProvider>
-            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#0E0D0C' }}>
-              <Navbar />
-              <CartDrawer />
+      <ThemeProvider>
+        <CurrencyProvider>
+          <AuthProvider>
+            <CartProvider>
+              <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg-primary, #0E0D0C)', color: 'var(--text-primary, #F2EFEA)', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
+                <Navbar />
+                <CartDrawer />
 
             <main style={{ flex: 1 }}>
               <Routes>
@@ -54,6 +56,7 @@ export default function App() {
         </CartProvider>
       </AuthProvider>
       </CurrencyProvider>
+      </ThemeProvider>
     </Router>
   );
 }

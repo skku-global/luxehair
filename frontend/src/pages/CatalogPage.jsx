@@ -119,31 +119,29 @@ export default function CatalogPage() {
   };
 
   return (
-    <div style={{ backgroundColor: '#0E0D0C', minHeight: '100vh', padding: '40px 0 80px' }}>
+    <div style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-primary)', minHeight: '100vh', padding: '40px 0 80px', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
       <div className="container">
-        {/* Header Breadcrumb & Title */}
-        <div style={{ marginBottom: '36px', textAlign: 'center' }}>
-          <span className="section-tag">
-            {activeCategory === 'all' ? 'Signature Catalog' : `Category / ${activeCategory}`}
-          </span>
+        {/* Header Title Section */}
+        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+          <span className="section-tag" style={{ color: 'var(--gold-primary)' }}>Haute Coiffure Catalog</span>
           <h1 style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
             fontSize: 'clamp(32px, 4vw, 48px)',
             fontWeight: 300,
-            color: '#F2EFEA',
+            color: 'var(--text-primary)',
             marginBottom: '10px'
           }}>
             {categoryTitles[activeCategory] || 'Haute Coiffure'}
           </h1>
-          <p style={{ color: '#A6A095', fontSize: '14px', maxWidth: '600px', margin: '0 auto' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', maxWidth: '600px', margin: '0 auto' }}>
             Browse our hand-crafted selection of 100% single-donor raw hair, bespoke lace closures, and French botanical elixirs.
           </p>
 
           {searchQuery && (
-            <div style={{ marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(201,168,118,0.1)', padding: '6px 14px', borderRadius: '2px', border: '1px solid rgba(201,168,118,0.2)' }}>
-              <span style={{ fontSize: '12px', color: '#A6A095' }}>Searching for:</span>
-              <strong style={{ fontSize: '13px', color: '#C9A876' }}>"{searchQuery}"</strong>
-              <button onClick={() => updateParam('search', '')} style={{ color: '#E06C75', marginLeft: '6px', fontSize: '12px' }}>✕</button>
+            <div style={{ marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(201,168,118,0.1)', padding: '6px 14px', borderRadius: '2px', border: '1px solid var(--border-gold)' }}>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Searching for:</span>
+              <strong style={{ fontSize: '13px', color: 'var(--gold-primary)' }}>"{searchQuery}"</strong>
+              <button onClick={() => updateParam('search', '')} style={{ color: '#E06C75', marginLeft: '6px', fontSize: '12px', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
             </div>
           )}
         </div>
@@ -156,7 +154,7 @@ export default function CatalogPage() {
           justifyContent: 'center',
           gap: '12px',
           marginBottom: '40px',
-          borderBottom: '1px solid #1C1B19',
+          borderBottom: '1px solid var(--border-subtle)',
           paddingBottom: '24px'
         }}>
           {[
@@ -169,9 +167,9 @@ export default function CatalogPage() {
               key={cat.id}
               onClick={() => handleCategoryChange(cat.id)}
               style={{
-                backgroundColor: activeCategory === cat.id ? '#C9A876' : '#141312',
-                color: activeCategory === cat.id ? '#0E0D0C' : '#C0BAB0',
-                border: activeCategory === cat.id ? '1px solid #C9A876' : '1px solid #24221F',
+                backgroundColor: activeCategory === cat.id ? 'var(--gold-primary)' : 'var(--bg-surface-1)',
+                color: activeCategory === cat.id ? '#0E0D0C' : 'var(--text-secondary)',
+                border: activeCategory === cat.id ? '1px solid var(--gold-primary)' : '1px solid var(--border-subtle)',
                 padding: '10px 22px',
                 fontSize: '13px',
                 fontWeight: activeCategory === cat.id ? 600 : 400,

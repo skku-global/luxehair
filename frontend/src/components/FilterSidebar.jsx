@@ -34,11 +34,12 @@ export default function FilterSidebar({
   return (
     <aside
       style={{
-        backgroundColor: '#121110',
-        border: '1px solid #24221F',
+        backgroundColor: 'var(--bg-surface-1)',
+        border: '1px solid var(--border-subtle)',
         padding: '24px',
         borderRadius: '4px',
-        height: 'fit-content'
+        height: 'fit-content',
+        transition: 'background-color 0.3s ease, border-color 0.3s ease'
       }}
       className="catalog-sidebar"
     >
@@ -49,11 +50,11 @@ export default function FilterSidebar({
         justifyContent: 'space-between',
         marginBottom: '20px',
         paddingBottom: '12px',
-        borderBottom: '1px solid #1C1B19'
+        borderBottom: '1px solid var(--border-subtle)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <SlidersHorizontal size={16} style={{ color: '#C9A876' }} />
-          <h3 style={{ fontSize: '13px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#F2EFEA', fontWeight: 600 }}>
+          <SlidersHorizontal size={16} style={{ color: 'var(--gold-primary)' }} />
+          <h3 style={{ fontSize: '13px', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-primary)', fontWeight: 600 }}>
             Refine Selection
           </h3>
         </div>
@@ -65,7 +66,7 @@ export default function FilterSidebar({
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
-              color: '#C9A876',
+              color: 'var(--gold-primary)',
               fontSize: '11px',
               backgroundColor: 'transparent',
               border: 'none',
@@ -85,17 +86,17 @@ export default function FilterSidebar({
       <div style={{
         marginBottom: '24px',
         padding: '8px 12px',
-        backgroundColor: '#181716',
+        backgroundColor: 'var(--bg-surface-2)',
         borderRadius: '2px',
-        border: '1px solid #24221F',
+        border: '1px solid var(--border-subtle)',
         fontSize: '11px',
-        color: '#A6A095',
+        color: 'var(--text-secondary)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
         <span>Active Category:</span>
-        <strong style={{ color: '#C9A876', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+        <strong style={{ color: 'var(--gold-primary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
           {activeCategory === 'wigs' ? 'Raw Wigs' : activeCategory === 'attachments' ? 'Attachments' : activeCategory === 'hair-care' ? 'Hair Care' : 'All Categories'}
         </strong>
       </div>
