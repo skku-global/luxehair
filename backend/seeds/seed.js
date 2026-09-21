@@ -1111,9 +1111,39 @@ async function runSeed() {
     console.log(`[Seed] ✅ Customer created: customer@luxehair.com / customer123`);
 
     console.log(`[Seed] Seeding ${sampleProducts.length} curated luxury hair products...`);
-    // Pre-assign slugs since insertMany bypasses Mongoose pre-save hook
+    const defaultReviews = [
+      {
+        name: 'Chioma Adeleke',
+        rating: 5,
+        title: 'Absolute Perfection — The HD Lace Melts Seamlessly',
+        comment: 'The hair quality exceeded all my expectations. The lace literally dissolved against my scalp with zero bleaching required. Hair remains silky and bouncy even after multiple washes.',
+        verifiedPurchase: true,
+        createdAt: new Date(Date.now() - 3 * 86400000)
+      },
+      {
+        name: 'Zainab Balogun',
+        rating: 5,
+        title: 'Luxury in a Box — Worth Every Kobo',
+        comment: 'Packaged like high jewelry! The texture is full from root to tip with zero shedding. I received compliments everywhere.',
+        verifiedPurchase: true,
+        createdAt: new Date(Date.now() - 7 * 86400000)
+      },
+      {
+        name: 'Amara Nwosu',
+        rating: 5,
+        title: 'Silky, Tangle-Free and Lightweight',
+        comment: 'I wore this unit to an evening gala. Heat styling held the curl pattern all night. 10/10 craftsmanship.',
+        verifiedPurchase: true,
+        createdAt: new Date(Date.now() - 12 * 86400000)
+      }
+    ];
+
+    // Pre-assign slugs and reviews since insertMany bypasses Mongoose pre-save hook
     sampleProducts.forEach(p => {
       p.slug = p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      p.reviews = defaultReviews;
+      p.rating = 5.0;
+      p.reviewsCount = defaultReviews.length;
     });
     const createdProducts = await Product.insertMany(sampleProducts);
     console.log(`[Seed] ✅ Successfully seeded ${createdProducts.length} luxury products!`);

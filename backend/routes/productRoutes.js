@@ -295,4 +295,95 @@ router.delete('/:id', protect, requireAdmin, async (req, res, next) => {
   }
 });
 
+/**
+ * @route   GET /api/products/:id/reviews
+ * @desc    Get all reviews for a product
+ * @access  Public
+ */
+router.get('/:id/reviews', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const isObjectId = id.match(/^[0-9a-fA-F]{24}$/);
+    const product = isObjectId
+      ? await Product.findById(id).select('reviews rating reviewsCount name')
+      : await Product.findOne({ slug: id }).select('reviews rating reviewsCount name');
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found.' });
+    }
+
+    res.json({
+      success: true,
+      reviews: product.reviews || [],
+      rating: product.rating,
+      reviewsCount: product.reviewsCount
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * @route   POST /api/products/:id/reviews
+ * @desc    Submit a verified customer review
+ * @access  Public
+ */
+router.post('/:id/reviews', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, email, rating, title, comment, verifiedPurchase } = req.body;
+
+    if (!name || !rating || !comment) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name, star rating (1-5), and review feedback are required.'
+      });
+    }
+
+    const isObjectId = id.match(/^[0-9a-fA-F]{24}$/);
+    const product = isObjectId
+      ? await Product.findById(id)
+      : await Product.findOne({ slug: id });
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found.' });
+    }
+
+    const numRating = Math.min(5, Math.max(1, Number(rating)));
+
+    const newReview = {
+      name,
+      email: email || '',
+      rating: numRating,
+      title: title || '',
+      comment,
+      verifiedPurchase: verifiedPurchase !== undefined ? Boolean(verifiedPurchase) : true,
+      createdAt: new Date()
+    };
+
+    if (!product.reviews) {
+      product.reviews = [];
+    }
+
+    product.reviews.unshift(newReview);
+
+    // Recalculate average rating & reviewsCount
+    const totalScore = product.reviews.reduce((sum, r) => sum + r.rating, 0);
+    product.rating = Number((totalScore / product.reviews.length).toFixed(1));
+    product.reviewsCount = product.reviews.length;
+
+    await product.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Thank you! Your atelier review has been published.',
+      review: newReview,
+      rating: product.rating,
+      reviewsCount: product.reviewsCount
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;

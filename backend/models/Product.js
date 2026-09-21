@@ -17,6 +17,21 @@ const variantSchema = new mongoose.Schema({
   sku: { type: String, default: '' }
 }, { _id: true });
 
+const reviewSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  name: { type: String, required: true },
+  email: { type: String, default: '' },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  title: { type: String, default: '' },
+  comment: { type: String, required: true },
+  verifiedPurchase: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now }
+}, { _id: true });
+
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -104,6 +119,7 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 18
   },
+  reviews: [reviewSchema],
   tags: [String]
 }, { timestamps: true });
 

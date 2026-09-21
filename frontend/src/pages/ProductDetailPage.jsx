@@ -31,6 +31,39 @@ export default function ProductDetailPage() {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
+  // Reviews State
+  const [reviews, setReviews] = useState([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [newReview, setNewReview] = useState({ name: '', email: '', rating: 5, title: '', comment: '' });
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewSuccessMsg, setReviewSuccessMsg] = useState('');
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!newReview.name || !newReview.comment) return;
+    setSubmittingReview(true);
+    try {
+      const res = await api.addProductReview(product._id, {
+        ...newReview,
+        verifiedPurchase: true
+      });
+      if (res.success) {
+        setReviews([res.review, ...reviews]);
+        if (product) {
+          setProduct({ ...product, rating: res.rating, reviewsCount: res.reviewsCount });
+        }
+        setReviewSuccessMsg("Thank you! Your verified atelier review has been published.");
+        setNewReview({ name: '', email: '', rating: 5, title: '', comment: '' });
+        setShowReviewForm(false);
+        setTimeout(() => setReviewSuccessMsg(''), 4000);
+      }
+    } catch (err) {
+      alert(err.message || "Failed to submit review");
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
@@ -39,6 +72,7 @@ export default function ProductDetailPage() {
         const res = await api.getProductByIdOrSlug(id);
         if (res.success && res.product) {
           setProduct(res.product);
+          setReviews(res.product.reviews || []);
           setRelated(res.related || []);
           setActiveImageIndex(0);
           setSelectedVariant(res.product.variants?.length > 0 ? res.product.variants[0] : null);
@@ -104,7 +138,12 @@ export default function ProductDetailPage() {
   const availableColors = product.specifications?.availableColors ||
     (product.specifications?.colorHex ? [{ name: product.specifications.colorName, hex: product.specifications.colorHex }] : []);
 
-  const tabLabels = { specs: "Technical Specifications", care: "Atelier Care Guide", shipping: "White-Glove Delivery" };
+  const tabLabels = {
+    specs: "Technical Specifications",
+    care: "Atelier Care Guide",
+    shipping: "White-Glove Delivery",
+    reviews: `Client Reviews (${reviews.length || product.reviewsCount || 0})`
+  };
 
   const specsConfig = product.category === "wigs"
     ? [
@@ -382,7 +421,7 @@ export default function ProductDetailPage() {
         {/* TABS */}
         <div style={{ backgroundColor: "var(--bg-surface-1)", border: "1px solid var(--border-subtle)", borderRadius: "6px", overflow: "hidden", marginBottom: "80px" }}>
           <div style={{ display: "flex", borderBottom: "1px solid var(--border-subtle)", backgroundColor: "var(--bg-surface-2)", overflowX: "auto" }}>
-            {["specs", "care", "shipping"].map((tab) => {
+            {["specs", "care", "shipping", "reviews"].map((tab) => {
               const isActive = activeTab === tab;
               return (
                 <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: "16px 24px", fontSize: "12px", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: isActive ? 700 : 400, color: isActive ? "var(--gold-primary)" : "var(--text-muted)", borderBottom: isActive ? "2px solid var(--gold-primary)" : "2px solid transparent", backgroundColor: "transparent", cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap", flexShrink: 0 }}>
@@ -431,6 +470,231 @@ export default function ProductDetailPage() {
                   <li><strong>Pay on Delivery:</strong> Available for Lagos &amp; Abuja. Card or cash on courier arrival.</li>
                   <li><strong>International:</strong> 7-14 Business Days via DHL International (rates at checkout).</li>
                 </ul>
+              </div>
+            )}
+            {activeTab === "reviews" && (
+              <div>
+                {/* Success Notification */}
+                {reviewSuccessMsg && (
+                  <div style={{ backgroundColor: 'rgba(126, 182, 133, 0.15)', border: '1px solid #7EB685', color: '#7EB685', padding: '12px 16px', borderRadius: '4px', marginBottom: '24px', fontSize: '13px' }}>
+                    ✦ {reviewSuccessMsg}
+                  </div>
+                )}
+
+                {/* Rating Overview & Breakdown Header */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                  gap: '32px',
+                  alignItems: 'center',
+                  paddingBottom: '28px',
+                  borderBottom: '1px solid var(--border-subtle)',
+                  marginBottom: '32px'
+                }}>
+                  {/* Big Rating Score */}
+                  <div style={{ textAlign: 'center', minWidth: '140px' }}>
+                    <div style={{ fontSize: '48px', fontFamily: "'Cormorant Garamond', Georgia, serif", color: 'var(--gold-primary)', fontWeight: 600, lineHeight: 1 }}>
+                      {product.rating || 5.0}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '3px', margin: '8px 0 4px', color: 'var(--gold-primary)' }}>
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star key={s} size={15} fill={s <= Math.round(product.rating || 5) ? 'currentColor' : 'none'} />
+                      ))}
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                      Based on {reviews.length || product.reviewsCount || 0} Verified Patron Reviews
+                    </div>
+                  </div>
+
+                  {/* Stars Distribution Bar Chart */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxWidth: '300px' }}>
+                    {[5, 4, 3, 2, 1].map((stars) => {
+                      const count = reviews.filter(r => Math.round(r.rating) === stars).length;
+                      const pct = reviews.length > 0 ? Math.round((count / reviews.length) * 100) : (stars === 5 ? 90 : stars === 4 ? 10 : 0);
+                      return (
+                        <div key={stars} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                          <span style={{ width: '22px' }}>{stars}★</span>
+                          <div style={{ flex: 1, height: '5px', backgroundColor: 'var(--bg-surface-2)', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${pct}%`, backgroundColor: 'var(--gold-primary)', transition: 'width 0.4s ease' }} />
+                          </div>
+                          <span style={{ width: '28px', textAlign: 'right' }}>{pct}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Action Button */}
+                  <div style={{ textAlign: 'center' }}>
+                    <button
+                      onClick={() => setShowReviewForm(!showReviewForm)}
+                      className="btn-gold"
+                      style={{ padding: '12px 20px', fontSize: '12px', whiteSpace: 'nowrap' }}
+                    >
+                      {showReviewForm ? 'Cancel Review' : '✦ Write Atelier Review'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Review Form (Expandable) */}
+                {showReviewForm && (
+                  <form
+                    onSubmit={handleReviewSubmit}
+                    style={{
+                      backgroundColor: 'var(--bg-surface-2)',
+                      border: '1px solid var(--gold-primary)',
+                      borderRadius: '6px',
+                      padding: '28px',
+                      marginBottom: '36px'
+                    }}
+                  >
+                    <h4 style={{ fontSize: '15px', color: 'var(--gold-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>
+                      Share Your Experience with {product.name}
+                    </h4>
+
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>
+                        Your Rating
+                      </label>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {[1, 2, 3, 4, 5].map((starVal) => (
+                          <button
+                            key={starVal}
+                            type="button"
+                            onClick={() => setNewReview({ ...newReview, rating: starVal })}
+                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '2px', color: starVal <= newReview.rating ? 'var(--gold-primary)' : 'var(--text-muted)' }}
+                          >
+                            <Star size={24} fill={starVal <= newReview.rating ? 'currentColor' : 'none'} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                          Your Name *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Chioma Adeleke"
+                          value={newReview.name}
+                          onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
+                          className="input-luxury"
+                          style={{ width: '100%' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                          Email Address
+                        </label>
+                        <input
+                          type="email"
+                          placeholder="e.g. chioma@example.com"
+                          value={newReview.email}
+                          onChange={(e) => setNewReview({ ...newReview, email: e.target.value })}
+                          className="input-luxury"
+                          style={{ width: '100%' }}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                        Review Headline
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Unbelievable hair luster and natural movement"
+                        value={newReview.title}
+                        onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
+                        className="input-luxury"
+                        style={{ width: '100%' }}
+                      />
+                    </div>
+
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                        Detailed Feedback &amp; Styling Impressions *
+                      </label>
+                      <textarea
+                        required
+                        rows={4}
+                        placeholder="Describe texture, lace melt, hair density, styling longevity, and packaging..."
+                        value={newReview.comment}
+                        onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                        className="input-luxury"
+                        style={{ width: '100%', resize: 'vertical' }}
+                      />
+                    </div>
+
+                    <button type="submit" disabled={submittingReview} className="btn-gold" style={{ padding: '12px 28px' }}>
+                      {submittingReview ? 'Publishing Review...' : 'Publish Atelier Review'}
+                    </button>
+                  </form>
+                )}
+
+                {/* Reviews List */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {reviews.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                      No reviews published yet. Be the first patron to share your styling experience!
+                    </div>
+                  ) : (
+                    reviews.map((rev, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          backgroundColor: 'var(--bg-surface-2)',
+                          border: '1px solid var(--border-subtle)',
+                          borderRadius: '4px',
+                          padding: '24px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ display: 'flex', gap: '2px', color: 'var(--gold-primary)' }}>
+                              {[1, 2, 3, 4, 5].map((s) => (
+                                <Star key={s} size={13} fill={s <= rev.rating ? 'currentColor' : 'none'} />
+                              ))}
+                            </div>
+                            <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '14px' }}>
+                              {rev.name}
+                            </span>
+                            {rev.verifiedPurchase !== false && (
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '10px',
+                                color: '#7EB685',
+                                backgroundColor: 'rgba(126, 182, 133, 0.12)',
+                                border: '1px solid rgba(126, 182, 133, 0.25)',
+                                padding: '2px 8px',
+                                borderRadius: '10px',
+                                letterSpacing: '0.04em'
+                              }}>
+                                ✓ Verified Atelier Client
+                              </span>
+                            )}
+                          </div>
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                            {new Date(rev.createdAt || Date.now()).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </span>
+                        </div>
+
+                        {rev.title && (
+                          <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--gold-primary)', marginBottom: '8px' }}>
+                            {rev.title}
+                          </div>
+                        )}
+                        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0 }}>
+                          {rev.comment}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             )}
           </div>

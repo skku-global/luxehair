@@ -166,5 +166,29 @@ export const api = {
     }).then(handleResponse),
 
   verifyStripePayment: (sessionId, orderNumber) =>
-    fetch(`${BASE_URL}/payment/stripe/verify/${sessionId}?orderNumber=${orderNumber || ''}`).then(handleResponse)
+    fetch(`${BASE_URL}/payment/stripe/verify/${sessionId}?orderNumber=${orderNumber || ''}`).then(handleResponse),
+
+  // Admin Customers
+  getAdminCustomers: (params = {}) => {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, val]) => {
+      if (val !== undefined && val !== null && val !== '') {
+        searchParams.append(key, val);
+      }
+    });
+    return fetch(`${BASE_URL}/auth/admin/customers?${searchParams.toString()}`, {
+      headers: getHeaders(true)
+    }).then(handleResponse);
+  },
+
+  // Product Reviews & Ratings
+  getProductReviews: (productId) =>
+    fetch(`${BASE_URL}/products/${productId}/reviews`).then(handleResponse),
+
+  addProductReview: (productId, reviewData) =>
+    fetch(`${BASE_URL}/products/${productId}/reviews`, {
+      method: 'POST',
+      headers: getHeaders(false),
+      body: JSON.stringify(reviewData)
+    }).then(handleResponse)
 };

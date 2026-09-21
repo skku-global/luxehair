@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Package, MapPin, Settings, LogOut, Plus, Trash2, Eye, ShieldCheck } from 'lucide-react';
+import { User, Package, MapPin, Settings, LogOut, Plus, Trash2, Eye, ShieldCheck, Crown, Award, Sparkles, CheckCircle2, ChevronRight, Gift } from 'lucide-react';
 import { BRAND, formatPrice } from '../config/brand';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
@@ -21,7 +21,7 @@ export default function AccountPage() {
   const [authLoading, setAuthLoading] = useState(false);
 
   // Authenticated Portal state
-  const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'addresses' | 'profile'
+  const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'vip' | 'addresses' | 'profile'
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
 
@@ -126,6 +126,39 @@ export default function AccountPage() {
       setProfileMessage('Failed to update profile.');
     }
   };
+
+  // VIP Loyalty Calculations
+  const totalSpentNgn = orders
+    .filter(o => o.paymentStatus === 'paid' && (o.currency === 'NGN' || !o.currency))
+    .reduce((sum, o) => sum + (o.pricingBreakdown?.total || 0), 0);
+
+  const totalSpentUsd = orders
+    .filter(o => o.paymentStatus === 'paid' && o.currency === 'USD')
+    .reduce((sum, o) => sum + (o.pricingBreakdown?.total || 0), 0);
+
+  let vipTier = 'Bronze VIP';
+  let nextTier = 'Silver VIP';
+  let nextTierThreshold = 300000;
+  let vipColor = '#CD7F32';
+
+  if (totalSpentNgn >= 1500000 || totalSpentUsd >= 1500) {
+    vipTier = 'Diamond VIP';
+    nextTier = 'Supreme Atelier Patron';
+    nextTierThreshold = 3000000;
+    vipColor = '#E5E4E2';
+  } else if (totalSpentNgn >= 750000 || totalSpentUsd >= 750) {
+    vipTier = 'Gold VIP';
+    nextTier = 'Diamond VIP';
+    nextTierThreshold = 1500000;
+    vipColor = '#C9A876';
+  } else if (totalSpentNgn >= 300000 || totalSpentUsd >= 300) {
+    vipTier = 'Silver VIP';
+    nextTier = 'Gold VIP';
+    nextTierThreshold = 750000;
+    vipColor = '#A8A9AD';
+  }
+
+  const tierProgress = Math.min(100, Math.round((totalSpentNgn / nextTierThreshold) * 100));
 
   // -------------------------------------------------------------
   // RENDER 1: UNAUTHENTICATED (Login / Signup)
@@ -295,30 +328,52 @@ export default function AccountPage() {
               {/* 1-Click Demo Testing Box */}
               <div style={{
                 marginTop: '32px',
-                padding: '16px',
+                padding: '20px',
                 backgroundColor: '#161514',
-                border: '1px dashed #33302B',
-                borderRadius: '2px'
+                border: '1px solid #33302B',
+                borderRadius: '4px'
               }}>
-                <div style={{ fontSize: '11px', color: '#C9A876', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 600 }}>
-                  ✦ Instant One-Click Demo Logins
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#C9A876', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px', fontWeight: 600 }}>
+                  <Sparkles size={14} /> Instant One-Click Demo Access
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <button
                     type="button"
                     onClick={() => handleQuickLogin('customer@luxehair.com', 'customer123')}
                     className="btn-dark"
-                    style={{ fontSize: '11px', padding: '8px 10px' }}
+                    style={{
+                      fontSize: '11px',
+                      padding: '12px 10px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      border: '1px solid #C9A876',
+                      cursor: 'pointer'
+                    }}
                   >
-                    Demo Customer
+                    <span style={{ color: '#F2EFEA', fontWeight: 600 }}>Demo Customer</span>
+                    <span style={{ fontSize: '10px', color: '#8A847A' }}>customer@luxehair.com</span>
+                    <span style={{ fontSize: '9px', color: '#C9A876' }}>Pass: customer123</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleQuickLogin('admin@luxehair.com', 'admin123456')}
                     className="btn-dark"
-                    style={{ fontSize: '11px', padding: '8px 10px', color: '#C9A876' }}
+                    style={{
+                      fontSize: '11px',
+                      padding: '12px 10px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      border: '1px solid #383430',
+                      cursor: 'pointer'
+                    }}
                   >
-                    Store Admin
+                    <span style={{ color: '#C9A876', fontWeight: 600 }}>Store Admin</span>
+                    <span style={{ fontSize: '10px', color: '#8A847A' }}>admin@luxehair.com</span>
+                    <span style={{ fontSize: '9px', color: '#A8A9AD' }}>Pass: admin123456</span>
                   </button>
                 </div>
               </div>
@@ -382,6 +437,75 @@ export default function AccountPage() {
           </div>
         </div>
 
+        {/* LUXURY VIP LOYALTY CARD BANNER */}
+        <div style={{
+          background: 'linear-gradient(135deg, #1C1A17 0%, #121110 50%, #1A1815 100%)',
+          border: `1px solid ${vipColor}66`,
+          borderRadius: '8px',
+          padding: '28px',
+          marginBottom: '36px',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
+        }}>
+          {/* Subtle Background Watermark */}
+          <div style={{
+            position: 'absolute',
+            right: '-10px',
+            bottom: '-20px',
+            opacity: 0.05,
+            fontSize: '130px',
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            color: '#C9A876',
+            pointerEvents: 'none'
+          }}>
+            LXH
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px', position: 'relative', zIndex: 1 }}>
+            <div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', color: vipColor, fontWeight: 700, marginBottom: '8px' }}>
+                <Crown size={14} /> LUXEHAIR Atelier Privilege Club
+              </div>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '28px', fontWeight: 500, color: '#F2EFEA', marginBottom: '6px' }}>
+                {vipTier} Member Status
+              </h2>
+              <p style={{ color: '#A6A095', fontSize: '13px', maxWidth: '520px', lineHeight: 1.5 }}>
+                {vipTier.includes('Diamond')
+                  ? 'At the pinnacle of haute coiffure. Enjoy personalized concierge, bespoke custom wig fittings, and unlimited complimentary express courier worldwide.'
+                  : vipTier.includes('Gold')
+                  ? 'Gold patron privileges active. Enjoy complimentary Lagos express delivery, priority bespoke styling queue, and seasonal atelier gifts.'
+                  : vipTier.includes('Silver')
+                  ? 'Silver patron status unlocked. Enjoy 10% private privilege discounts (Code: LUXE10) and complimentary lace maintenance sets.'
+                  : 'Welcome to the LUXEHAIR Clientèle Club. Earn points on every authentic unit purchase and advance toward Silver VIP privileges.'}
+              </p>
+            </div>
+
+            {/* Spend Stats & Progress */}
+            <div style={{ minWidth: '220px', backgroundColor: 'rgba(0,0,0,0.4)', padding: '16px 20px', borderRadius: '6px', border: '1px solid #2B2926' }}>
+              <div style={{ fontSize: '11px', color: '#8A847A', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
+                Lifetime Atelier Spend
+              </div>
+              <div style={{ fontSize: '22px', fontWeight: 600, color: '#C9A876', marginBottom: '10px' }}>
+                {formatPrice(totalSpentNgn || (totalSpentUsd * 1500), 'NGN')}
+              </div>
+
+              {/* Progress bar to next tier */}
+              {vipTier !== 'Diamond VIP' && (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#8A847A', marginBottom: '4px' }}>
+                    <span>Next: {nextTier}</span>
+                    <span>{tierProgress}%</span>
+                  </div>
+                  <div style={{ height: '4px', backgroundColor: '#24221F', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${tierProgress}%`, backgroundColor: vipColor, transition: 'width 0.4s ease' }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Portal Tabs Layout */}
         <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '32px' }} className="account-layout">
           {/* Side Tabs Navigation */}
@@ -405,6 +529,27 @@ export default function AccountPage() {
             >
               <Package size={16} style={{ color: activeTab === 'orders' ? '#C9A876' : '#8A847A' }} />
               <span>Order History ({orders.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('vip')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '14px 18px',
+                backgroundColor: activeTab === 'vip' ? '#181716' : 'transparent',
+                border: activeTab === 'vip' ? '1px solid #2A2824' : '1px solid transparent',
+                borderLeft: activeTab === 'vip' ? '3px solid #C9A876' : '3px solid transparent',
+                color: activeTab === 'vip' ? '#F2EFEA' : '#8A847A',
+                fontSize: '13px',
+                fontWeight: activeTab === 'vip' ? 600 : 400,
+                cursor: 'pointer',
+                textAlign: 'left'
+              }}
+            >
+              <Crown size={16} style={{ color: activeTab === 'vip' ? '#C9A876' : '#8A847A' }} />
+              <span>VIP Privilege Tiers</span>
             </button>
 
             <button
@@ -538,10 +683,184 @@ export default function AccountPage() {
                             Total: <span style={{ color: '#C9A876' }}>{formatPrice(ord.pricingBreakdown.total)}</span>
                           </span>
                         </div>
+
+                        {/* Fulfillment Journey Timeline */}
+                        <div style={{
+                          marginTop: '16px',
+                          padding: '14px 16px',
+                          backgroundColor: '#161514',
+                          borderRadius: '4px',
+                          border: '1px solid #24221F'
+                        }}>
+                          <div style={{ fontSize: '10px', color: '#8A847A', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                            <span>Atelier Fulfillment Journey</span>
+                            {ord.shippingAddress && (
+                              <span style={{ color: '#C9A876' }}>
+                                📍 Delivery to {ord.shippingAddress.city}, {ord.shippingAddress.state}
+                              </span>
+                            )}
+                          </div>
+                          
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                            {[
+                              { label: 'Order Placed', desc: 'Verified' },
+                              { label: 'Atelier Styling', desc: 'Quality Check' },
+                              { label: 'Dispatched', desc: 'In Transit' },
+                              { label: 'Delivered', desc: 'Fulfilled' }
+                            ].map((step, sIdx) => {
+                              const stepIndex = ord.orderStatus === 'delivered' ? 3 :
+                                                ord.orderStatus === 'shipped' ? 2 :
+                                                ord.orderStatus === 'processing' || ord.orderStatus === 'confirmed' ? 1 : 0;
+                              const isCompleted = sIdx <= stepIndex;
+                              const isCurrent = sIdx === stepIndex;
+                              return (
+                                <div key={step.label} style={{ textAlign: 'center' }}>
+                                  <div style={{
+                                    height: '4px',
+                                    backgroundColor: isCompleted ? '#C9A876' : '#2A2824',
+                                    marginBottom: '6px',
+                                    borderRadius: '2px',
+                                    transition: 'background-color 0.3s'
+                                  }} />
+                                  <div style={{
+                                    fontSize: '11px',
+                                    fontWeight: isCurrent ? 700 : isCompleted ? 600 : 400,
+                                    color: isCurrent ? '#C9A876' : isCompleted ? '#F2EFEA' : '#6E6960'
+                                  }}>
+                                    {step.label}
+                                  </div>
+                                  <div style={{ fontSize: '9px', color: '#8A847A' }}>{step.desc}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* TAB 2: VIP PRIVILEGES */}
+            {activeTab === 'vip' && (
+              <div>
+                <h3 style={{ fontSize: '18px', color: '#F2EFEA', marginBottom: '8px' }}>
+                  Atelier VIP Loyalty & Privilege Tiers
+                </h3>
+                <p style={{ color: '#8A847A', fontSize: '13px', marginBottom: '28px' }}>
+                  Every bespoke purchase brings you closer to elevated salon perks, private concierge priority, and complimentary worldwide dispatch.
+                </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
+                  {[
+                    {
+                      tier: 'Bronze VIP',
+                      color: '#CD7F32',
+                      spend: 'Welcome Patron',
+                      desc: 'Initial tier for all registered patrons.',
+                      perks: [
+                        'Access to member-only drops',
+                        'Real-time DHL shipment tracking',
+                        'Complimentary satin storage bag'
+                      ]
+                    },
+                    {
+                      tier: 'Silver VIP',
+                      color: '#A8A9AD',
+                      spend: '₦300,000 / $300 Spend',
+                      desc: 'Unlocked after placing luxury orders.',
+                      perks: [
+                        '10% Private Code: LUXE10 on all orders',
+                        'Complimentary Lace Melting Band & Silk Comb',
+                        'Priority customer concierge assistance'
+                      ]
+                    },
+                    {
+                      tier: 'Gold VIP',
+                      color: '#C9A876',
+                      spend: '₦750,000 / $750 Spend',
+                      desc: 'Esteemed frequent client status.',
+                      perks: [
+                        'Free Lagos Express Courier on every order',
+                        'Complimentary Atelier Wig Deep-Wash Ritual',
+                        'Early 48-Hour access to limited hair drops',
+                        'Seasonal high-fashion gifts'
+                      ]
+                    },
+                    {
+                      tier: 'Diamond VIP',
+                      color: '#E5E4E2',
+                      spend: '₦1,500,000 / $1,500 Spend',
+                      desc: 'The zenith of LUXEHAIR luxury clientele.',
+                      perks: [
+                        'Dedicated 1-on-1 Celebrity Stylist Concierge',
+                        'Free DHL Express Dispatch Worldwide',
+                        'Private custom wig fitting & density tailoring',
+                        'VIP gala invitations & bespoke monogramming'
+                      ]
+                    }
+                  ].map((lvl) => {
+                    const isCurrent = vipTier === lvl.tier;
+                    return (
+                      <div
+                        key={lvl.tier}
+                        style={{
+                          backgroundColor: '#121110',
+                          border: isCurrent ? `2px solid ${lvl.color}` : '1px solid #24221F',
+                          borderRadius: '6px',
+                          padding: '24px',
+                          position: 'relative',
+                          boxShadow: isCurrent ? `0 0 25px ${lvl.color}22` : 'none'
+                        }}
+                      >
+                        {isCurrent && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '12px',
+                            right: '12px',
+                            backgroundColor: `${lvl.color}22`,
+                            color: lvl.color,
+                            border: `1px solid ${lvl.color}`,
+                            fontSize: '9px',
+                            fontWeight: 700,
+                            padding: '2px 8px',
+                            borderRadius: '10px',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.08em'
+                          }}>
+                            Your Current Tier
+                          </div>
+                        )}
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                          <Crown size={18} style={{ color: lvl.color }} />
+                          <h4 style={{ fontSize: '16px', fontWeight: 600, color: lvl.color }}>{lvl.tier}</h4>
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#F2EFEA', fontWeight: 500, marginBottom: '4px' }}>
+                          {lvl.spend}
+                        </div>
+                        <p style={{ fontSize: '12px', color: '#8A847A', marginBottom: '16px', lineHeight: 1.4 }}>
+                          {lvl.desc}
+                        </p>
+
+                        <div style={{ borderTop: '1px solid #1C1B19', paddingTop: '14px' }}>
+                          <div style={{ fontSize: '10px', color: '#8A847A', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>
+                            Included Privileges:
+                          </div>
+                          <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingLeft: 0, listStyle: 'none' }}>
+                            {lvl.perks.map((p, pIdx) => (
+                              <li key={pIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12px', color: isCurrent ? '#F2EFEA' : '#A6A095' }}>
+                                <CheckCircle2 size={13} style={{ color: lvl.color, flexShrink: 0, marginTop: '2px' }} />
+                                <span>{p}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
