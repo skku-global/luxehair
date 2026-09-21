@@ -3,26 +3,23 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    try {
-      return localStorage.getItem('luxehair_theme') || 'dark';
-    } catch {
-      return 'dark';
-    }
-  });
+  // Dark mode is the permanent default — always force dark
+  const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
+    // Always force dark — overwrite any stored light preference
     try {
-      localStorage.setItem('luxehair_theme', theme);
+      localStorage.setItem('luxehair_theme', 'dark');
     } catch (e) {
       console.error(e);
     }
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.removeAttribute('data-theme'); // falls back to :root (dark)
+  }, []);
 
-  const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
-  };
+  // Toggle disabled — dark is permanently enforced
+  const toggleTheme = () => {};
+
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, isDark: theme === 'dark' }}>
