@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const seedPath = path.join(__dirname, '../../backend/seeds/seed.js');
+const seedPath = path.join(__dirname, 'seed.js');
 let content = fs.readFileSync(seedPath, 'utf8');
 
 const namesToRemove = [

@@ -291,47 +291,6 @@ const sampleProducts = [
     tags: ["brown", "chocolate", "bob", "silky straight", "hd lace", "natural"]
   },
   {
-    name: "The Noir Obsidian Jet Black Bone Straight Wig",
-    category: "wigs",
-    price: 280000,
-    compareAtPrice: 335000,
-    shortDescription: "Ultra-glossy jet black bone-straight long wig with mirror-like glass shine and seamless 13x6 HD frontal.",
-    description: "Timeless, dramatic, and impossibly sleek. Sourced from premium single-donor raw Vietnamese hair in its purest natural jet black state — zero processing, zero chemicals — resulting in a luminous, glass-like mirror shine that photographs beautifully under studio and ambient light alike. Features a hand-tied 13x6 HD Swiss lace with micro-bleached knots.",
-    specifications: {
-      hairType: "100% Raw Unprocessed Single Donor Hair",
-      origin: "Vietnam Highlands",
-      laceType: "13x6 Ultra-Thin HD Swiss Frontal",
-      hairGrade: "14A Double Drawn",
-      capSize: "Medium (22.5\") with velvet grip band",
-      longevity: "3 - 5 Years",
-      texture: "Bone Straight",
-      colorName: "Jet Black #1",
-      colorHex: "#0A0A0A",
-      availableColors: [
-        { name: "Jet Black #1", hex: "#0A0A0A" },
-        { name: "Natural Black #1B", hex: "#18181B" }
-      ]
-    },
-    images: [
-      "/images/products/wig-black-model.jpg",
-      "/images/products/wig-black-bust.jpg",
-      "/images/products/wig-bone-straight-1.jpg",
-      "/images/products/wig-bone-straight-3.jpg"
-    ],
-    variants: [
-      { name: '24" / 200% Density / Jet Black #1', length: '24"', density: '200%', color: 'Jet Black #1', texture: 'Bone Straight', price: 280000, stock: 12 },
-      { name: '28" / 250% Density / Jet Black #1', length: '28"', density: '250%', color: 'Jet Black #1', texture: 'Bone Straight', price: 340000, stock: 8 },
-      { name: '32" / 250% Density / Natural Black #1B', length: '32"', density: '250%', color: 'Natural Black #1B', texture: 'Bone Straight', price: 390000, stock: 4 }
-    ],
-    inStock: true,
-    stockQuantity: 24,
-    isFeatured: true,
-    isBestseller: true,
-    rating: 5.0,
-    reviewsCount: 33,
-    tags: ["black hair", "jet black", "bone straight", "hd lace", "glass shine", "raw"]
-  },
-  {
     name: "The Havana Flame Burnt Orange Body Wave Wig",
     category: "wigs",
     price: 310000,
@@ -659,126 +618,6 @@ const sampleProducts = [
     reviewsCount: 32,
     tags: ["standard", "chestnut", "brown", "body wave", "hd lace", "everyday"]
   },
-  {
-    name: "STANDARD | The Serena Midnight Body Wave Wig",
-    category: "wigs",
-    price: 175000,
-    compareAtPrice: 210000,
-    shortDescription: "Classic natural black long body wave frontal wig — effortless volume and natural movement for any occasion.",
-    description: "The timeless go-to. Our Standard Serena is built on a 13x4 pre-plucked HD frontal with natural black hair in a beautiful, free-flowing body wave. Pre-bleached knots and a natural-density hairline make installation seamless. Suitable for all-day wear, heat styling, and colour treatments.",
-    specifications: {
-      hairType: "100% Virgin Human Hair",
-      origin: "Southeast Asia",
-      laceType: "13x4 Pre-Plucked HD Frontal",
-      hairGrade: "12A Double Drawn",
-      capSize: "Medium Adjustable Cap",
-      longevity: "2 - 3 Years",
-      texture: "Body Wave",
-      colorName: "Natural Black #1B",
-      colorHex: "#18181B",
-      availableColors: [
-        { name: "Natural Black #1B", hex: "#18181B" },
-        { name: "Jet Black #1", hex: "#0A0A0A" }
-      ]
-    },
-    images: [
-      "/images/products/wig-black-model.jpg",
-      "/images/products/wig-black-bust.jpg",
-      "/images/products/wig-body-wave-2.jpg"
-    ],
-    variants: [
-      { name: '20" / 180% Density / Natural Black', length: '20"', density: '180%', color: 'Natural Black #1B', texture: 'Body Wave', price: 175000, stock: 18 },
-      { name: '24" / 200% Density / Natural Black', length: '24"', density: '200%', color: 'Natural Black #1B', texture: 'Body Wave', price: 210000, stock: 12 },
-      { name: '28" / 200% Density / Natural Black', length: '28"', density: '200%', color: 'Natural Black #1B', texture: 'Body Wave', price: 240000, stock: 8 }
-    ],
-    inStock: true,
-    stockQuantity: 38,
-    isFeatured: false,
-    isBestseller: true,
-    rating: 4.8,
-    reviewsCount: 45,
-    tags: ["standard", "natural black", "body wave", "hd lace", "everyday", "classic"]
-  },
-  {
-    name: "STANDARD | The Rosé Deep Wave Frontal Wig",
-    category: "wigs",
-    price: 220000,
-    compareAtPrice: 265000,
-    shortDescription: "Warm burgundy-rose deep wave frontal wig with voluminous spiral curls and 13x4 pre-plucked HD lace.",
-    description: "A popular Standard Series bestseller. Rich rose-burgundy tones woven through deep spiral wave curls create a head-turning yet wearable everyday look. Built on a 13x4 pre-plucked HD frontal with comfortable medium-weight cap. The deep wave pattern is defined, frizz-resistant, and wash-and-go friendly.",
-    specifications: {
-      hairType: "100% Virgin Human Hair",
-      origin: "Burmese Virgin",
-      laceType: "13x4 Pre-Plucked HD Frontal",
-      hairGrade: "12A Double Drawn",
-      capSize: "Medium (22.5\") Adjustable",
-      longevity: "2 - 3 Years",
-      texture: "Deep Wave",
-      colorName: "Rosé Burgundy Tinted",
-      colorHex: "#7B2D4A",
-      availableColors: [
-        { name: "Rosé Burgundy Tinted", hex: "#7B2D4A" },
-        { name: "Natural Black Deep Wave", hex: "#18181B" }
-      ]
-    },
-    images: [
-      "/images/products/wig-burgundy-model.jpg",
-      "/images/products/wig-burgundy-bust.jpg",
-      "/images/products/wig-deep-wave-1.jpg",
-      "/images/products/wig-deep-wave-2.jpg"
-    ],
-    variants: [
-      { name: '20" / 180% Density / Rosé Burgundy', length: '20"', density: '180%', color: 'Rosé Burgundy Tinted', texture: 'Deep Wave', price: 220000, stock: 12 },
-      { name: '24" / 200% Density / Rosé Burgundy', length: '24"', density: '200%', color: 'Rosé Burgundy Tinted', texture: 'Deep Wave', price: 260000, stock: 8 },
-      { name: '22" / 180% Density / Natural Black', length: '22"', density: '180%', color: 'Natural Black Deep Wave', texture: 'Deep Wave', price: 210000, stock: 10 }
-    ],
-    inStock: true,
-    stockQuantity: 30,
-    isFeatured: false,
-    isBestseller: true,
-    rating: 4.7,
-    reviewsCount: 27,
-    tags: ["standard", "rose", "burgundy", "deep wave", "hd lace", "curly"]
-  },
-  {
-    name: "STANDARD | The Sahara Caramel Highlight Straight Wig",
-    category: "wigs",
-    price: 210000,
-    compareAtPrice: 255000,
-    shortDescription: "Lush dark brown base with warm caramel highlights — long silky straight frontal wig with effortless dimension.",
-    description: "Sun-kissed dimension for everyday elegance. Our Standard Sahara features dark brown roots blended with scattered warm caramel highlights throughout, crafted on Grade 12A Vietnamese hair. The long silky straight texture lays flat and smooth with a healthy, natural sheen. A crowd favourite for its versatility across office, evening and casual wear.",
-    specifications: {
-      hairType: "100% Virgin Vietnamese Human Hair",
-      origin: "Vietnam",
-      laceType: "13x4 HD Swiss Frontal",
-      hairGrade: "12A Double Drawn",
-      capSize: "Medium Adjustable",
-      longevity: "2 - 3 Years",
-      texture: "Silky Straight",
-      colorName: "Dark Brown with Caramel Highlights",
-      colorHex: "#5C3317",
-      availableColors: [
-        { name: "Brown with Caramel Highlights", hex: "#5C3317" },
-        { name: "Natural Black #1B", hex: "#18181B" }
-      ]
-    },
-    images: [
-      "/images/products/wig-brown-model.jpg",
-      "/images/products/wig-brown-bust.jpg",
-      "/images/products/wig-bone-straight-2.jpg"
-    ],
-    variants: [
-      { name: '22" / 180% Density / Brown Caramel', length: '22"', density: '180%', color: 'Brown with Caramel Highlights', texture: 'Silky Straight', price: 210000, stock: 15 },
-      { name: '26" / 200% Density / Brown Caramel', length: '26"', density: '200%', color: 'Brown with Caramel Highlights', texture: 'Silky Straight', price: 250000, stock: 10 }
-    ],
-    inStock: true,
-    stockQuantity: 25,
-    isFeatured: false,
-    isBestseller: false,
-    rating: 4.7,
-    reviewsCount: 19,
-    tags: ["standard", "caramel", "highlight", "brown", "silky straight", "hd lace"]
-  },
 
   // --- WIGS: QUALITY TIER ---
   {
@@ -818,46 +657,6 @@ const sampleProducts = [
     rating: 4.7,
     reviewsCount: 51,
     tags: ["quality", "glueless", "natural wave", "beginner", "closure wig", "everyday"]
-  },
-  {
-    name: "QUALITY | The Amber Deep Brown Kinky Straight Wig",
-    category: "wigs",
-    price: 135000,
-    compareAtPrice: 165000,
-    shortDescription: "Textured kinky straight wig in a rich dark brown for a natural, lived-in look — 13x4 frontal, quality grade.",
-    description: "Designed to mimic the natural texture of relaxed African hair at its most natural state. The kinky straight pattern adds a realistic body and natural volume without appearing over-processed. Crafted from Grade 11A double-drawn hair on a 13x4 pre-plucked lace frontal. The deep brown tone is warm, universally flattering, and photograph beautifully.",
-    specifications: {
-      hairType: "100% Virgin Human Hair",
-      origin: "Southeast Asia",
-      laceType: "13x4 Pre-Plucked Lace Frontal",
-      hairGrade: "11A Double Drawn",
-      capSize: "Medium Adjustable Cap",
-      longevity: "1.5 - 2 Years",
-      texture: "Kinky Straight",
-      colorName: "Deep Brown #4",
-      colorHex: "#3D1C00",
-      availableColors: [
-        { name: "Deep Brown #4", hex: "#3D1C00" },
-        { name: "Natural Black #1B", hex: "#18181B" }
-      ]
-    },
-    images: [
-      "/images/products/wig-brown-bust.jpg",
-      "/images/products/wig-bone-straight-1.jpg",
-      "/images/products/wig-bone-straight-2.jpg"
-    ],
-    variants: [
-      { name: '18" / 150% Density / Deep Brown #4', length: '18"', density: '150%', color: 'Deep Brown #4', texture: 'Kinky Straight', price: 135000, stock: 22 },
-      { name: '22" / 180% Density / Deep Brown #4', length: '22"', density: '180%', color: 'Deep Brown #4', texture: 'Kinky Straight', price: 165000, stock: 15 },
-      { name: '18" / 150% Density / Natural Black', length: '18"', density: '150%', color: 'Natural Black #1B', texture: 'Kinky Straight', price: 135000, stock: 20 }
-    ],
-    inStock: true,
-    stockQuantity: 57,
-    isFeatured: false,
-    isBestseller: false,
-    rating: 4.6,
-    reviewsCount: 38,
-    tags: ["quality", "kinky straight", "brown", "natural", "frontal", "textured"]
   },
   {
     name: "QUALITY | The Tara Orange Ginger Bob Wig",
@@ -900,46 +699,6 @@ const sampleProducts = [
     reviewsCount: 29,
     tags: ["quality", "ginger", "orange", "bob", "closure", "glueless", "bold"]
   },
-  {
-    name: "QUALITY | The Ivy Blonde Straight Closure Wig",
-    category: "wigs",
-    price: 155000,
-    compareAtPrice: 185000,
-    shortDescription: "Radiant honey blonde straight closure wig with pre-bleached knots and natural-density hairline.",
-    description: "Affordable blonde luxury — finally. The Ivy Quality Series offers a clean honey blonde straight unit on a 5x5 HD closure cap with pre-bleached knots and a naturally low-density hairline. Crafted from Grade 11A double-drawn hair that retains its blonde tone without brassiness. The long, straight silhouette is sleek, polished, and universally flattering.",
-    specifications: {
-      hairType: "100% Virgin Human Hair",
-      origin: "Southeast Asia",
-      laceType: "5x5 Pre-Cut HD Closure",
-      hairGrade: "11A Double Drawn",
-      capSize: "Medium Adjustable",
-      longevity: "1.5 - 2 Years",
-      texture: "Silky Straight",
-      colorName: "Honey Blonde #27",
-      colorHex: "#D4A017",
-      availableColors: [
-        { name: "Honey Blonde #27", hex: "#D4A017" },
-        { name: "Light Blonde #613", hex: "#FACC15" }
-      ]
-    },
-    images: [
-      "/images/products/wig-blonde-model.jpg",
-      "/images/products/wig-blonde-bust.jpg",
-      "/images/products/wig-bone-straight-2.jpg"
-    ],
-    variants: [
-      { name: '18" / 150% Density / Honey Blonde #27', length: '18"', density: '150%', color: 'Honey Blonde #27', texture: 'Silky Straight', price: 155000, stock: 18 },
-      { name: '22" / 180% Density / Honey Blonde #27', length: '22"', density: '180%', color: 'Honey Blonde #27', texture: 'Silky Straight', price: 185000, stock: 12 },
-      { name: '18" / 150% Density / Light Blonde #613', length: '18"', density: '150%', color: 'Light Blonde #613', texture: 'Silky Straight', price: 160000, stock: 10 }
-    ],
-    inStock: true,
-    stockQuantity: 40,
-    isFeatured: false,
-    isBestseller: false,
-    rating: 4.6,
-    reviewsCount: 22,
-    tags: ["quality", "blonde", "honey blonde", "closure", "straight", "everyday"]
-  },
 
   // --- WIGS: FINE TIER ---
   {
@@ -978,46 +737,6 @@ const sampleProducts = [
     rating: 4.5,
     reviewsCount: 68,
     tags: ["fine", "entry luxury", "natural wave", "closure", "beginner", "affordable"]
-  },
-  {
-    name: "FINE | The Maya Straight Brown Closure Wig",
-    category: "wigs",
-    price: 82000,
-    compareAtPrice: 100000,
-    shortDescription: "Sleek brown silky straight 4x4 closure wig — clean, polished and great for everyday protective styling.",
-    description: "Simple, clean, and dependable. The Maya Fine Series is our entry-level straight unit — a well-constructed 4x4 HD closure with Grade 10A straight brown hair. Pre-plucked for a natural hairline. Easy to style, wash, and maintain. A great starter unit or everyday protective option for those who want quality hair at a responsible price.",
-    specifications: {
-      hairType: "100% Human Hair",
-      origin: "Southeast Asia",
-      laceType: "4x4 HD Closure",
-      hairGrade: "10A Double Drawn",
-      capSize: "Medium Standard Cap",
-      longevity: "1 - 1.5 Years",
-      texture: "Silky Straight",
-      colorName: "Medium Brown #4",
-      colorHex: "#5C3317",
-      availableColors: [
-        { name: "Medium Brown #4", hex: "#5C3317" },
-        { name: "Natural Black #1B", hex: "#18181B" }
-      ]
-    },
-    images: [
-      "/images/products/wig-brown-bust.jpg",
-      "/images/products/wig-bone-straight-1.jpg",
-      "/images/products/wig-bone-straight-2.jpg"
-    ],
-    variants: [
-      { name: '16" / 130% Density / Medium Brown #4', length: '16"', density: '130%', color: 'Medium Brown #4', texture: 'Silky Straight', price: 82000, stock: 35 },
-      { name: '20" / 150% Density / Medium Brown #4', length: '20"', density: '150%', color: 'Medium Brown #4', texture: 'Silky Straight', price: 100000, stock: 25 },
-      { name: '16" / 130% Density / Natural Black', length: '16"', density: '130%', color: 'Natural Black #1B', texture: 'Silky Straight', price: 82000, stock: 30 }
-    ],
-    inStock: true,
-    stockQuantity: 90,
-    isFeatured: false,
-    isBestseller: true,
-    rating: 4.5,
-    reviewsCount: 72,
-    tags: ["fine", "affordable", "brown", "straight", "closure", "protective", "everyday"]
   },
   {
     name: "FINE | The Nina Bob Closure Wig",
