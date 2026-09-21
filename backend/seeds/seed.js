@@ -250,6 +250,249 @@ const sampleProducts = [
     reviewsCount: 34,
     tags: ["bone straight", "hd lace", "raw hair", "vietnamese", "luxury", "black hair"]
   },
+  {
+    name: "The Maison Chocolat Rich Brown Silk Bob Wig",
+    category: "wigs",
+    price: 215000,
+    compareAtPrice: 255000,
+    shortDescription: "Luxurious single-donor chocolate brown sleek bob with pre-plucked invisible HD lace — effortlessly chic.",
+    description: "Elegance in its purest form. Handcrafted from single-donor raw hair, deep-dyed to a flawless multi-tonal chocolate brown with warm caramel undertones. The precision-cut blunt bob drapes with liquid smoothness, complementing every skin tone. Finished with a pre-customised 13x4 HD Swiss frontal that melts perfectly into the hairline.",
+    specifications: {
+      hairType: "100% Single Donor Raw Virgin Hair",
+      origin: "Vietnamese Highland Raw",
+      laceType: "13x4 Melt HD Swiss Frontal",
+      hairGrade: "13A Double Drawn",
+      capSize: "Medium (22.5\") Breathable Cap",
+      longevity: "3+ Years",
+      texture: "Silky Straight Bob",
+      colorName: "Rich Chocolate Brown #4",
+      colorHex: "#5C3317",
+      availableColors: [
+        { name: "Chocolate Brown #4", hex: "#5C3317" },
+        { name: "Caramel Toffee #6", hex: "#8B5E3C" }
+      ]
+    },
+    images: [
+      "/images/products/wig-brown-model.jpg",
+      "/images/products/wig-brown-bust.jpg",
+      "/images/products/wig-bone-straight-2.jpg"
+    ],
+    variants: [
+      { name: '12" / 180% Density / Chocolate Brown #4', length: '12"', density: '180%', color: 'Chocolate Brown #4', texture: 'Silky Straight Bob', price: 215000, stock: 10 },
+      { name: '14" / 200% Density / Chocolate Brown #4', length: '14"', density: '200%', color: 'Chocolate Brown #4', texture: 'Silky Straight Bob', price: 235000, stock: 7 },
+      { name: '14" / 200% Density / Caramel Toffee #6', length: '14"', density: '200%', color: 'Caramel Toffee #6', texture: 'Silky Straight Bob', price: 245000, stock: 5 }
+    ],
+    inStock: true,
+    stockQuantity: 22,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 4.9,
+    reviewsCount: 21,
+    tags: ["brown", "chocolate", "bob", "silky straight", "hd lace", "natural"]
+  },
+  {
+    name: "The Noir Obsidian Jet Black Bone Straight Wig",
+    category: "wigs",
+    price: 280000,
+    compareAtPrice: 335000,
+    shortDescription: "Ultra-glossy jet black bone-straight long wig with mirror-like glass shine and seamless 13x6 HD frontal.",
+    description: "Timeless, dramatic, and impossibly sleek. Sourced from premium single-donor raw Vietnamese hair in its purest natural jet black state — zero processing, zero chemicals — resulting in a luminous, glass-like mirror shine that photographs beautifully under studio and ambient light alike. Features a hand-tied 13x6 HD Swiss lace with micro-bleached knots.",
+    specifications: {
+      hairType: "100% Raw Unprocessed Single Donor Hair",
+      origin: "Vietnam Highlands",
+      laceType: "13x6 Ultra-Thin HD Swiss Frontal",
+      hairGrade: "14A Double Drawn",
+      capSize: "Medium (22.5\") with velvet grip band",
+      longevity: "3 - 5 Years",
+      texture: "Bone Straight",
+      colorName: "Jet Black #1",
+      colorHex: "#0A0A0A",
+      availableColors: [
+        { name: "Jet Black #1", hex: "#0A0A0A" },
+        { name: "Natural Black #1B", hex: "#18181B" }
+      ]
+    },
+    images: [
+      "/images/products/wig-black-model.jpg",
+      "/images/products/wig-black-bust.jpg",
+      "/images/products/wig-bone-straight-1.jpg",
+      "/images/products/wig-bone-straight-3.jpg"
+    ],
+    variants: [
+      { name: '24" / 200% Density / Jet Black #1', length: '24"', density: '200%', color: 'Jet Black #1', texture: 'Bone Straight', price: 280000, stock: 12 },
+      { name: '28" / 250% Density / Jet Black #1', length: '28"', density: '250%', color: 'Jet Black #1', texture: 'Bone Straight', price: 340000, stock: 8 },
+      { name: '32" / 250% Density / Natural Black #1B', length: '32"', density: '250%', color: 'Natural Black #1B', texture: 'Bone Straight', price: 390000, stock: 4 }
+    ],
+    inStock: true,
+    stockQuantity: 24,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 5.0,
+    reviewsCount: 33,
+    tags: ["black hair", "jet black", "bone straight", "hd lace", "glass shine", "raw"]
+  },
+  {
+    name: "The Havana Flame Burnt Orange Body Wave Wig",
+    category: "wigs",
+    price: 310000,
+    compareAtPrice: 370000,
+    shortDescription: "Fiery burnt-orange long body waves with radiant warm-toned chromatic pigment and 13x6 HD Swiss frontal.",
+    description: "Be the room. This statement piece is saturated in a vivid burnt mandarin-orange hue with multi-dimensional amber and rust undertones that glow under warm lighting. Crafted from Burmese raw hair — renowned for its naturally voluminous body wave pattern that retains shape wash after wash. Pre-installed with our Melt HD Swiss frontal.",
+    specifications: {
+      hairType: "100% Raw Burmese Virgin Hair",
+      origin: "Myanmar / Burmese Highlands",
+      laceType: "13x6 Melt HD Swiss Frontal",
+      hairGrade: "14A Double Drawn",
+      capSize: "Medium (22.5\") with adjustable band",
+      longevity: "3 - 4 Years",
+      texture: "Body Wave",
+      colorName: "Burnt Mandarin Orange",
+      colorHex: "#C45000",
+      availableColors: [
+        { name: "Burnt Mandarin Orange", hex: "#C45000" },
+        { name: "Copper Rust Ombre", hex: "#A0522D" }
+      ]
+    },
+    images: [
+      "/images/products/wig-orange-model.jpg",
+      "/images/products/wig-orange-bust.jpg",
+      "/images/products/wig-body-wave-1.jpg",
+      "/images/products/wig-body-wave-2.jpg"
+    ],
+    variants: [
+      { name: '22" / 180% Density / Burnt Orange', length: '22"', density: '180%', color: 'Burnt Mandarin Orange', texture: 'Body Wave', price: 310000, stock: 8 },
+      { name: '26" / 200% Density / Burnt Orange', length: '26"', density: '200%', color: 'Burnt Mandarin Orange', texture: 'Body Wave', price: 365000, stock: 6 },
+      { name: '24" / 200% Density / Copper Rust Ombre', length: '24"', density: '200%', color: 'Copper Rust Ombre', texture: 'Body Wave', price: 345000, stock: 4 }
+    ],
+    inStock: true,
+    stockQuantity: 18,
+    isFeatured: true,
+    isBestseller: false,
+    rating: 4.8,
+    reviewsCount: 17,
+    tags: ["orange", "burnt orange", "body wave", "bold color", "hd lace", "statement"]
+  },
+  {
+    name: "The Versailles Auburn Copper Silk Straight Wig",
+    category: "wigs",
+    price: 295000,
+    compareAtPrice: 350000,
+    shortDescription: "Glamorous rich auburn copper-red silk straight long wig — warm, opulent and endlessly photogenic.",
+    description: "Channel autumn luxury with this deeply saturated auburn copper-red long straight unit. Multi-tonal pigmentation blends warm sienna, burnished copper, and deep russet tones for a breathtaking dimensional effect. Made from single-donor Vietnamese raw hair, pre-treated with cuticle-sealing amino acids for extreme shine and silkiness.",
+    specifications: {
+      hairType: "100% Single Donor Raw Vietnamese Hair",
+      origin: "Vietnam Highlands",
+      laceType: "13x4 Pre-Plucked HD Swiss Frontal",
+      hairGrade: "13A Double Drawn",
+      capSize: "Medium (22.5\") Silk Cap",
+      longevity: "3+ Years",
+      texture: "Silky Straight",
+      colorName: "Rich Auburn Copper #30",
+      colorHex: "#8B3A00",
+      availableColors: [
+        { name: "Rich Auburn Copper #30", hex: "#8B3A00" },
+        { name: "Sienna Red Ombre", hex: "#922B21" }
+      ]
+    },
+    images: [
+      "/images/products/wig-auburn-model.jpg",
+      "/images/products/wig-auburn-bust.jpg",
+      "/images/products/wig-bone-straight-2.jpg"
+    ],
+    variants: [
+      { name: '22" / 200% Density / Auburn Copper #30', length: '22"', density: '200%', color: 'Rich Auburn Copper #30', texture: 'Silky Straight', price: 295000, stock: 9 },
+      { name: '26" / 200% Density / Auburn Copper #30', length: '26"', density: '200%', color: 'Rich Auburn Copper #30', texture: 'Silky Straight', price: 345000, stock: 6 },
+      { name: '24" / 200% Density / Sienna Red Ombre', length: '24"', density: '200%', color: 'Sienna Red Ombre', texture: 'Silky Straight', price: 325000, stock: 4 }
+    ],
+    inStock: true,
+    stockQuantity: 19,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 4.9,
+    reviewsCount: 24,
+    tags: ["auburn", "copper", "red hair", "silk straight", "hd lace", "warm tones"]
+  },
+  {
+    name: "The Bellissima Burgundy Wine Curl Wig",
+    category: "wigs",
+    price: 305000,
+    compareAtPrice: 360000,
+    shortDescription: "Sumptuous deep wine burgundy long curly wig with rich jewel-toned pigment and a lush, bouncy curl pattern.",
+    description: "Opulence in every curl. This bordeaux-wine burgundy unit is saturated with multi-dimensional jewel-toned pigment — deep plum, crimson wine, and moody violet undertones — that shift beautifully in different lighting. Crafted from Cambodian raw hair, known for its naturally thick, voluminous curl pattern that holds shape beautifully without frizz.",
+    specifications: {
+      hairType: "100% Raw Cambodian Virgin Hair",
+      origin: "Cambodian Highlands",
+      laceType: "13x6 HD Swiss Lace Frontal",
+      hairGrade: "14A Double Drawn",
+      capSize: "Medium (22.5\") with elastic band",
+      longevity: "3 - 5 Years",
+      texture: "Deep Curly",
+      colorName: "Bordeaux Wine Burgundy #99J",
+      colorHex: "#6D0E2E",
+      availableColors: [
+        { name: "Bordeaux Wine Burgundy #99J", hex: "#6D0E2E" },
+        { name: "Dark Plum Violet", hex: "#4A235A" }
+      ]
+    },
+    images: [
+      "/images/products/wig-burgundy-model.jpg",
+      "/images/products/wig-burgundy-bust.jpg",
+      "/images/products/wig-deep-wave-1.jpg",
+      "/images/products/wig-deep-wave-2.jpg"
+    ],
+    variants: [
+      { name: '22" / 200% Density / Burgundy #99J', length: '22"', density: '200%', color: 'Bordeaux Wine Burgundy #99J', texture: 'Deep Curly', price: 305000, stock: 8 },
+      { name: '26" / 250% Density / Burgundy #99J', length: '26"', density: '250%', color: 'Bordeaux Wine Burgundy #99J', texture: 'Deep Curly', price: 365000, stock: 5 },
+      { name: '24" / 200% Density / Dark Plum Violet', length: '24"', density: '200%', color: 'Dark Plum Violet', texture: 'Deep Curly', price: 335000, stock: 4 }
+    ],
+    inStock: true,
+    stockQuantity: 17,
+    isFeatured: true,
+    isBestseller: false,
+    rating: 4.9,
+    reviewsCount: 19,
+    tags: ["burgundy", "wine", "deep curly", "jewel tone", "hd lace", "plum"]
+  },
+  {
+    name: "The Monaco Golden Honey Blonde Beach Wave Wig",
+    category: "wigs",
+    price: 325000,
+    compareAtPrice: 385000,
+    shortDescription: "Sun-kissed golden honey blonde long beach waves with luminous warmth and seamless HD frontal — pure coastal glamour.",
+    description: "Escape to the French Riviera with every wear. Crafted from single-donor Brazilian raw hair and gently lifted to a golden honey blonde with warm caramel and butterscotch highlights throughout. The long beach wave pattern adds effortless volume and movement. Features a pre-plucked 13x6 HD Swiss frontal for a flawless natural hairline.",
+    specifications: {
+      hairType: "100% Raw Brazilian Single Donor Hair",
+      origin: "Brazilian Raw Donors",
+      laceType: "13x6 Pre-Plucked HD Swiss Frontal",
+      hairGrade: "14A Double Drawn",
+      capSize: "Medium (22.5\") with velvet grip band",
+      longevity: "3 - 4 Years",
+      texture: "Beach Wave",
+      colorName: "Golden Honey Blonde #27",
+      colorHex: "#D4A017",
+      availableColors: [
+        { name: "Golden Honey Blonde #27", hex: "#D4A017" },
+        { name: "Butterscotch Caramel Ombre", hex: "#C68A00" }
+      ]
+    },
+    images: [
+      "/images/products/wig-blonde-model.jpg",
+      "/images/products/wig-blonde-bust.jpg",
+      "/images/products/wig-body-wave-2.jpg"
+    ],
+    variants: [
+      { name: '22" / 180% Density / Golden Honey Blonde', length: '22"', density: '180%', color: 'Golden Honey Blonde #27', texture: 'Beach Wave', price: 325000, stock: 8 },
+      { name: '26" / 200% Density / Golden Honey Blonde', length: '26"', density: '200%', color: 'Golden Honey Blonde #27', texture: 'Beach Wave', price: 385000, stock: 5 },
+      { name: '24" / 200% Density / Butterscotch Ombre', length: '24"', density: '200%', color: 'Butterscotch Caramel Ombre', texture: 'Beach Wave', price: 355000, stock: 5 }
+    ],
+    inStock: true,
+    stockQuantity: 18,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 4.9,
+    reviewsCount: 28,
+    tags: ["blonde", "honey blonde", "beach wave", "golden", "hd lace", "summer"]
+  },
 
   // --- ATTACHMENTS ---
   {
