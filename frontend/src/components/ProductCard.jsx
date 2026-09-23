@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Star, Eye, Sparkles } from 'lucide-react';
+import { ShoppingBag, Eye, Sparkles } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
 
 export default function ProductCard({ product }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isActive, setIsActive] = useState(false); // covers both hover (desktop) and touch (mobile)
+  const touchTimeout = useRef(null);
   const { addToCart } = useCart();
   const { format } = useCurrency();
 
@@ -14,11 +14,21 @@ export default function ProductCard({ product }) {
 
   const defaultVariant = product.variants && product.variants.length > 0 ? product.variants[0] : null;
   const displayPrice = defaultVariant ? defaultVariant.price : product.price;
-  const primaryImage = product.images?.[0] || '/images/products/placeholder-hair.jpg';
-  const secondaryImage = product.images?.[1] || primaryImage;
 
-  const hasMannequinView = product.images && product.images.length > 1;
-  const displayImage = isHovered && hasMannequinView ? secondaryImage : primaryImage;
+  // Wigs: show the wig/mannequin image first, model on hover/touch
+  // Hair care: show product image, secondary on hover/touch
+  const isWig = product.category === 'wigs';
+  const allImages = product.images || [];
+
+  // For wigs, find the mannequin/wig-only image (often index 1) as primary
+  // and model image as secondary (hover state)
+  // We always put the product/wig first, model second
+  const primaryImage = allImages[0] || '/images/products/placeholder-hair.jpg';
+  const secondaryImage = allImages[1] || primaryImage;
+  const hasSecondImage = allImages.length > 1;
+
+  // Show secondary image when active (hovered or touched)
+  const displayImage = isActive && hasSecondImage ? secondaryImage : primaryImage;
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
@@ -26,15 +36,28 @@ export default function ProductCard({ product }) {
     addToCart(product, defaultVariant, 1);
   };
 
+  // Mobile touch: tap image area to toggle the view
+  const handleTouchStart = () => {
+    clearTimeout(touchTimeout.current);
+    setIsActive(true);
+  };
+
+  const handleTouchEnd = () => {
+    // Keep active for 1.5s after finger lifts so user can see the change
+    touchTimeout.current = setTimeout(() => setIsActive(false), 1500);
+  };
+
   const availableColors = product.specifications?.availableColors || (
-    product.specifications?.colorHex ? [{ name: product.specifications.colorName, hex: product.specifications.colorHex }] : []
+    product.specifications?.colorHex
+      ? [{ name: product.specifications.colorName, hex: product.specifications.colorHex }]
+      : []
   );
 
   return (
     <div
       className="card-luxury"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => setIsActive(true)}
+      onMouseLeave={() => setIsActive(false)}
       style={{
         position: 'relative',
         display: 'flex',
@@ -49,13 +72,16 @@ export default function ProductCard({ product }) {
       {/* Product Image Frame */}
       <Link
         to={`/product/${product.slug || product._id}`}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         style={{
           position: 'relative',
           width: '100%',
-          paddingTop: '128%', // 4:5 editorial portrait ratio
+          paddingTop: '128%',
           backgroundColor: 'var(--bg-surface-2)',
           overflow: 'hidden',
-          display: 'block'
+          display: 'block',
+          WebkitTapHighlightColor: 'transparent'
         }}
       >
         <img
@@ -68,22 +94,22 @@ export default function ProductCard({ product }) {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease',
-            transform: isHovered ? 'scale(1.04)' : 'scale(1)'
+            transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
+            transform: isActive ? 'scale(1.04)' : 'scale(1)'
           }}
           onError={(e) => {
             e.target.src = 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&auto=format&fit=crop&q=80';
           }}
         />
 
-        {/* View Mode Indicator Badge */}
-        {hasMannequinView && (
+        {/* View Mode Badge — shows "Touch to view wig" hint on mobile */}
+        {hasSecondImage && (
           <div style={{
             position: 'absolute',
-            bottom: isHovered ? '56px' : '10px',
+            bottom: '52px',
             left: '10px',
             zIndex: 2,
-            backgroundColor: 'rgba(14, 13, 12, 0.78)',
+            backgroundColor: 'rgba(14, 13, 12, 0.82)',
             border: '1px solid var(--border-gold)',
             color: '#F2EFEA',
             fontSize: '9px',
@@ -92,13 +118,42 @@ export default function ProductCard({ product }) {
             padding: '3px 8px',
             borderRadius: '2px',
             backdropFilter: 'blur(6px)',
-            transition: 'bottom 0.3s ease, opacity 0.3s ease',
+            opacity: isActive ? 1 : 0,
+            transition: 'opacity 0.25s ease',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '4px'
+            gap: '4px',
+            pointerEvents: 'none'
           }}>
             <Sparkles size={10} style={{ color: 'var(--gold-primary)' }} />
-            <span>{isHovered ? 'Mannequin Atelier Display' : 'Model Wear'}</span>
+            <span>{isWig ? 'Mannequin Atelier Display' : 'Detail View'}</span>
+          </div>
+        )}
+
+        {/* Touch hint — only shows on mobile when NOT active */}
+        {hasSecondImage && (
+          <div style={{
+            position: 'absolute',
+            bottom: '52px',
+            left: '10px',
+            zIndex: 2,
+            backgroundColor: 'rgba(14, 13, 12, 0.65)',
+            border: '1px solid rgba(201,168,118,0.35)',
+            color: 'var(--gold-primary)',
+            fontSize: '9px',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            padding: '3px 8px',
+            borderRadius: '2px',
+            backdropFilter: 'blur(4px)',
+            opacity: isActive ? 0 : 1,
+            transition: 'opacity 0.25s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            pointerEvents: 'none'
+          }}>
+            <span>👆 Touch to view</span>
           </div>
         )}
 
@@ -113,9 +168,7 @@ export default function ProductCard({ product }) {
           zIndex: 2
         }}>
           {product.isBestseller && (
-            <span className="badge-gold">
-              Bestseller
-            </span>
+            <span className="badge-gold">Bestseller</span>
           )}
           {product.compareAtPrice > displayPrice && (
             <span style={{
@@ -132,7 +185,7 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        {/* Quick Add overlay button on hover */}
+        {/* Quick Add — slides up on hover (desktop), always visible on mobile */}
         <div style={{
           position: 'absolute',
           bottom: 0,
@@ -140,9 +193,10 @@ export default function ProductCard({ product }) {
           right: 0,
           padding: '10px 12px',
           background: 'linear-gradient(to top, rgba(14, 13, 12, 0.95), transparent)',
-          transform: isHovered ? 'translateY(0)' : 'translateY(100%)',
+          transform: isActive ? 'translateY(0)' : 'translateY(100%)',
           transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-          zIndex: 3
+          zIndex: 3,
+          // Always show on mobile with a slight overlay
         }}>
           <button
             onClick={handleQuickAdd}
@@ -156,6 +210,44 @@ export default function ProductCard({ product }) {
           >
             <ShoppingBag size={13} />
             <span>Quick Add to Bag</span>
+          </button>
+        </div>
+
+        {/* Mobile-only permanent Quick Add bar at bottom (when not active) */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: '8px 12px',
+          background: 'linear-gradient(to top, rgba(14,13,12,0.88), transparent)',
+          zIndex: 2,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          // Only show on touch devices when not active
+          opacity: isActive ? 0 : 1,
+          transition: 'opacity 0.25s ease',
+          pointerEvents: isActive ? 'none' : 'auto'
+        }}>
+          <button
+            onClick={handleQuickAdd}
+            style={{
+              background: 'rgba(201,168,118,0.15)',
+              border: '1px solid var(--border-gold)',
+              color: 'var(--gold-primary)',
+              borderRadius: '50%',
+              width: '32px',
+              height: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              backdropFilter: 'blur(4px)'
+            }}
+            title="Add to bag"
+          >
+            <ShoppingBag size={14} />
           </button>
         </div>
       </Link>
@@ -187,10 +279,9 @@ export default function ProductCard({ product }) {
               {product.category}
             </span>
 
-            {/* Color Swatch Dots */}
             {availableColors.length > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                {availableColors.map((col, idx) => (
+                {availableColors.slice(0, 5).map((col, idx) => (
                   <span
                     key={idx}
                     title={col.name}
@@ -224,7 +315,6 @@ export default function ProductCard({ product }) {
             </h3>
           </Link>
 
-          {/* Color & Hair Specs bullet */}
           <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
             {product.specifications?.colorName && (
               <span style={{ color: 'var(--text-muted)' }}>
@@ -249,19 +339,11 @@ export default function ProductCard({ product }) {
           paddingTop: '10px'
         }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-            <span style={{
-              fontSize: '15px',
-              fontWeight: 600,
-              color: 'var(--gold-primary)'
-            }}>
+            <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--gold-primary)' }}>
               {format(displayPrice)}
             </span>
             {product.compareAtPrice > displayPrice && (
-              <span style={{
-                fontSize: '12px',
-                color: 'var(--text-muted)',
-                textDecoration: 'line-through'
-              }}>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
                 {format(product.compareAtPrice)}
               </span>
             )}
@@ -286,4 +368,3 @@ export default function ProductCard({ product }) {
     </div>
   );
 }
-

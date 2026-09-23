@@ -20,6 +20,8 @@ export default function CatalogPage() {
   const activeColor = searchParams.get('color') || 'all';
   const activeProductType = searchParams.get('productType') || 'all';
   const activeSort = searchParams.get('sort') || 'newest';
+  // Category priority: wigs always first, then frontals, then extensions, then hair-care
+  const CATEGORY_ORDER = { wigs: 0, frontals: 1, extensions: 2, 'hair-care': 3 };
   const searchQuery = searchParams.get('search') || '';
   const maxPriceParam = searchParams.get('maxPrice') || '';
 
@@ -53,7 +55,13 @@ export default function CatalogPage() {
 
         const res = await api.getProducts(params);
         if (res.success) {
-          setProducts(res.products || []);
+          // Sort: wigs first, then other categories, within same category keep API order
+          const sorted = (res.products || []).slice().sort((a, b) => {
+            const aOrder = CATEGORY_ORDER[a.category] ?? 99;
+            const bOrder = CATEGORY_ORDER[b.category] ?? 99;
+            return aOrder - bOrder;
+          });
+          setProducts(sorted);
           setTotalCount(res.total || 0);
         }
       } catch (err) {
