@@ -557,3 +557,11 @@ img {
   }
 }
 
+/* 360 Studio Turntable Animations */
+@keyframes spin360Slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spin-animation {
+  animation: spin360Slow 3s linear infinite;
+}

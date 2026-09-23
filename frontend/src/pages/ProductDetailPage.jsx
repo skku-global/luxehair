@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ShoppingBag, Star, ShieldCheck, Truck, Sparkles, ChevronRight, ChevronLeft,
-  Check, RefreshCw, ZoomIn, Maximize2, X
+  Check, RefreshCw, ZoomIn, Maximize2, X, Play, Pause, RotateCw, Compass
 } from "lucide-react";
 import { BRAND } from "../config/brand";
 import { api } from "../services/api";
@@ -10,8 +10,29 @@ import { useCart } from "../context/CartContext";
 import { useCurrency } from "../context/CurrencyContext";
 import ProductCard from "../components/ProductCard";
 
-const ANGLE_LABELS = ["Model Wear", "Mannequin Front", "Mannequin Side", "Texture Detail"];
-const ANGLE_ICONS = ["\u2726", "\u2B21", "\u25C8", "\u25C9"];
+export function getImageAngleInfo(url, index) {
+  const lower = (url || "").toLowerCase();
+  if (lower.includes("model") || lower.includes("editorial")) {
+    return { label: "Model Editorial", short: "Model", icon: "✦", degree: null, is360: false };
+  }
+  if (lower.includes("quarter") || lower.includes("45")) {
+    return { label: "45° Three-Quarter View", short: "45° Angle", icon: "◈", degree: "45°", is360: true };
+  }
+  if (lower.includes("side") || lower.includes("profile") || lower.includes("90")) {
+    return { label: "90° Side Profile View", short: "90° Profile", icon: "◆", degree: "90°", is360: true };
+  }
+  if (lower.includes("back") || lower.includes("rear") || lower.includes("180")) {
+    return { label: "180° Rear Drape View", short: "180° Back", icon: "◉", degree: "180°", is360: true };
+  }
+  if (lower.includes("bust") || lower.includes("front")) {
+    return { label: "0° Front Bust View", short: "0° Front", icon: "⯀", degree: "0°", is360: true };
+  }
+  if (lower.includes("detail") || lower.includes("lace") || lower.includes("texture") || lower.includes("knot")) {
+    return { label: "Macro Lace & Knot Detail", short: "Lace Detail", icon: "🔍", degree: null, is360: false };
+  }
+
+  return { label: `Atelier View ${index + 1}`, short: `View ${index + 1}`, icon: "✧", degree: null, is360: false };
+}
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -30,6 +51,12 @@ export default function ProductDetailPage() {
   const [addedNotification, setAddedNotification] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // 360 Turntable State
+  const [isAutoSpinning, setIsAutoSpinning] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartXRef = useRef(null);
+  const isDraggingRef = useRef(false);
 
   // Reviews State
   const [reviews, setReviews] = useState([]);
@@ -101,6 +128,56 @@ export default function ProductDetailPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  const currentImages = product?.images?.length > 0
+    ? product.images
+    : ["https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&auto=format&fit=crop&q=80"];
+
+  const has360Rotation = currentImages.filter((img, idx) => {
+    const info = getImageAngleInfo(img, idx);
+    return info.is360;
+  }).length >= 3;
+
+  // 360 Auto-spin Interval
+  useEffect(() => {
+    let interval;
+    if (isAutoSpinning && currentImages.length > 1) {
+      interval = setInterval(() => {
+        setActiveImageIndex((prev) => (prev + 1) % currentImages.length);
+      }, 1600);
+    }
+    return () => clearInterval(interval);
+  }, [isAutoSpinning, currentImages.length]);
+
+  // Drag to rotate turntable handlers
+  const handleDragStart = (e) => {
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    dragStartXRef.current = clientX;
+    isDraggingRef.current = true;
+    setIsDragging(true);
+  };
+
+  const handleDragMove = (e) => {
+    if (!isDraggingRef.current || dragStartXRef.current === null) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const diff = clientX - dragStartXRef.current;
+    const threshold = 35;
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        setActiveImageIndex((prev) => (prev - 1 + currentImages.length) % currentImages.length);
+      } else {
+        setActiveImageIndex((prev) => (prev + 1) % currentImages.length);
+      }
+      dragStartXRef.current = clientX;
+      if (isAutoSpinning) setIsAutoSpinning(false);
+    }
+  };
+
+  const handleDragEnd = () => {
+    isDraggingRef.current = false;
+    dragStartXRef.current = null;
+    setIsDragging(false);
+  };
+
   if (loading) return (
     <div style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--gold-primary)" }}>
       <div style={{ textAlign: "center" }}>
@@ -119,9 +196,6 @@ export default function ProductDetailPage() {
   );
 
   const currentPrice = selectedVariant ? selectedVariant.price : product.price;
-  const currentImages = product.images?.length > 0
-    ? product.images
-    : ["https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&auto=format&fit=crop&q=80"];
 
   const handleAddToCart = () => {
     addToCart(product, selectedVariant, quantity);
@@ -211,8 +285,9 @@ export default function ProductDetailPage() {
               <button key={idx} onClick={(e) => { e.stopPropagation(); setLightboxIndex(idx); }} style={{ width: lightboxIndex === idx ? "26px" : "8px", height: "8px", borderRadius: "4px", backgroundColor: lightboxIndex === idx ? "#C9A876" : "rgba(255,255,255,0.3)", border: "none", cursor: "pointer", transition: "all 0.3s ease" }} />
             ))}
           </div>
-          <div style={{ position: "absolute", top: "22px", left: "50%", transform: "translateX(-50%)", backgroundColor: "rgba(201,168,118,0.12)", border: "1px solid rgba(201,168,118,0.3)", color: "#C9A876", padding: "6px 18px", borderRadius: "20px", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", backdropFilter: "blur(10px)" }}>
-            {ANGLE_ICONS[lightboxIndex] || "\u2726"} {ANGLE_LABELS[lightboxIndex] || ("View " + (lightboxIndex + 1))}
+          <div style={{ position: "absolute", top: "22px", left: "50%", transform: "translateX(-50%)", backgroundColor: "rgba(201,168,118,0.14)", border: "1px solid rgba(201,168,118,0.35)", color: "#C9A876", padding: "6px 18px", borderRadius: "20px", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", gap: "8px" }}>
+            <span>{getImageAngleInfo(currentImages[lightboxIndex], lightboxIndex).icon}</span>
+            <span>{getImageAngleInfo(currentImages[lightboxIndex], lightboxIndex).label}</span>
           </div>
         </div>
       )}
@@ -230,66 +305,325 @@ export default function ProductDetailPage() {
         {/* MAIN GRID */}
         <div style={{ display: "grid", gridTemplateColumns: "minmax(300px, 1.15fr) minmax(300px, 1fr)", gap: "56px", marginBottom: "80px" }} className="pdp-layout">
 
-          {/* LEFT: GALLERY */}
+          {/* LEFT: GALLERY / 360 TURNTABLE */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--gold-primary)", fontWeight: 600 }}>
-                <span style={{ fontSize: "14px" }}>&#9673;</span>
-                <span>360&#176; Multi-Angle Studio View</span>
+            {/* 360 Header Bar */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", flexWrap: "wrap", gap: "10px" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+                <div style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "7px",
+                  fontSize: "10px",
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                  color: "var(--gold-primary)",
+                  fontWeight: 700,
+                  backgroundColor: "rgba(201,168,118,0.08)",
+                  padding: "6px 12px",
+                  borderRadius: "20px",
+                  border: "1px solid rgba(201,168,118,0.25)"
+                }}>
+                  <RotateCw size={12} className={isAutoSpinning ? "spin-animation" : ""} />
+                  <span>{has360Rotation ? "360° Studio Turntable" : "Atelier Gallery"}</span>
+                </div>
+                {has360Rotation && getImageAngleInfo(currentImages[activeImageIndex], activeImageIndex).degree && (
+                  <span style={{
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    letterSpacing: "0.15em",
+                    color: "var(--gold-primary)",
+                    border: "1px solid var(--gold-primary)",
+                    borderRadius: "12px",
+                    padding: "2px 8px",
+                    backgroundColor: "rgba(201,168,118,0.12)"
+                  }}>
+                    {getImageAngleInfo(currentImages[activeImageIndex], activeImageIndex).degree}
+                  </span>
+                )}
               </div>
-              <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>{activeImageIndex + 1} / {currentImages.length}</span>
+
+              {/* Controls */}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <button
+                  type="button"
+                  onClick={() => setIsAutoSpinning(prev => !prev)}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    backgroundColor: isAutoSpinning ? "var(--gold-primary)" : "var(--bg-surface-2)",
+                    color: isAutoSpinning ? "#0E0D0C" : "var(--text-primary)",
+                    border: "1px solid " + (isAutoSpinning ? "var(--gold-primary)" : "var(--border-subtle)"),
+                    padding: "5px 12px",
+                    borderRadius: "16px",
+                    fontSize: "10px",
+                    letterSpacing: "0.1em",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    fontWeight: 600
+                  }}
+                  title={has360Rotation ? "Toggle 360° Auto-Turntable Rotation" : "Auto-Browse Gallery"}
+                >
+                  {isAutoSpinning ? <Pause size={12} /> : <Play size={12} />}
+                  <span>{isAutoSpinning ? (has360Rotation ? "Pause 360°" : "Pause") : (has360Rotation ? "Auto-Spin 360°" : "Auto-Play")}</span>
+                </button>
+                <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+                  {activeImageIndex + 1} / {currentImages.length}
+                </span>
+              </div>
             </div>
 
-            {/* Main Image */}
-            <div style={{ position: "relative", width: "100%", paddingTop: "118%", backgroundColor: "var(--bg-surface-2)", borderRadius: "4px", overflow: "hidden", border: "1px solid var(--border-subtle)", boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
+            {/* Main 360 Image Turntable Stage */}
+            <div
+              onMouseDown={handleDragStart}
+              onMouseMove={handleDragMove}
+              onMouseUp={handleDragEnd}
+              onMouseLeave={handleDragEnd}
+              onTouchStart={handleDragStart}
+              onTouchMove={handleDragMove}
+              onTouchEnd={handleDragEnd}
+              style={{
+                position: "relative",
+                width: "100%",
+                paddingTop: "118%",
+                backgroundColor: "var(--bg-surface-2)",
+                borderRadius: "6px",
+                overflow: "hidden",
+                border: "1px solid var(--border-subtle)",
+                boxShadow: "0 25px 70px rgba(0,0,0,0.22)",
+                cursor: isDragging ? "grabbing" : "grab",
+                userSelect: "none"
+              }}
+            >
               <img
                 key={activeImageIndex}
                 src={currentImages[activeImageIndex]}
-                alt={product.name}
-                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", transition: "opacity 0.4s ease", cursor: "zoom-in" }}
-                onClick={() => openLightbox(activeImageIndex)}
+                alt={`${product.name} - ${getImageAngleInfo(currentImages[activeImageIndex], activeImageIndex).label}`}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  transition: "opacity 0.35s ease, transform 0.35s ease",
+                  pointerEvents: "none"
+                }}
                 onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&auto=format&fit=crop&q=80"; }}
               />
+
+              {/* Badges */}
               <div style={{ position: "absolute", top: "14px", left: "14px", display: "flex", flexDirection: "column", gap: "6px", zIndex: 2 }}>
                 {product.isBestseller && <span className="badge-gold">Bestseller</span>}
                 {product.compareAtPrice > currentPrice && (
                   <span style={{ backgroundColor: "#991B1B", color: "#fff", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "2px", letterSpacing: "0.06em" }}>SAVE {Math.round(((product.compareAtPrice - currentPrice) / product.compareAtPrice) * 100)}%</span>
                 )}
               </div>
-              <div style={{ position: "absolute", bottom: "52px", left: "14px", backgroundColor: "rgba(0,0,0,0.78)", color: "#fff", padding: "5px 12px", borderRadius: "20px", fontSize: "10px", letterSpacing: "0.12em", backdropFilter: "blur(8px)", display: "inline-flex", alignItems: "center", gap: "6px", border: "1px solid rgba(201,168,118,0.3)" }}>
-                <span style={{ color: "var(--gold-primary)" }}>{ANGLE_ICONS[activeImageIndex] || "\u2726"}</span>
-                <span>{ANGLE_LABELS[activeImageIndex] || ("View " + (activeImageIndex + 1))}</span>
+
+              {/* Angle Label & Drag Prompt */}
+              <div style={{
+                position: "absolute",
+                bottom: "52px",
+                left: "14px",
+                backgroundColor: "rgba(0,0,0,0.82)",
+                color: "#fff",
+                padding: "6px 14px",
+                borderRadius: "20px",
+                fontSize: "10px",
+                letterSpacing: "0.14em",
+                backdropFilter: "blur(10px)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "7px",
+                border: "1px solid rgba(201,168,118,0.35)",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.4)"
+              }}>
+                <span style={{ color: "var(--gold-primary)", fontSize: "12px" }}>
+                  {getImageAngleInfo(currentImages[activeImageIndex], activeImageIndex).icon}
+                </span>
+                <span style={{ fontWeight: 600 }}>
+                  {getImageAngleInfo(currentImages[activeImageIndex], activeImageIndex).label}
+                </span>
               </div>
-              <div style={{ position: "absolute", bottom: "52px", right: "14px", backgroundColor: "rgba(0,0,0,0.6)", color: "rgba(255,255,255,0.65)", padding: "5px 10px", borderRadius: "20px", fontSize: "9px", letterSpacing: "0.1em", backdropFilter: "blur(8px)", display: "inline-flex", alignItems: "center", gap: "5px" }}>
-                <ZoomIn size={10} /><span>Click to zoom</span>
+
+              {/* Drag to Rotate Indicator */}
+              <div style={{
+                position: "absolute",
+                bottom: "16px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                backgroundColor: "rgba(0,0,0,0.65)",
+                color: "rgba(255,255,255,0.75)",
+                padding: "4px 12px",
+                borderRadius: "14px",
+                fontSize: "9px",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                backdropFilter: "blur(8px)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                pointerEvents: "none"
+              }}>
+                <span>&#10229;</span>
+                <span>{has360Rotation ? "Drag to Rotate 360°" : "Drag to Browse"}</span>
+                <span>&#10230;</span>
               </div>
+
+              <div
+                onClick={() => openLightbox(activeImageIndex)}
+                style={{
+                  position: "absolute",
+                  bottom: "52px",
+                  right: "14px",
+                  backgroundColor: "rgba(0,0,0,0.7)",
+                  color: "rgba(255,255,255,0.85)",
+                  padding: "6px 12px",
+                  borderRadius: "20px",
+                  fontSize: "10px",
+                  letterSpacing: "0.1em",
+                  backdropFilter: "blur(8px)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "5px",
+                  cursor: "pointer",
+                  border: "1px solid rgba(255,255,255,0.15)"
+                }}
+              >
+                <ZoomIn size={12} /><span>Zoom</span>
+              </div>
+
               {activeImageIndex > 0 && (
-                <button onClick={() => navigateImage(-1)} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", backgroundColor: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "50%", width: "38px", height: "38px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", zIndex: 3, backdropFilter: "blur(6px)" }}>
-                  <ChevronLeft size={18} />
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); navigateImage(-1); if (isAutoSpinning) setIsAutoSpinning(false); }}
+                  style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", backgroundColor: "rgba(0,0,0,0.65)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", zIndex: 3, backdropFilter: "blur(8px)", transition: "all 0.2s ease" }}
+                  aria-label="Previous angle"
+                >
+                  <ChevronLeft size={20} />
                 </button>
               )}
               {activeImageIndex < currentImages.length - 1 && (
-                <button onClick={() => navigateImage(1)} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", backgroundColor: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "50%", width: "38px", height: "38px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", zIndex: 3, backdropFilter: "blur(6px)" }}>
-                  <ChevronRight size={18} />
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); navigateImage(1); if (isAutoSpinning) setIsAutoSpinning(false); }}
+                  style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", backgroundColor: "rgba(0,0,0,0.65)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", zIndex: 3, backdropFilter: "blur(8px)", transition: "all 0.2s ease" }}
+                  aria-label="Next angle"
+                >
+                  <ChevronRight size={20} />
                 </button>
               )}
+
+              {/* Progress bar */}
               <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "3px", backgroundColor: "rgba(255,255,255,0.08)" }}>
                 <div style={{ height: "100%", width: ((activeImageIndex + 1) / currentImages.length * 100) + "%", backgroundColor: "var(--gold-primary)", transition: "width 0.3s ease" }} />
               </div>
             </div>
 
-            {/* Thumbnails */}
-            <div style={{ display: "flex", gap: "10px", marginTop: "12px", overflowX: "auto", paddingBottom: "4px" }}>
-              {currentImages.map((img, idx) => (
-                <button key={idx} onClick={() => setActiveImageIndex(idx)} style={{ position: "relative", flexShrink: 0, width: "78px", height: "96px", borderRadius: "3px", overflow: "hidden", padding: 0, backgroundColor: "var(--bg-surface-2)", border: activeImageIndex === idx ? "2px solid var(--gold-primary)" : "1px solid var(--border-subtle)", opacity: activeImageIndex === idx ? 1 : 0.55, transition: "all 0.2s", cursor: "pointer", boxShadow: activeImageIndex === idx ? "0 0 0 3px rgba(201,168,118,0.12)" : "none" }}>
-                  <img src={img} alt={ANGLE_LABELS[idx] || ("Angle " + (idx + 1))} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=200&auto=format&fit=crop&q=80"; }} />
-                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: activeImageIndex === idx ? "rgba(201,168,118,0.92)" : "rgba(0,0,0,0.75)", color: activeImageIndex === idx ? "#0E0D0C" : "#fff", fontSize: "7px", letterSpacing: "0.05em", textAlign: "center", padding: "3px 2px", textTransform: "uppercase", fontWeight: activeImageIndex === idx ? 700 : 400 }}>
-                    {ANGLE_LABELS[idx] || ("View " + (idx + 1))}
-                  </div>
-                  {activeImageIndex === idx && <div style={{ position: "absolute", top: "5px", right: "5px", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "var(--gold-primary)", boxShadow: "0 0 8px rgba(201,168,118,0.7)" }} />}
-                </button>
-              ))}
-              <button onClick={() => openLightbox(activeImageIndex)} style={{ flexShrink: 0, width: "78px", height: "96px", borderRadius: "3px", padding: 0, cursor: "pointer", backgroundColor: "var(--bg-surface-2)", border: "1px dashed var(--border-medium)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px", color: "var(--text-muted)", transition: "all 0.2s" }}>
+            {/* Quick 360 Angle Selector Pills */}
+            <div style={{ display: "flex", gap: "6px", marginTop: "12px", overflowX: "auto", paddingBottom: "4px", scrollbarWidth: "none" }}>
+              {currentImages.map((img, idx) => {
+                const info = getImageAngleInfo(img, idx);
+                const isActive = activeImageIndex === idx;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => { setActiveImageIndex(idx); if (isAutoSpinning) setIsAutoSpinning(false); }}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      fontSize: "10px",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      fontWeight: isActive ? 700 : 500,
+                      backgroundColor: isActive ? "rgba(201,168,118,0.2)" : "var(--bg-surface-2)",
+                      color: isActive ? "var(--gold-primary)" : "var(--text-secondary)",
+                      border: isActive ? "1px solid var(--gold-primary)" : "1px solid var(--border-subtle)",
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                      transition: "all 0.2s ease"
+                    }}
+                  >
+                    <span>{info.icon}</span>
+                    <span>{info.short}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Thumbnails Tray */}
+            <div style={{ display: "flex", gap: "10px", marginTop: "10px", overflowX: "auto", paddingBottom: "4px" }}>
+              {currentImages.map((img, idx) => {
+                const info = getImageAngleInfo(img, idx);
+                const isActive = activeImageIndex === idx;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => { setActiveImageIndex(idx); if (isAutoSpinning) setIsAutoSpinning(false); }}
+                    style={{
+                      position: "relative",
+                      flexShrink: 0,
+                      width: "78px",
+                      height: "96px",
+                      borderRadius: "4px",
+                      overflow: "hidden",
+                      padding: 0,
+                      backgroundColor: "var(--bg-surface-2)",
+                      border: isActive ? "2px solid var(--gold-primary)" : "1px solid var(--border-subtle)",
+                      opacity: isActive ? 1 : 0.6,
+                      transition: "all 0.2s",
+                      cursor: "pointer",
+                      boxShadow: isActive ? "0 0 0 3px rgba(201,168,118,0.2)" : "none"
+                    }}
+                  >
+                    <img src={img} alt={info.label} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=200&auto=format&fit=crop&q=80"; }} />
+                    <div style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      backgroundColor: isActive ? "rgba(201,168,118,0.95)" : "rgba(0,0,0,0.8)",
+                      color: isActive ? "#0E0D0C" : "#fff",
+                      fontSize: "7.5px",
+                      letterSpacing: "0.05em",
+                      textAlign: "center",
+                      padding: "3px 2px",
+                      textTransform: "uppercase",
+                      fontWeight: isActive ? 700 : 500
+                    }}>
+                      {info.short}
+                    </div>
+                    {isActive && <div style={{ position: "absolute", top: "5px", right: "5px", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "var(--gold-primary)", boxShadow: "0 0 8px rgba(201,168,118,0.9)" }} />}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => openLightbox(activeImageIndex)}
+                style={{
+                  flexShrink: 0,
+                  width: "78px",
+                  height: "96px",
+                  borderRadius: "4px",
+                  padding: 0,
+                  cursor: "pointer",
+                  backgroundColor: "var(--bg-surface-2)",
+                  border: "1px dashed var(--border-medium)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                  color: "var(--text-muted)",
+                  transition: "all 0.2s"
+                }}
+              >
                 <Maximize2 size={15} />
                 <span style={{ fontSize: "7px", letterSpacing: "0.08em", textTransform: "uppercase" }}>Full View</span>
               </button>
@@ -298,7 +632,21 @@ export default function ProductDetailPage() {
             {/* Dots */}
             <div style={{ display: "flex", justifyContent: "center", gap: "6px", marginTop: "14px" }}>
               {currentImages.map((_, idx) => (
-                <button key={idx} onClick={() => setActiveImageIndex(idx)} style={{ width: activeImageIndex === idx ? "22px" : "7px", height: "7px", borderRadius: "3px", padding: 0, backgroundColor: activeImageIndex === idx ? "var(--gold-primary)" : "var(--border-medium)", border: "none", cursor: "pointer", transition: "all 0.3s ease" }} />
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => { setActiveImageIndex(idx); if (isAutoSpinning) setIsAutoSpinning(false); }}
+                  style={{
+                    width: activeImageIndex === idx ? "24px" : "7px",
+                    height: "7px",
+                    borderRadius: "3px",
+                    padding: 0,
+                    backgroundColor: activeImageIndex === idx ? "var(--gold-primary)" : "var(--border-medium)",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease"
+                  }}
+                />
               ))}
             </div>
           </div>

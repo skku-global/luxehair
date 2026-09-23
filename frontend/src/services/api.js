@@ -4,7 +4,11 @@
  * JSON serialization, and error mapping.
  */
 
-const BASE_URL = '/api';
+const API_ORIGIN = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.replace(/\/+$/, '')
+  : (import.meta.env.PROD ? 'https://luxehair.onrender.com' : '');
+
+const BASE_URL = `${API_ORIGIN}/api`;
 
 const getHeaders = (includeAuth = true) => {
   const headers = {

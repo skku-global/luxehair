@@ -17,14 +17,9 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB
 connectDB();
 
-// Middleware: Enable CORS for frontend requests
+// Middleware: Enable CORS for frontend requests (dynamically allows localhost and production domains)
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://localhost:3000',
-    process.env.FRONTEND_URL || ''
-  ].filter(Boolean),
+  origin: true,
   credentials: true
 }));
 

@@ -1,4 +1,8 @@
+require('dotenv').config({ path: __dirname + '/../.env' });
+const dns = require('dns');
+try { dns.setServers(['8.8.8.8', '1.1.1.1']); } catch(e) {}
 const mongoose = require('mongoose');
+const { formatMongoUri } = require('../config/db');
 
 const sampleReviewsPool = [
   {
@@ -44,7 +48,10 @@ const sampleReviewsPool = [
 ];
 
 async function seedReviews() {
-  await mongoose.connect('mongodb://localhost:27017/luxehair');
+  const rawUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/luxehair';
+  const mongoUri = formatMongoUri ? formatMongoUri(rawUri) : rawUri;
+  console.log(`[Reviews Seed] Connecting to MongoDB...`);
+  await mongoose.connect(mongoUri);
   const Product = mongoose.model('Product', new mongoose.Schema({
     name: String,
     rating: Number,
