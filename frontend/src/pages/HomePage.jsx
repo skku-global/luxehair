@@ -15,8 +15,14 @@ export default function HomePage() {
       try {
         const res = await api.getFeaturedProducts();
         if (res.success) {
-          setFeaturedProducts(res.featured || []);
-          setBestsellers(res.bestsellers || []);
+          // Always put wigs first, then frontals, extensions, hair-care
+          const CATEGORY_ORDER = { wigs: 0, frontals: 1, extensions: 2, 'hair-care': 3 };
+          const sortByWigsFirst = (arr) =>
+            (arr || []).slice().sort((a, b) =>
+              (CATEGORY_ORDER[a.category] ?? 99) - (CATEGORY_ORDER[b.category] ?? 99)
+            );
+          setFeaturedProducts(sortByWigsFirst(res.featured));
+          setBestsellers(sortByWigsFirst(res.bestsellers));
         }
       } catch (err) {
         console.error('Failed to load home products:', err);

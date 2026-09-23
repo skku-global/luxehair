@@ -15,16 +15,19 @@ export default function ProductCard({ product }) {
   const defaultVariant = product.variants && product.variants.length > 0 ? product.variants[0] : null;
   const displayPrice = defaultVariant ? defaultVariant.price : product.price;
 
-  // Wigs: show the wig/mannequin image first, model on hover/touch
-  // Hair care: show product image, secondary on hover/touch
+  // Wigs: mannequin/bust image FIRST (index 1 in seed), model on hover/touch
+  // Other products: product image first, secondary on hover
   const isWig = product.category === 'wigs';
   const allImages = product.images || [];
 
-  // For wigs, find the mannequin/wig-only image (often index 1) as primary
-  // and model image as secondary (hover state)
-  // We always put the product/wig first, model second
-  const primaryImage = allImages[0] || '/images/products/placeholder-hair.jpg';
-  const secondaryImage = allImages[1] || primaryImage;
+  // For wigs: bust/mannequin is images[1], model is images[0]
+  // We flip them so wig is the default view, model appears on interaction
+  const primaryImage = isWig && allImages.length > 1
+    ? allImages[1]
+    : (allImages[0] || '/images/products/placeholder-hair.jpg');
+  const secondaryImage = isWig && allImages.length > 1
+    ? allImages[0]
+    : (allImages[1] || primaryImage);
   const hasSecondImage = allImages.length > 1;
 
   // Show secondary image when active (hovered or touched)
@@ -102,8 +105,8 @@ export default function ProductCard({ product }) {
           }}
         />
 
-        {/* View Mode Badge — shows "Touch to view wig" hint on mobile */}
-        {hasSecondImage && (
+        {/* View mode badge — shows when active (hover/touch) */}
+        {hasSecondImage && isActive && (
           <div style={{
             position: 'absolute',
             bottom: '52px',
@@ -118,42 +121,13 @@ export default function ProductCard({ product }) {
             padding: '3px 8px',
             borderRadius: '2px',
             backdropFilter: 'blur(6px)',
-            opacity: isActive ? 1 : 0,
-            transition: 'opacity 0.25s ease',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '4px',
             pointerEvents: 'none'
           }}>
             <Sparkles size={10} style={{ color: 'var(--gold-primary)' }} />
-            <span>{isWig ? 'Mannequin Atelier Display' : 'Detail View'}</span>
-          </div>
-        )}
-
-        {/* Touch hint — only shows on mobile when NOT active */}
-        {hasSecondImage && (
-          <div style={{
-            position: 'absolute',
-            bottom: '52px',
-            left: '10px',
-            zIndex: 2,
-            backgroundColor: 'rgba(14, 13, 12, 0.65)',
-            border: '1px solid rgba(201,168,118,0.35)',
-            color: 'var(--gold-primary)',
-            fontSize: '9px',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            padding: '3px 8px',
-            borderRadius: '2px',
-            backdropFilter: 'blur(4px)',
-            opacity: isActive ? 0 : 1,
-            transition: 'opacity 0.25s ease',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-            pointerEvents: 'none'
-          }}>
-            <span>👆 Touch to view</span>
+            <span>{isWig ? 'Model Editorial' : 'Detail View'}</span>
           </div>
         )}
 

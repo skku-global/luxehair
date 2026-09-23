@@ -127,10 +127,10 @@ export default function CatalogPage() {
   };
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-primary)', minHeight: '100vh', padding: '40px 0 80px', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
+    <div className="catalog-page-root" style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-primary)', minHeight: '100vh', padding: '40px 0 80px', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
       <div className="container">
         {/* Header Title Section */}
-        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+        <div className="catalog-header" style={{ textAlign: 'center', marginBottom: '36px' }}>
           <span className="section-tag" style={{ color: 'var(--gold-primary)' }}>Haute Coiffure Catalog</span>
           <h1 style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
@@ -155,7 +155,7 @@ export default function CatalogPage() {
         </div>
 
         {/* Category Horizontal Filter Pills */}
-        <div style={{
+        <div className="catalog-category-pills" style={{
           display: 'flex',
           flexWrap: 'wrap',
           alignItems: 'center',
@@ -194,7 +194,7 @@ export default function CatalogPage() {
         </div>
 
         {/* Toolbar: Count, Mobile Toggle, Sort Dropdown */}
-        <div style={{
+        <div className="catalog-toolbar" style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -396,6 +396,28 @@ export default function CatalogPage() {
           }
           .mobile-filter-btn {
             display: inline-flex !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .catalog-page-root {
+            padding: 20px 0 60px !important;
+          }
+          .catalog-header {
+            margin-bottom: 20px !important;
+          }
+          .catalog-category-pills {
+            gap: 8px !important;
+            margin-bottom: 20px !important;
+            padding-bottom: 16px !important;
+          }
+          .catalog-category-pills button {
+            padding: 8px 14px !important;
+            font-size: 11px !important;
+          }
+          .catalog-toolbar {
+            margin-bottom: 16px !important;
+            flex-wrap: wrap !important;
+            gap: 10px !important;
           }
         }
       `}</style>

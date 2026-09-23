@@ -78,6 +78,11 @@ body {
   transition: background-color var(--transition-smooth), color var(--transition-smooth);
 }
 
+#root {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 /* Custom Luxury Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
@@ -549,7 +554,13 @@ img {
 
 @media (max-width: 480px) {
   .grid-products {
-    grid-template-columns: 1fr;
+    /* Keep 2 columns on phones — 1 column creates huge whitespace */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
   }
   .trust-badge-grid {
     grid-template-columns: 1fr;
