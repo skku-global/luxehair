@@ -15,23 +15,14 @@ export default function ProductCard({ product }) {
   const defaultVariant = product.variants && product.variants.length > 0 ? product.variants[0] : null;
   const displayPrice = defaultVariant ? defaultVariant.price : product.price;
 
-  // Wigs: mannequin/bust image FIRST (index 1 in seed), model on hover/touch
-  // Other products: product image first, secondary on hover
+  // Model photo is 1st (default view)
+  // Hair / mannequin / detail photo is revealed when hovered or touched
   const isWig = product.category === 'wigs';
   const allImages = product.images || [];
 
-  // For wigs: bust/mannequin is images[1], model is images[0]
-  // We flip them so wig is the default view, model appears on interaction
-  const primaryImage = isWig && allImages.length > 1
-    ? allImages[1]
-    : (allImages[0] || '/images/products/placeholder-hair.jpg');
-  const secondaryImage = isWig && allImages.length > 1
-    ? allImages[0]
-    : (allImages[1] || primaryImage);
+  const primaryImage = allImages[0] || '/images/products/placeholder-hair.jpg';
+  const secondaryImage = allImages[1] || primaryImage;
   const hasSecondImage = allImages.length > 1;
-
-  // Show secondary image when active (hovered or touched)
-  const displayImage = isActive && hasSecondImage ? secondaryImage : primaryImage;
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
@@ -39,15 +30,15 @@ export default function ProductCard({ product }) {
     addToCart(product, defaultVariant, 1);
   };
 
-  // Mobile touch: tap image area to toggle the view
+  // Mobile touch: touching/holding the image reveals the mannequin/hair view
   const handleTouchStart = () => {
     clearTimeout(touchTimeout.current);
     setIsActive(true);
   };
 
   const handleTouchEnd = () => {
-    // Keep active for 1.5s after finger lifts so user can see the change
-    touchTimeout.current = setTimeout(() => setIsActive(false), 1500);
+    // Keep hair view active for 1.2s after finger lifts so mobile user sees it clearly
+    touchTimeout.current = setTimeout(() => setIsActive(false), 1200);
   };
 
   const availableColors = product.specifications?.availableColors || (
@@ -77,6 +68,7 @@ export default function ProductCard({ product }) {
         to={`/product/${product.slug || product._id}`}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
         style={{
           position: 'relative',
           width: '100%',
@@ -87,8 +79,9 @@ export default function ProductCard({ product }) {
           WebkitTapHighlightColor: 'transparent'
         }}
       >
+        {/* Primary Image: Model Photo (Default View) */}
         <img
-          src={displayImage}
+          src={primaryImage}
           alt={product.name}
           style={{
             position: 'absolute',
@@ -97,13 +90,34 @@ export default function ProductCard({ product }) {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
-            transform: isActive ? 'scale(1.04)' : 'scale(1)'
+            transition: 'opacity 0.4s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
+            transform: isActive ? 'scale(1.04)' : 'scale(1)',
+            opacity: isActive && hasSecondImage ? 0 : 1
           }}
           onError={(e) => {
             e.target.src = 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&auto=format&fit=crop&q=80';
           }}
         />
+
+        {/* Secondary Image: Mannequin / Hair Detail (Revealed on Hover/Touch) */}
+        {hasSecondImage && (
+          <img
+            src={secondaryImage}
+            alt={`${product.name} hair mannequin view`}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              transition: 'opacity 0.4s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
+              transform: isActive ? 'scale(1.04)' : 'scale(1)',
+              opacity: isActive ? 1 : 0,
+              pointerEvents: 'none'
+            }}
+          />
+        )}
 
         {/* View mode badge — shows when active (hover/touch) */}
         {hasSecondImage && isActive && (
@@ -112,7 +126,7 @@ export default function ProductCard({ product }) {
             bottom: '52px',
             left: '10px',
             zIndex: 2,
-            backgroundColor: 'rgba(14, 13, 12, 0.82)',
+            backgroundColor: 'rgba(14, 13, 12, 0.85)',
             border: '1px solid var(--border-gold)',
             color: '#F2EFEA',
             fontSize: '9px',
@@ -127,7 +141,7 @@ export default function ProductCard({ product }) {
             pointerEvents: 'none'
           }}>
             <Sparkles size={10} style={{ color: 'var(--gold-primary)' }} />
-            <span>{isWig ? 'Model Editorial' : 'Detail View'}</span>
+            <span>{isWig ? 'Hair & Mannequin' : 'Detail View'}</span>
           </div>
         )}
 
