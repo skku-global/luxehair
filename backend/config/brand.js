@@ -27,6 +27,26 @@ module.exports = {
       rate: 1500 // ₦1,500 = $1.00 USD (manually set in brand config)
     }
   },
+  /**
+   * Server-side copy of the shipping table.
+   *
+   * The checkout form sends a shipping fee, and an order's total is built from
+   * it -- so it has to be checked against a trusted list here rather than
+   * taken at face value. Keep this in sync with `frontend/src/config/brand.js`.
+   */
+  shippingOptions: [
+    { id: 'standard-lagos',    fee: 3500,  feeUsd: 5 },
+    { id: 'nationwide-dhl',    fee: 7500,  feeUsd: 10 },
+    { id: 'international-dhl', fee: 45000, feeUsd: 35 },
+    { id: 'vip-same-day',      fee: 12000, feeUsd: 15 }
+  ],
+
+  // Subtotal at or above which shipping is complimentary
+  freeShippingThreshold: {
+    NGN: 250000,
+    USD: 200
+  },
+
   contact: {
     email: 'concierge@luxehairco.com',
     phone: '+234 800 589 3424',

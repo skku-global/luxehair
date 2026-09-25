@@ -1,7 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
-const { protect, requireAdmin } = require('../middleware/auth');
+const Order = require('../models/Order');
+const { protect, requireAdmin, optionalAuth } = require('../middleware/auth');
+const { reviewLimiter } = require('../middleware/rateLimit');
+
+/** Fields an admin is permitted to change through the update endpoint. */
+const PRODUCT_UPDATABLE_FIELDS = [
+  'name', 'category', 'price', 'compareAtPrice', 'description', 'shortDescription',
+  'specifications', 'images', 'variants', 'inStock', 'stockQuantity',
+  'isFeatured', 'isBestseller', 'tags'
+];
+
+/** Resolve a product by Mongo ObjectId or URL slug. */
+function findProductByIdentifier(identifier, projection) {
+  const isObjectId = /^[0-9a-fA-F]{24}$/.test(identifier);
+  const query = isObjectId ? { _id: identifier } : { slug: identifier };
+  return projection ? Product.findOne(query).select(projection) : Product.findOne(query);
+}
 
 /**
  * @route   GET /api/products
@@ -42,15 +58,15 @@ router.get('/', async (req, res, next) => {
       conditions.push({ 'variants.length': { $regex: length, $options: 'i' } });
     }
 
-    // Filter by type (Attachments: Clip-In, Tape-In, Ponytail)
+    // Filter by type (Attachments: Clip-In, Weft, Tape-In, Nano-Tip, Keratin, Ponytail)
     const attachmentType = type || req.query.attachmentType;
     if (attachmentType && attachmentType !== 'all') {
-      const cleanType = attachmentType.replace('-', '[- ]?');
+      const cleanType = attachmentType.replace(/-/g, '[- ]?');
       conditions.push({
         $or: [
+          { 'specifications.attachmentType': { $regex: cleanType, $options: 'i' } },
           { name: { $regex: cleanType, $options: 'i' } },
-          { tags: { $in: [new RegExp(cleanType, 'i')] } },
-          { description: { $regex: cleanType, $options: 'i' } }
+          { tags: { $in: [new RegExp(cleanType, 'i')] } }
         ]
       });
     }
@@ -151,13 +167,7 @@ router.get('/featured', async (req, res, next) => {
  */
 router.get('/:identifier', async (req, res, next) => {
   try {
-    const { identifier } = req.params;
-
-    // Check whether identifier is ObjectId or slug string
-    const isObjectId = identifier.match(/^[0-9a-fA-F]{24}$/);
-    const product = isObjectId
-      ? await Product.findById(identifier)
-      : await Product.findOne({ slug: identifier });
+    const product = await findProductByIdentifier(req.params.identifier);
 
     if (!product) {
       return res.status(404).json({
@@ -247,9 +257,29 @@ router.post('/', protect, requireAdmin, async (req, res, next) => {
  */
 router.put('/:id', protect, requireAdmin, async (req, res, next) => {
   try {
+    // Only whitelisted fields may be updated — never trust the request body wholesale
+    // (an unrestricted $set lets a caller overwrite reviews, rating, slug or _id).
+    const updates = {};
+    for (const field of PRODUCT_UPDATABLE_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+        updates[field] = req.body[field];
+      }
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No updatable product fields were supplied.'
+      });
+    }
+
+    if (updates.price !== undefined) updates.price = Number(updates.price);
+    if (updates.compareAtPrice !== undefined) updates.compareAtPrice = Number(updates.compareAtPrice);
+    if (updates.stockQuantity !== undefined) updates.stockQuantity = Number(updates.stockQuantity);
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      { $set: updates },
       { new: true, runValidators: true }
     );
 
@@ -302,11 +332,7 @@ router.delete('/:id', protect, requireAdmin, async (req, res, next) => {
  */
 router.get('/:id/reviews', async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const isObjectId = id.match(/^[0-9a-fA-F]{24}$/);
-    const product = isObjectId
-      ? await Product.findById(id).select('reviews rating reviewsCount name')
-      : await Product.findOne({ slug: id }).select('reviews rating reviewsCount name');
+    const product = await findProductByIdentifier(req.params.id, 'reviews rating reviewsCount name');
 
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found.' });
@@ -325,45 +351,86 @@ router.get('/:id/reviews', async (req, res, next) => {
 
 /**
  * @route   POST /api/products/:id/reviews
- * @desc    Submit a verified customer review
- * @access  Public
+ * @desc    Submit a customer review. Verified-purchase status is determined
+ *          server-side from order history — never taken from the request body.
+ * @access  Public (rate limited); purchase verification requires a logged-in user
  */
-router.post('/:id/reviews', async (req, res, next) => {
+router.post('/:id/reviews', reviewLimiter, optionalAuth, async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, email, rating, title, comment, verifiedPurchase } = req.body;
+    const name = typeof req.body.name === 'string' ? req.body.name.trim() : '';
+    const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+    const title = typeof req.body.title === 'string' ? req.body.title.trim() : '';
+    const comment = typeof req.body.comment === 'string' ? req.body.comment.trim() : '';
+    const rating = Number(req.body.rating);
 
-    if (!name || !rating || !comment) {
-      return res.status(400).json({
-        success: false,
-        message: 'Name, star rating (1-5), and review feedback are required.'
-      });
+    const errors = [];
+    if (name.length < 2 || name.length > 80) {
+      errors.push('Name must be between 2 and 80 characters.');
+    }
+    if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
+      errors.push('Star rating must be a number between 1 and 5.');
+    }
+    if (comment.length < 10 || comment.length > 2000) {
+      errors.push('Review must be between 10 and 2000 characters.');
+    }
+    if (title.length > 120) {
+      errors.push('Review title must be 120 characters or fewer.');
+    }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.push('Email address is not valid.');
     }
 
-    const isObjectId = id.match(/^[0-9a-fA-F]{24}$/);
-    const product = isObjectId
-      ? await Product.findById(id)
-      : await Product.findOne({ slug: id });
+    if (errors.length > 0) {
+      return res.status(400).json({ success: false, message: errors.join(' ') });
+    }
 
+    const product = await findProductByIdentifier(id);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found.' });
     }
 
-    const numRating = Math.min(5, Math.max(1, Number(rating)));
+    if (!product.reviews) product.reviews = [];
+
+    // One review per customer per product
+    const authorEmail = req.user?.email ? req.user.email.toLowerCase() : email;
+    const alreadyReviewed = product.reviews.some((r) => {
+      if (req.user && r.user && String(r.user) === String(req.user._id)) return true;
+      return Boolean(authorEmail) && (r.email || '').toLowerCase() === authorEmail;
+    });
+
+    if (alreadyReviewed) {
+      return res.status(409).json({
+        success: false,
+        message: 'You have already reviewed this piece. Please edit your existing review instead.'
+      });
+    }
+
+    // Verified-purchase badge is earned, not claimed: it requires a paid order
+    // placed by the authenticated account that contains this product.
+    let verifiedPurchase = false;
+    if (req.user) {
+      const paidOrder = await Order.findOne({
+        customer: req.user._id,
+        'items.product': product._id,
+        $or: [
+          { paymentStatus: 'paid' },
+          { orderStatus: 'delivered' } // covers pay-on-delivery orders
+        ]
+      }).select('_id');
+      verifiedPurchase = Boolean(paidOrder);
+    }
 
     const newReview = {
+      user: req.user ? req.user._id : null,
       name,
-      email: email || '',
-      rating: numRating,
-      title: title || '',
+      email: req.user?.email || email,
+      rating: Math.round(rating),
+      title,
       comment,
-      verifiedPurchase: verifiedPurchase !== undefined ? Boolean(verifiedPurchase) : true,
+      verifiedPurchase,
       createdAt: new Date()
     };
-
-    if (!product.reviews) {
-      product.reviews = [];
-    }
 
     product.reviews.unshift(newReview);
 

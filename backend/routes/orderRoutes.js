@@ -4,22 +4,101 @@ const Order = require('../models/Order');
 const Product = require('../models/Product');
 const brandConfig = require('../config/brand');
 const { protect, optionalAuth, requireAdmin } = require('../middleware/auth');
+const { checkoutLimiter, orderLookupLimiter } = require('../middleware/rateLimit');
+
+const MAX_QUANTITY_PER_ITEM = 10;
 
 /**
  * Helper: Generate unique Luxury Order Number
  * e.g., LXH-739281
+ *
+ * `orderNumber` is a unique index, so a collision used to surface as an E11000
+ * and a failed checkout for a real customer. Six digits collide sooner than
+ * intuition suggests (~50% chance somewhere in the set by ~1,100 orders), so
+ * retry against the database before giving up.
  */
-const generateOrderNumber = () => {
-  const randomDigits = Math.floor(100000 + Math.random() * 900000);
-  return `LXH-${randomDigits}`;
+const generateOrderNumber = async () => {
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const candidate = `LXH-${Math.floor(100000 + Math.random() * 900000)}`;
+    const clash = await Order.exists({ orderNumber: candidate });
+    if (!clash) return candidate;
+  }
+  // Astronomically unlikely; fall back to a wider space rather than fail
+  return `LXH-${Date.now().toString(36).toUpperCase()}`;
 };
+
+/**
+ * Resolve the authentic price for a line item.
+ *
+ * The client sends the variant it picked, but the PRICE must come from our own
+ * product document: trusting `item.selectedVariant.price` let a crafted request
+ * buy any product for any amount.
+ */
+function resolveUnitPriceNgn(product, requestedVariant) {
+  if (!requestedVariant) return { unitPriceNgn: product.price, variant: null };
+
+  const variants = product.variants || [];
+  if (variants.length === 0) return { unitPriceNgn: product.price, variant: null };
+
+  // Match on the variant's own id first, then its name, then its attributes.
+  // The attribute pass only runs when at least one attribute was supplied --
+  // otherwise every condition is vacuously true and an unrecognised variant
+  // would silently match (and be charged as) the first one in the list.
+  const hasAttributes = Boolean(
+    requestedVariant.length || requestedVariant.density || requestedVariant.color
+  );
+
+  const match =
+    (requestedVariant._id && variants.find(v => v._id?.toString() === String(requestedVariant._id))) ||
+    (requestedVariant.name && variants.find(v => v.name === requestedVariant.name)) ||
+    (hasAttributes && variants.find(v =>
+      (!requestedVariant.length || v.length === requestedVariant.length) &&
+      (!requestedVariant.density || v.density === requestedVariant.density) &&
+      (!requestedVariant.color || v.color === requestedVariant.color)
+    ));
+
+  if (!match) return { unitPriceNgn: product.price, variant: null };
+
+  return {
+    unitPriceNgn: match.price,
+    variant: {
+      name: match.name || '',
+      length: match.length || '',
+      density: match.density || '',
+      color: match.color || ''
+    }
+  };
+}
+
+/**
+ * Validate the shipping fee against the server-side table.
+ * Returns the fee we are willing to charge, never the client's number.
+ */
+function resolveShippingFee(requestedFee, isUsd, subtotalInCurrency) {
+  const threshold = isUsd
+    ? brandConfig.freeShippingThreshold.USD
+    : brandConfig.freeShippingThreshold.NGN;
+
+  // Complimentary shipping is legitimate above the threshold
+  if (subtotalInCurrency >= threshold) return 0;
+
+  const allowed = (brandConfig.shippingOptions || []).map(o => (isUsd ? o.feeUsd : o.fee));
+  const fee = Number(requestedFee);
+
+  if (!Number.isFinite(fee) || fee < 0) return Math.min(...allowed);
+  if (allowed.includes(fee)) return fee;
+
+  // Unrecognised amount: fall back to the cheapest legitimate option rather
+  // than honouring whatever the client asked for.
+  return Math.min(...allowed);
+}
 
 /**
  * @route   POST /api/orders
  * @desc    Create a new order (Supports logged-in user and guest checkout, NGN and USD currencies)
  * @access  Public / Optional Auth
  */
-router.post('/', optionalAuth, async (req, res, next) => {
+router.post('/', checkoutLimiter, optionalAuth, async (req, res, next) => {
   try {
     const {
       items,
@@ -55,6 +134,30 @@ router.post('/', optionalAuth, async (req, res, next) => {
     const usdRate = brandConfig.currencies?.USD?.rate || 1500;
     const isUsd = currency.toUpperCase() === 'USD';
 
+    /**
+     * Pay-on-delivery eligibility was only checked in the checkout form, so a
+     * crafted request could place an unlimited COD order anywhere in the
+     * world. The same rules are applied here.
+     */
+    if (paymentMethod === 'payOnDelivery') {
+      if (isUsd) {
+        return res.status(400).json({
+          success: false,
+          message: 'Pay on Delivery is only available for orders settled in Naira.'
+        });
+      }
+
+      const region = `${shippingAddress.state || ''} ${shippingAddress.city || ''}`.toLowerCase();
+      const isServiceableRegion = region.includes('lagos') || region.includes('abuja');
+
+      if (!isServiceableRegion) {
+        return res.status(400).json({
+          success: false,
+          message: 'Pay on Delivery is only available within Lagos State and Abuja FCT.'
+        });
+      }
+    }
+
     // Calculate verified server-side subtotal
     let subtotalNgn = 0;
     const validatedItems = [];
@@ -69,13 +172,15 @@ router.post('/', optionalAuth, async (req, res, next) => {
         });
       }
 
-      // Check variant price if variant was chosen (base price is stored in NGN)
-      let unitPriceNgn = product.price;
-      if (item.selectedVariant && item.selectedVariant.price) {
-        unitPriceNgn = item.selectedVariant.price;
-      }
+      // Price always comes from our own record, never from the request body
+      const { unitPriceNgn, variant } = resolveUnitPriceNgn(product, item.selectedVariant);
 
-      const itemQty = Number(item.quantity) || 1;
+      // Clamp quantity: a negative or absurd value would distort the total
+      const requestedQty = Math.floor(Number(item.quantity));
+      const itemQty = Number.isFinite(requestedQty)
+        ? Math.min(Math.max(requestedQty, 1), MAX_QUANTITY_PER_ITEM)
+        : 1;
+
       subtotalNgn += unitPriceNgn * itemQty;
 
       // Price stored on order item matches the checkout currency
@@ -89,16 +194,27 @@ router.post('/', optionalAuth, async (req, res, next) => {
         image: item.image || (product.images && product.images[0]) || '',
         price: finalItemPrice,
         quantity: itemQty,
-        selectedVariant: item.selectedVariant || {}
+        selectedVariant: variant || {}
       });
     }
 
-    const calculatedShipping = Number(shippingFee) || 0;
     const orderSubtotal = isUsd
       ? Math.round((subtotalNgn / usdRate) * 100) / 100
       : subtotalNgn;
+
+    // Validated against the server-side table, not taken from the request
+    const calculatedShipping = resolveShippingFee(shippingFee, isUsd, orderSubtotal);
+
     const total = Math.round((orderSubtotal + calculatedShipping) * 100) / 100;
-    const orderNumber = generateOrderNumber();
+
+    if (paymentMethod === 'payOnDelivery' && total > 350000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Pay on Delivery is restricted to orders up to \u20A6350,000. Please choose card or bank transfer.'
+      });
+    }
+
+    const orderNumber = await generateOrderNumber();
 
     // Map payment processor
     let processor = 'paystack';
@@ -178,7 +294,7 @@ router.get('/my-orders', protect, async (req, res, next) => {
  * @desc    Fetch single order by order reference number (for confirmation page & receipt)
  * @access  Public
  */
-router.get('/:orderNumber', async (req, res, next) => {
+router.get('/:orderNumber', orderLookupLimiter, async (req, res, next) => {
   try {
     const order = await Order.findOne({ orderNumber: req.params.orderNumber });
 
@@ -273,3 +389,7 @@ router.put('/:id/status', protect, requireAdmin, async (req, res, next) => {
 });
 
 module.exports = router;
+
+// Exported for testing: these two decide what a customer is actually charged.
+module.exports.resolveUnitPriceNgn = resolveUnitPriceNgn;
+module.exports.resolveShippingFee = resolveShippingFee;

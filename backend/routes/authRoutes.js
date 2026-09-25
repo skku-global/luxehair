@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Order = require('../models/Order');
 const { protect, requireAdmin, JWT_SECRET } = require('../middleware/auth');
+const { authLimiter } = require('../middleware/rateLimit');
 
 /**
  * Helper: Generate Signed JWT Token
@@ -18,7 +19,7 @@ const generateToken = (userId, role) => {
  * @desc    Register a new customer account
  * @access  Public
  */
-router.post('/register', async (req, res, next) => {
+router.post('/register', authLimiter, async (req, res, next) => {
   try {
     const { name, email, password, phone } = req.body;
 
@@ -65,7 +66,7 @@ router.post('/register', async (req, res, next) => {
  * @desc    Authenticate customer or admin and return JWT
  * @access  Public
  */
-router.post('/login', async (req, res, next) => {
+router.post('/login', authLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body;
 

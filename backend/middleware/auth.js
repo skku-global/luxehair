@@ -1,7 +1,35 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'luxehair_jwt_super_secret_key_2026';
+const crypto = require('crypto');
+
+/**
+ * JWT signing secret.
+ * Must be supplied via the environment. There is deliberately no hardcoded
+ * fallback: a committed secret lets anyone mint valid admin tokens.
+ * In production a missing secret is fatal; in development we generate an
+ * ephemeral one so the server still boots (sessions reset on restart).
+ */
+function resolveJwtSecret() {
+  const fromEnv = process.env.JWT_SECRET;
+  if (fromEnv && fromEnv.trim().length >= 32) return fromEnv.trim();
+
+  if (process.env.NODE_ENV === 'production') {
+    console.error('[Auth] JWT_SECRET is missing or shorter than 32 characters. Refusing to start.');
+    console.error('[Auth] Generate one with:  openssl rand -hex 48');
+    process.exit(1);
+  }
+
+  if (fromEnv && fromEnv.trim()) {
+    console.warn('[Auth] JWT_SECRET is shorter than 32 characters — using it anyway in development.');
+    return fromEnv.trim();
+  }
+
+  console.warn('[Auth] JWT_SECRET not set — using a random development secret. Tokens will not survive a restart.');
+  return crypto.randomBytes(48).toString('hex');
+}
+
+const JWT_SECRET = resolveJwtSecret();
 
 /**
  * Authentication Middleware: Verify Bearer Token

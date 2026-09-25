@@ -4,9 +4,55 @@ const crypto = require('crypto');
 const axios = require('axios');
 const Order = require('../models/Order');
 
-// Paystack Secret Key from environment or fallback placeholder
+const { checkoutLimiter } = require('../middleware/rateLimit');
+
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+// Paystack Secret Key from environment, with a development-only mock fallback.
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || 'sk_test_mock_luxehair_secret_key';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+/**
+ * Simulation mode lets you walk the whole checkout locally with no gateway
+ * credentials. It marks orders paid without money changing hands, so it must
+ * NEVER be reachable in production: a live deployment without real keys is a
+ * configuration error, not a reason to hand out free orders.
+ */
+const PAYSTACK_IS_MOCK = !IS_PRODUCTION && PAYSTACK_SECRET_KEY.startsWith('sk_test_mock');
+
+if (IS_PRODUCTION && PAYSTACK_SECRET_KEY.startsWith('sk_test_mock')) {
+  console.error('[Payments] PAYSTACK_SECRET_KEY is not configured. Refusing to start in production.');
+  console.error('[Payments] Set a live Paystack secret key before deploying.');
+  process.exit(1);
+}
+
+/**
+ * Constant-time string comparison for webhook signatures.
+ * A plain `!==` leaks how much of the digest matched via response timing.
+ */
+function safeCompare(a, b) {
+  const bufA = Buffer.from(String(a), 'utf8');
+  const bufB = Buffer.from(String(b), 'utf8');
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+/**
+ * Look up the order a payment reference belongs to.
+ *
+ * The previous `$or: [{ reference }, { orderNumber }]` let a caller pair ANY
+ * reference with ANY order number, so a reference from a cheap order could be
+ * pointed at an expensive one. The reference must identify the order; an
+ * orderNumber may be supplied as a hint but must agree with it.
+ */
+async function findOrderForReference(refField, refValue, orderNumberHint) {
+  const byRef = await Order.findOne({ [refField]: refValue });
+  if (byRef) {
+    if (orderNumberHint && byRef.orderNumber !== orderNumberHint) return null;
+    return byRef;
+  }
+  return null;
+}
 
 /**
  * ============================================================================
@@ -35,7 +81,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
  * @desc    Initiate Paystack transaction and generate authorization URL
  * @access  Public
  */
-router.post('/paystack/initialize', async (req, res, next) => {
+router.post('/paystack/initialize', checkoutLimiter, async (req, res, next) => {
   try {
     const { orderNumber, callbackUrl } = req.body;
 
@@ -66,10 +112,8 @@ router.post('/paystack/initialize', async (req, res, next) => {
     // Step 2: Convert order total to Kobo (integer minor units)
     const amountInKobo = Math.round(order.pricingBreakdown.total * 100);
 
-    // Step 3: Check if real Paystack live/test key is set vs test simulation mode
-    const isMockKey = PAYSTACK_SECRET_KEY.startsWith('sk_test_mock');
-
-    if (isMockKey) {
+    // Step 3: Development simulation mode (never active in production)
+    if (PAYSTACK_IS_MOCK) {
       // In local development without real API credentials, provide a seamless mock response
       // so you can test the entire checkout flow end-to-end without needing real cards!
       const simulatedRef = `LXH-PAY-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -139,17 +183,14 @@ router.post('/paystack/initialize', async (req, res, next) => {
  * @desc    Verify transaction with Paystack and confirm payment status
  * @access  Public
  */
-router.get('/paystack/verify/:reference', async (req, res, next) => {
+router.get('/paystack/verify/:reference', checkoutLimiter, async (req, res, next) => {
   try {
     const { reference } = req.params;
     const { orderNumber } = req.query;
 
-    const order = await Order.findOne({
-      $or: [
-        { paystackReference: reference },
-        { orderNumber: orderNumber }
-      ]
-    });
+    // The reference must identify the order. Accepting a caller-supplied
+    // orderNumber as an alternative let anyone verify an arbitrary order.
+    const order = await findOrderForReference('paystackReference', reference, orderNumber);
 
     if (!order) {
       return res.status(404).json({
@@ -158,9 +199,24 @@ router.get('/paystack/verify/:reference', async (req, res, next) => {
       });
     }
 
-    // Check if development simulation mode was used
-    const isMockKey = PAYSTACK_SECRET_KEY.startsWith('sk_test_mock');
-    if (isMockKey || reference.startsWith('LXH-PAY-')) {
+    if (order.paymentStatus === 'paid') {
+      return res.json({
+        success: true,
+        message: 'Payment already confirmed for this order.',
+        order
+      });
+    }
+
+    /**
+     * Simulated settlement, development only.
+     *
+     * This used to read `isMockKey || reference.startsWith('LXH-PAY-')`, so a
+     * caller could hit this endpoint with any reference beginning "LXH-PAY-"
+     * and have a real order marked PAID with no payment taken -- even with
+     * live Paystack credentials configured. The prefix check is now only
+     * honoured when the server is genuinely in mock mode.
+     */
+    if (PAYSTACK_IS_MOCK) {
       order.paymentStatus = 'paid';
       order.orderStatus = 'confirmed';
       order.paystackPaidAt = new Date();
@@ -259,8 +315,9 @@ router.post('/paystack/webhook', async (req, res) => {
       .update(bodyToHash)
       .digest('hex');
 
-    // Reject if signature does not match
-    if (signature !== expectedHash && !PAYSTACK_SECRET_KEY.startsWith('sk_test_mock')) {
+    // Reject if signature does not match (constant-time comparison).
+    // The signature check is only skipped in local mock mode.
+    if (!safeCompare(signature, expectedHash) && !PAYSTACK_IS_MOCK) {
       console.warn('[Webhook Warning] Invalid Paystack signature detected. Request rejected.');
       return res.status(401).send('Invalid signature');
     }
@@ -312,7 +369,7 @@ router.post('/paystack/webhook', async (req, res) => {
  * @desc    Submit bank transfer reference/payer name for manual verification
  * @access  Public
  */
-router.post('/bank-transfer/submit-proof', async (req, res, next) => {
+router.post('/bank-transfer/submit-proof', checkoutLimiter, async (req, res, next) => {
   try {
     const { orderNumber, senderName, bankName, transferReference } = req.body;
 
@@ -368,12 +425,19 @@ const stripe = (process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_SECRET_KEY.
   ? require('stripe')(process.env.STRIPE_SECRET_KEY)
   : null;
 
+// As with Paystack: simulated settlement is a development affordance only.
+const STRIPE_IS_MOCK = !IS_PRODUCTION && !stripe;
+
+if (IS_PRODUCTION && !stripe) {
+  console.warn('[Payments] STRIPE_SECRET_KEY is not configured - USD checkout will be rejected.');
+}
+
 /**
  * @route   POST /api/payment/stripe/create-checkout-session
  * @desc    Create a Stripe Checkout Session for international USD orders
  * @access  Public
  */
-router.post('/stripe/create-checkout-session', async (req, res, next) => {
+router.post('/stripe/create-checkout-session', checkoutLimiter, async (req, res, next) => {
   try {
     const { orderNumber, callbackUrl } = req.body;
 
@@ -403,9 +467,14 @@ router.post('/stripe/create-checkout-session', async (req, res, next) => {
     // e.g. $256.67 -> 25667 cents
     const totalInCents = Math.round(order.pricingBreakdown.total * 100);
 
-    const isMockStripe = !stripe || STRIPE_SECRET_KEY.startsWith('sk_test_mock');
+    if (!stripe && IS_PRODUCTION) {
+      return res.status(503).json({
+        success: false,
+        message: 'International card payment is temporarily unavailable. Please choose another payment method.'
+      });
+    }
 
-    if (isMockStripe) {
+    if (STRIPE_IS_MOCK) {
       // In local development / preview mode without live Stripe credentials,
       // provide a seamless simulated session redirect
       const simulatedSessionId = `cs_test_mock_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
@@ -472,17 +541,13 @@ router.post('/stripe/create-checkout-session', async (req, res, next) => {
  * @desc    Verify Stripe session completion and confirm order payment
  * @access  Public
  */
-router.get('/stripe/verify/:sessionId', async (req, res, next) => {
+router.get('/stripe/verify/:sessionId', checkoutLimiter, async (req, res, next) => {
   try {
     const { sessionId } = req.params;
     const { orderNumber } = req.query;
 
-    const order = await Order.findOne({
-      $or: [
-        { stripeSessionId: sessionId },
-        { orderNumber: orderNumber }
-      ]
-    });
+    // The session id must identify the order; an orderNumber hint must agree.
+    const order = await findOrderForReference('stripeSessionId', sessionId, orderNumber);
 
     if (!order) {
       return res.status(404).json({
@@ -491,9 +556,22 @@ router.get('/stripe/verify/:sessionId', async (req, res, next) => {
       });
     }
 
-    const isMockStripe = !stripe || sessionId.startsWith('cs_test_mock');
+    if (order.paymentStatus === 'paid') {
+      return res.json({
+        success: true,
+        message: 'Payment already confirmed for this order.',
+        order
+      });
+    }
 
-    if (isMockStripe) {
+    /**
+     * Simulated settlement, development only.
+     *
+     * This previously read `!stripe || sessionId.startsWith('cs_test_mock')`,
+     * so even with live Stripe credentials a caller could pass a session id
+     * starting "cs_test_mock" and have an order marked PAID for free.
+     */
+    if (STRIPE_IS_MOCK) {
       // Confirm payment in development simulation
       order.paymentStatus = 'paid';
       order.orderStatus = 'confirmed';
@@ -565,8 +643,17 @@ router.post('/stripe/webhook', async (req, res) => {
     if (endpointSecret && stripe) {
       const rawBody = req.rawBody ? req.rawBody : JSON.stringify(req.body);
       event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret);
-    } else {
+    } else if (STRIPE_IS_MOCK) {
+      // Local simulation only: accept the body as-is so the flow is testable.
       event = req.body;
+    } else {
+      /**
+       * Without STRIPE_WEBHOOK_SECRET this handler used to trust any POST
+       * body, so anyone could send a fabricated `checkout.session.completed`
+       * naming an order and have it marked PAID. Unsigned events are refused.
+       */
+      console.error('[Stripe Webhook] STRIPE_WEBHOOK_SECRET is not configured - rejecting unsigned event.');
+      return res.status(400).send('Webhook Error: signature verification is not configured');
     }
   } catch (err) {
     console.error('[Stripe Webhook Signature Error]:', err.message);
@@ -586,6 +673,20 @@ router.post('/stripe/webhook', async (req, res) => {
     });
 
     if (order && order.paymentStatus !== 'paid') {
+      // Confirm the amount settled matches what we expect, exactly as the
+      // Paystack webhook does. Without this an underpaid session would still
+      // flip the order to paid.
+      const expectedCents = Math.round(order.pricingBreakdown.total * 100);
+      const paidCents = session.amount_total;
+
+      if (typeof paidCents === 'number' && paidCents !== expectedCents) {
+        console.warn(
+          `[Stripe Webhook] Amount mismatch for ${order.orderNumber}: ` +
+          `expected ${expectedCents} cents, received ${paidCents}. Not marking paid.`
+        );
+        return res.json({ received: true });
+      }
+
       order.paymentStatus = 'paid';
       order.orderStatus = 'confirmed';
       order.stripePaidAt = new Date();
