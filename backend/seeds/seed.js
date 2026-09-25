@@ -2,7 +2,7 @@ require('dotenv').config({ path: __dirname + '/../.env' });
 const dns = require('dns');
 try { dns.setServers(['8.8.8.8', '1.1.1.1']); } catch(e) {}
 const mongoose = require('mongoose');
-const { formatMongoUri, ATLAS_FALLBACK_URI } = require('../config/db');
+const { resolveMongoUri } = require('../config/db');
 const User = require('../models/User');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
@@ -461,6 +461,228 @@ const sampleProducts = [
 
   // --- ATTACHMENTS ---
   {
+    name: "Genius Invisi Clip-In Extensions (7 Piece Set)",
+    category: "attachments",
+    price: 118000,
+    compareAtPrice: 145000,
+    shortDescription: "Completely invisible top-attachment clip-ins that sit flat against the scalp — no clips seen, no compromise on comfort.",
+    description: "Our signature Genius Invisi Clip-Ins redefine the clip-in standard. Unlike conventional clip-ins, the Genius features a completely invisible top-attachment that sits flush against the scalp with zero bulk or ridge. 100% Remy human hair — can be curled, straightened, coloured, and styled exactly like your own hair. The 7-piece set (140g) provides full-head coverage from root to tip with a natural fall that blends invisibly into your natural hair.",
+    specifications: {
+      hairType: "100% Remy Human Hair",
+      origin: "Indian Virgin",
+      laceType: "Genius Invisible Top Attachment (Zero Clip-Bulk)",
+      hairGrade: "12A Single Donor (140g — 7 Pieces)",
+      capSize: "7 Piece Set: 1×4-clip | 2×3-clip | 2×2-clip | 2×1-clip",
+      longevity: "12–18 Months with proper care",
+      texture: "Natural Straight",
+      attachmentType: "Clip-In",
+      colorName: "Natural Black #1B",
+      colorHex: "#18181B",
+      availableColors: [
+        { name: "Natural Black #1B", hex: "#18181B" },
+        { name: "Chocolate Brown #4", hex: "#3D1C02" },
+        { name: "Honey Balayage #27", hex: "#C9833B" },
+        { name: "Icy Platinum #613", hex: "#F0E6D0" }
+      ]
+    },
+    images: [
+      "/images/products/attachment-genius-clipin.jpg",
+      "/images/products/attachment-genius-clipin-detail.jpg",
+      "/images/products/attachment-model-length.jpg"
+    ],
+    variants: [
+      { name: '18" / 140g / Natural Black #1B', length: '18"', density: '140g', color: 'Natural Black #1B', texture: 'Natural Straight', price: 118000, stock: 18 },
+      { name: '22" / 140g / Natural Black #1B', length: '22"', density: '140g', color: 'Natural Black #1B', texture: 'Natural Straight', price: 138000, stock: 14 },
+      { name: '18" / 140g / Chocolate Brown #4', length: '18"', density: '140g', color: 'Chocolate Brown #4', texture: 'Natural Straight', price: 118000, stock: 12 },
+      { name: '22" / 140g / Honey Balayage #27', length: '22"', density: '140g', color: 'Honey Balayage #27', texture: 'Natural Straight', price: 145000, stock: 9 },
+      { name: '22" / 140g / Icy Platinum #613', length: '22"', density: '140g', color: 'Icy Platinum #613', texture: 'Natural Straight', price: 158000, stock: 7 }
+    ],
+    inStock: true,
+    stockQuantity: 60,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 4.9,
+    reviewsCount: 61,
+    tags: ["clip-ins", "genius", "invisi", "seamless", "natural straight", "remy"]
+  },
+  {
+    name: "Secret Weft — Invisible Machine Weft Extensions",
+    category: "attachments",
+    price: 155000,
+    compareAtPrice: 190000,
+    shortDescription: "Ultra-flat zero-return machine weft — the thinnest, most discreet weft extension on the market.",
+    description: "The Secret Weft is engineered to be completely invisible once applied. A hand-stitched ultra-thin machine weft with zero weft-return hair — meaning no bulk, no bumps, no ridging. Applied by a professional using Beaded Rows or Sew-In method, the weft sits flush to the scalp and moves like your natural hair. 100% Remy cuticle-aligned hair, available in 18\" and 22\".",
+    specifications: {
+      hairType: "100% Remy Single-Donor Hair",
+      origin: "South East Asian Virgin",
+      laceType: "Micro-Thin Machine Weft (Zero Return Hair)",
+      hairGrade: "13A Double Drawn (100g per Bundle)",
+      capSize: "Single Bundle — 100g | 50cm wide weft",
+      longevity: "Up to 3 Years with professional re-installs",
+      texture: "Silky Straight",
+      attachmentType: "Weft",
+      colorName: "Natural Black #1B",
+      colorHex: "#18181B",
+      availableColors: [
+        { name: "Natural Black #1B", hex: "#18181B" },
+        { name: "Jet Black #1", hex: "#0A0A0A" },
+        { name: "Chocolate Brown #4", hex: "#3D1C02" },
+        { name: "Chocolate Caramel #8/27", hex: "#7B4A1E" }
+      ]
+    },
+    images: [
+      "/images/products/attachment-secret-weft.jpg",
+      "/images/products/attachment-secret-weft-detail.jpg",
+      "/images/products/attachment-model-length.jpg"
+    ],
+    variants: [
+      { name: '18" / 100g / Natural Black #1B', length: '18"', density: '100g', color: 'Natural Black #1B', texture: 'Silky Straight', price: 155000, stock: 15 },
+      { name: '22" / 100g / Natural Black #1B', length: '22"', density: '100g', color: 'Natural Black #1B', texture: 'Silky Straight', price: 178000, stock: 12 },
+      { name: '25" / 100g / Natural Black #1B', length: '25"', density: '100g', color: 'Natural Black #1B', texture: 'Silky Straight', price: 198000, stock: 8 },
+      { name: '22" / 100g / Chocolate Caramel #8/27', length: '22"', density: '100g', color: 'Chocolate Caramel #8/27', texture: 'Silky Straight', price: 185000, stock: 10 }
+    ],
+    inStock: true,
+    stockQuantity: 45,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 4.9,
+    reviewsCount: 38,
+    tags: ["weft", "secret weft", "machine weft", "semi-permanent", "beaded row", "sew-in"]
+  },
+  {
+    name: "Nano-Tip Micro Ring Extensions",
+    category: "attachments",
+    price: 175000,
+    compareAtPrice: 210000,
+    shortDescription: "50 strands of professional Nano-Tip extensions — the smallest, most discreet permanent attachment available.",
+    description: "Nano-Tip extensions use a 2mm micro-ring (the smallest bond available) to attach individual strands of 100% Remy hair directly to your natural hair. No heat. No glue. No damage. The nano ring is 90% smaller than a micro ring, making it virtually undetectable even in fine hair. Applied by a trained professional, these last 3–4 months between maintenance appointments and can be re-used up to 3 times.",
+    specifications: {
+      hairType: "100% Remy Human Hair",
+      origin: "Indian Virgin",
+      laceType: "2mm Nano Copper Ring — No Heat, No Glue",
+      hairGrade: "12A Double Drawn (50 Strands = ±50g)",
+      capSize: "50 Individual Strand Pack",
+      longevity: "3–4 Months per install | Reusable 2–3x",
+      texture: "Natural Straight",
+      attachmentType: "Nano-Tip",
+      colorName: "Jet Black #1",
+      colorHex: "#0A0A0A",
+      availableColors: [
+        { name: "Jet Black #1", hex: "#0A0A0A" },
+        { name: "Natural Black #1B", hex: "#18181B" },
+        { name: "Dark Brown #2", hex: "#2C1503" },
+        { name: "Chocolate Brown #4", hex: "#3D1C02" }
+      ]
+    },
+    images: [
+      "/images/products/attachment-nano-tip.jpg",
+      "/images/products/attachment-nano-tip-detail.jpg",
+      "/images/products/attachment-clipin-1.jpg"
+    ],
+    variants: [
+      { name: '18" / 50 Strands / Jet Black #1', length: '18"', density: '50 strands', color: 'Jet Black #1', texture: 'Natural Straight', price: 175000, stock: 16 },
+      { name: '22" / 50 Strands / Jet Black #1', length: '22"', density: '50 strands', color: 'Jet Black #1', texture: 'Natural Straight', price: 198000, stock: 12 },
+      { name: '18" / 50 Strands / Natural Black #1B', length: '18"', density: '50 strands', color: 'Natural Black #1B', texture: 'Natural Straight', price: 175000, stock: 14 },
+      { name: '22" / 50 Strands / Chocolate Brown #4', length: '22"', density: '50 strands', color: 'Chocolate Brown #4', texture: 'Natural Straight', price: 198000, stock: 8 }
+    ],
+    inStock: true,
+    stockQuantity: 50,
+    isFeatured: true,
+    isBestseller: false,
+    rating: 4.8,
+    reviewsCount: 24,
+    tags: ["nano-tip", "nano ring", "micro ring", "permanent extensions", "individual strands", "salon"]
+  },
+  {
+    name: "Italian Keratin K-Tip Bond Extensions",
+    category: "attachments",
+    price: 185000,
+    compareAtPrice: 225000,
+    shortDescription: "50 strands of Italian keratin-tipped fusion extensions — the gold standard for seamless, long-lasting length.",
+    description: "Keratin K-Tip extensions are the pinnacle of professional hair extension technology. Each strand is pre-tipped with an Italian keratin polymer bond that fuses to your natural hair with a heat wand, creating a strong, flat attachment that lasts 3–6 months. 100% cuticle-aligned Remy hair from a single donor — undetectable even in fine or bleached hair. The amber keratin bond dissolves cleanly with professional keratin remover, causing zero damage.",
+    specifications: {
+      hairType: "100% Single-Donor Remy Hair",
+      origin: "European Remy Virgin",
+      laceType: "Italian Keratin Flat-Tip Bond (Fusion Method)",
+      hairGrade: "13A Double Drawn (50 Strands = ±50g)",
+      capSize: "50 Individual K-Tip Strand Pack",
+      longevity: "3–6 Months | Zero damage removal",
+      texture: "Silky Straight",
+      attachmentType: "Keratin",
+      colorName: "Chocolate Brown #4",
+      colorHex: "#3D1C02",
+      availableColors: [
+        { name: "Jet Black #1", hex: "#0A0A0A" },
+        { name: "Natural Black #1B", hex: "#18181B" },
+        { name: "Dark Brown #2", hex: "#2C1503" },
+        { name: "Chocolate Brown #4", hex: "#3D1C02" },
+        { name: "Honey Balayage #27", hex: "#C9833B" }
+      ]
+    },
+    images: [
+      "/images/products/attachment-keratin-ktip.jpg",
+      "/images/products/attachment-keratin-ktip-detail.jpg",
+      "/images/products/attachment-clipin-1.jpg"
+    ],
+    variants: [
+      { name: '18" / 50 Strands / Jet Black #1', length: '18"', density: '50 strands', color: 'Jet Black #1', texture: 'Silky Straight', price: 185000, stock: 12 },
+      { name: '22" / 50 Strands / Jet Black #1', length: '22"', density: '50 strands', color: 'Jet Black #1', texture: 'Silky Straight', price: 215000, stock: 10 },
+      { name: '22" / 50 Strands / Natural Black #1B', length: '22"', density: '50 strands', color: 'Natural Black #1B', texture: 'Silky Straight', price: 215000, stock: 10 },
+      { name: '22" / 50 Strands / Honey Balayage #27', length: '22"', density: '50 strands', color: 'Honey Balayage #27', texture: 'Silky Straight', price: 225000, stock: 6 }
+    ],
+    inStock: true,
+    stockQuantity: 38,
+    isFeatured: true,
+    isBestseller: false,
+    rating: 4.9,
+    reviewsCount: 19,
+    tags: ["keratin", "k-tip", "fusion", "permanent extensions", "bond", "salon-only"]
+  },
+  {
+    name: "Express Tape Weft Extensions (20\")",
+    category: "attachments",
+    price: 128000,
+    compareAtPrice: 155000,
+    shortDescription: "40-piece medical-grade PU tape weft — applied in under 30 minutes, lasting 6–8 weeks per application.",
+    description: "The Express Tape Weft is the faster, smarter evolution of the traditional tape-in. Medical-grade hypoallergenic polyurethane skin wefts bond seamlessly to your natural hair in sandwiched sections. Zero heat required. Each piece is 4cm wide and pre-taped with our reusable adhesive system that holds for 6–8 weeks and lifts cleanly with no residue. Reusable up to 3 times with fresh adhesive tabs. Ideal for fine hair wanting added density without weight.",
+    specifications: {
+      hairType: "100% Remy Human Hair",
+      origin: "Vietnamese Virgin",
+      laceType: "Medical-Grade PU Skin Weft — Hypoallergenic Adhesive",
+      hairGrade: "12A Double Drawn (40 pcs = 100g)",
+      capSize: "40 Pieces | 4cm × 0.8cm Tabs | Reusable 3×",
+      longevity: "6–8 Weeks per application | Reusable up to 2 Years",
+      texture: "Silky Straight",
+      attachmentType: "Tape-In",
+      colorName: "Natural Black #1B",
+      colorHex: "#18181B",
+      availableColors: [
+        { name: "Natural Black #1B", hex: "#18181B" },
+        { name: "Jet Black #1", hex: "#0A0A0A" },
+        { name: "Chocolate Brown #4", hex: "#3D1C02" },
+        { name: "Honey Balayage #27", hex: "#C9833B" }
+      ]
+    },
+    images: [
+      "/images/products/attachment-express-tape.jpg",
+      "/images/products/attachment-express-tape-detail.jpg",
+      "/images/products/attachment-model-length.jpg"
+    ],
+    variants: [
+      { name: '20" / 40pcs / 100g / Natural Black #1B', length: '20"', density: '100g', color: 'Natural Black #1B', texture: 'Silky Straight', price: 128000, stock: 20 },
+      { name: '20" / 40pcs / 100g / Jet Black #1', length: '20"', density: '100g', color: 'Jet Black #1', texture: 'Silky Straight', price: 128000, stock: 16 },
+      { name: '20" / 40pcs / 100g / Chocolate Brown #4', length: '20"', density: '100g', color: 'Chocolate Brown #4', texture: 'Silky Straight', price: 128000, stock: 14 },
+      { name: '20" / 40pcs / 100g / Honey Balayage #27', length: '20"', density: '100g', color: 'Honey Balayage #27', texture: 'Silky Straight', price: 138000, stock: 11 }
+    ],
+    inStock: true,
+    stockQuantity: 61,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 4.8,
+    reviewsCount: 33,
+    tags: ["tape-in", "express tape", "skin weft", "semi-permanent", "fine hair", "quick install"]
+  },
+  {
     name: "Seamless Clip-In Extensions Set (7 Pieces)",
     category: "attachments",
     price: 95000,
@@ -475,6 +697,7 @@ const sampleProducts = [
       capSize: "7 Multi-Width Pieces (1x 4-clip, 2x 3-clip, 2x 2-clip, 2x 1-clip)",
       longevity: "18 - 24 Months",
       texture: "Natural Straight / Blowout",
+      attachmentType: "Clip-In",
       colorName: "Multi-Color Collection",
       colorHex: "#18181B",
       availableColors: [
@@ -484,10 +707,9 @@ const sampleProducts = [
       ]
     },
     images: [
-      "/images/products/attachment-clipin-emerald.jpg",
-      "/images/products/attachment-clipin-blonde.jpg",
-      "/images/products/attachment-tapein-natural.jpg",
-      "/images/products/attachment-clipin-texture.jpg"
+      "/images/products/attachment-genius-clipin.jpg",
+      "/images/products/attachment-genius-clipin-detail.jpg",
+      "/images/products/attachment-model-length.jpg"
     ],
     variants: [
       { name: '20" / 160g / Natural Black #1B', length: '20"', density: '160g', color: 'Natural Black #1B', texture: 'Natural Straight', price: 95000, stock: 15 },
@@ -496,52 +718,11 @@ const sampleProducts = [
     ],
     inStock: true,
     stockQuantity: 33,
-    isFeatured: true,
-    isBestseller: true,
-    rating: 4.9,
+    isFeatured: false,
+    isBestseller: false,
+    rating: 4.8,
     reviewsCount: 42,
     tags: ["clip-ins", "seamless", "extensions", "colored", "natural straight"]
-  },
-  {
-    name: "Skin-Weft Invisible Tape-In Extensions",
-    category: "attachments",
-    price: 140000,
-    compareAtPrice: 165000,
-    shortDescription: "40 pieces of medical-grade ultra-thin tape-ins offering weightless semi-permanent hair luxury.",
-    description: "The choice of celebrity hairstylists. Each pack contains 40 individual tape-ins (100 grams) fitted with hospital-grade, hypoallergenic adhesive tape that lasts 8-10 weeks before re-taping. Ultra-flexible wefts distribute weight evenly with zero strain on biological hair follicles.",
-    specifications: {
-      hairType: "100% Raw Virgin Donor Hair",
-      origin: "Vietnamese Virgin",
-      laceType: "Medical Grade Invisible PU Skin Weft",
-      hairGrade: "13A Double Drawn (40 Sandwiches)",
-      capSize: "Universal 4cm x 0.8cm Tabs",
-      longevity: "Reusable for up to 2 Years with re-taping",
-      texture: "Silky Straight",
-      colorName: "Multi-Color Collection",
-      colorHex: "#18181B",
-      availableColors: [
-        { name: "Natural Black #1B", hex: "#18181B" },
-        { name: "Royal Sapphire Blue", hex: "#1D4ED8" }
-      ]
-    },
-    images: [
-      "/images/products/attachment-tapein-natural.jpg",
-      "/images/products/attachment-tapein-sapphire.jpg",
-      "/images/products/attachment-clipin-texture.jpg",
-      "/images/products/attachment-clipin-1.jpg"
-    ],
-    variants: [
-      { name: '22" / 100g (40 pcs) / Natural Black', length: '22"', density: '100g', color: 'Natural Black', texture: 'Straight', price: 140000, stock: 14 },
-      { name: '26" / 120g (40 pcs) / Natural Black', length: '26"', density: '120g', color: 'Natural Black', texture: 'Straight', price: 175000, stock: 10 },
-      { name: '22" / 100g (40 pcs) / Sapphire Blue', length: '22"', density: '100g', color: 'Royal Sapphire Blue', texture: 'Straight', price: 165000, stock: 8 }
-    ],
-    inStock: true,
-    stockQuantity: 32,
-    isFeatured: true,
-    isBestseller: true,
-    rating: 4.8,
-    reviewsCount: 16,
-    tags: ["tape-in", "semi-permanent", "extensions", "luxury", "blue hair"]
   },
   {
     name: "The Sovereign Sleek Wrap-Around Ponytail",
@@ -558,6 +739,7 @@ const sampleProducts = [
       capSize: "One size fits all buns",
       longevity: "2+ Years",
       texture: "Bone Straight",
+      attachmentType: "Ponytail",
       colorName: "Multi-Color Collection",
       colorHex: "#18181B",
       availableColors: [
@@ -568,10 +750,9 @@ const sampleProducts = [
       ]
     },
     images: [
-      "/images/products/attachment-ponytail-black.jpg",
-      "/images/products/attachment-ponytail-platinum.jpg",
-      "/images/products/attachment-ponytail-magenta.jpg",
-      "/images/products/attachment-ponytail-lemon.jpg"
+      "/images/products/attachment-ponytail-1.jpg",
+      "/images/products/attachment-ponytail-2.jpg",
+      "/images/products/attachment-clipin-1.jpg"
     ],
     variants: [
       { name: '26" / 150g / Natural Black #1B', length: '26"', density: '150g', color: 'Natural Black #1B', texture: 'Bone Straight', price: 85000, stock: 20 },
@@ -582,7 +763,7 @@ const sampleProducts = [
     ],
     inStock: true,
     stockQuantity: 32,
-    isFeatured: true,
+    isFeatured: false,
     isBestseller: false,
     rating: 4.9,
     reviewsCount: 23,
@@ -591,131 +772,178 @@ const sampleProducts = [
 
   // --- HAIR CARE & FORMULATIONS ---
   {
-    name: "Golden Elixir Moroccan Argan & Marula Hair Oil",
+    name: "Argan & Marula Golden Hair Elixir",
     category: "hair-care",
-    price: 24500,
-    compareAtPrice: 30000,
-    shortDescription: "Ultra-nourishing cold-pressed botanical gloss elixir that seals cuticles and prevents heat damage.",
-    description: "Formulated in Grasse, France specifically for virgin hair extensions and high-end human hair units. A decadent fusion of cold-pressed Moroccan Argan Oil, Namibian Marula, and Camellia Seed Oil. Delivers mirror-like luminosity without greasy residue, restores lipid barriers, and shields cuticles from heat styling up to 450°F.",
+    price: 28500,
+    compareAtPrice: 35000,
+    shortDescription: "Cold-pressed liquid gold for wigs and extensions — delivers mirror shine, seals cuticles, and shields against 450°F heat damage.",
+    description: "Formulated by cosmetic chemists in Grasse, France specifically for 100% raw virgin hair wigs and extensions. The Argan & Marula Elixir is a lightweight dry-oil fusion of three certified organic botanical oils — Moroccan Argan, Namibian Marula, and Japanese Camellia — that penetrates the hair cortex to restore lipid balance, eliminate frizz at the source, and deliver a high-definition glossy finish that lasts 4–6 washes. Two to three drops is all you need. Absorbs in seconds. Leaves zero greasy residue. Scented with a delicate accord of warm amber and sandalwood.",
     specifications: {
-      volume: "100ml / 3.4 fl. oz",
-      origin: "Formulated in France",
-      keyIngredients: "Certified Organic Argania Spinosa Kernel Oil, Sclerocarya Birrea (Marula) Seed Oil, Camellia Japonica Seed Oil, Vitamin E Acetate",
-      hairGrade: "Bespoke Extension & Wig Grade",
-      longevity: "Shelf life: 24 Months after opening",
-      texture: "Silky Lightweight Dry-Oil"
+      volume: "100ml / 3.4 fl. oz (Glass Dropper Bottle)",
+      origin: "Formulated in Grasse, France",
+      keyIngredients: "Certified Organic Argania Spinosa Kernel Oil 38%, Sclerocarya Birrea (Marula) Seed Oil 22%, Camellia Japonica Seed Oil 18%, Vitamin E Tocopherol, Golden Jojoba Esters",
+      productType: "Oil",
+      hairGrade: "Virgin & Extension Grade — Safe for colored, bleached & heat-styled hair",
+      longevity: "Shelf life 24 months | Use 2–3 drops per application",
+      scentProfile: "Warm Amber · Sandalwood · Bergamot",
+      texture: "Silky Dry-Oil — Absorbs in 30 seconds, zero residue"
     },
     images: [
-      "/images/products/care-elixir-1.jpg",
-      "/images/products/care-elixir-2.jpg"
+      "/images/products/care-argan-oil.jpg",
+      "/images/products/care-argan-oil-2.jpg",
+      "/images/products/care-argan-oil.jpg"
     ],
     variants: [
-      { name: "100ml Glass Dropper Bottle", length: "", density: "", color: "Golden Amber", texture: "Elixir", price: 24500, stock: 50 },
-      { name: "200ml Luxury Salon Refill", length: "", density: "", color: "Golden Amber", texture: "Elixir", price: 42000, stock: 25 }
+      { name: "100ml Glass Dropper — Golden Amber", length: "", density: "", color: "Golden Amber", texture: "Dry-Oil Elixir", price: 28500, stock: 60 },
+      { name: "200ml Salon Refill — Golden Amber", length: "", density: "", color: "Golden Amber", texture: "Dry-Oil Elixir", price: 48500, stock: 25 }
     ],
     inStock: true,
-    stockQuantity: 75,
+    stockQuantity: 85,
     isFeatured: true,
     isBestseller: true,
     rating: 5.0,
-    reviewsCount: 58,
-    tags: ["hair oil", "argan", "marula", "shine", "heat protectant"]
+    reviewsCount: 72,
+    tags: ["hair oil", "argan", "marula", "camellia", "shine", "heat protectant", "dry oil", "elixir"]
   },
   {
-    name: "Invisible Lace Melting Mist & Hold Spray",
+    name: "Night Recovery Keratin Repair Balm",
     category: "hair-care",
-    price: 18500,
-    compareAtPrice: 22000,
-    shortDescription: "Alcohol-free holding mist that melts HD and Swiss lace invisibly into the skin with zero white residue.",
-    description: "Achieve the coveted 'melted into scalp' finish. Our proprietary fast-drying formula bonds lace seamlessly to skin while resisting humidity, sweat, and active movement. Easily washes away with water or micellar cleanser without snagging hair knots or damaging delicate Swiss lace.",
+    price: 34000,
+    compareAtPrice: 42000,
+    shortDescription: "Overnight restorative sleeping treatment — wakes up your wig or extensions completely transformed: soft, silky, and full from root to tip.",
+    description: "The Night Recovery Balm is our most intensive reconstructive treatment. Formulated for weekly overnight use on virgin wigs, bundles, and extensions that have been through heat styling, colour processing, or environmental exposure. A rich whipped crème fortified with biomimetic keratin amino acids, Nilotica shea butter, ceramide complex, and biotin that penetrates the hair shaft overnight to restore tensile strength, lock in moisture, and eliminate breakage. Apply a generous amount from mid-shaft to ends before bed. Wrap in a silk bonnet. Wake to silky, full, runway-finish hair.",
     specifications: {
-      volume: "200ml / 6.8 fl. oz",
-      origin: "Formulated in the UK",
-      keyIngredients: "Hydrolyzed Silk Protein, Rosewater Distillate, Polyquaternium-11, Panthenol Provitamin B5",
-      hairGrade: "Dermatologist Tested, Latex-Free",
-      longevity: "24-48 hour secure hold",
-      texture: "Fine Mist Aerosol Spray"
+      volume: "100ml / 3.4 fl. oz (Matte Black Jar with Gold Lid)",
+      origin: "Formulated in Paris, France",
+      keyIngredients: "Hydrolyzed Keratin Amino Acids 12%, Nilotica Shea Butter, Ceramide NP Complex, Biotin, Sweet Almond Oil, Provitamin B5 Panthenol",
+      productType: "Masque",
+      hairGrade: "Reconstructive — For chemically treated, heat-damaged or dry extensions",
+      longevity: "Use once per week overnight | Shelf life 18 months",
+      scentProfile: "Delicate Jasmine Musk · Vanilla · Coconut Milk",
+      texture: "Whipped Velvety Crème — Melts on contact with hair heat"
     },
     images: [
-      "/images/products/care-spray-1.jpg",
-      "/images/products/care-spray-2.jpg"
+      "/images/products/care-night-balm.jpg",
+      "/images/products/care-night-balm-2.jpg",
+      "/images/products/care-night-balm.jpg"
     ],
     variants: [
-      { name: "200ml Daily Hold Spray", length: "", density: "", color: "Clear", texture: "Spray", price: 18500, stock: 60 }
-    ],
-    inStock: true,
-    stockQuantity: 60,
-    isFeatured: true,
-    isBestseller: true,
-    rating: 4.9,
-    reviewsCount: 38,
-    tags: ["melting spray", "lace hold", "glueless", "swiss lace"]
-  },
-  {
-    name: "Silk Infusion Keratin Restorative Masque",
-    category: "hair-care",
-    price: 28000,
-    compareAtPrice: 34000,
-    shortDescription: "Deep conditioning restorative treatment infused with biomimetic keratin and shea butter for extensions.",
-    description: "Rejuvenate tired virgin bundles and wigs back to their out-of-the-box silky perfection. This luxurious intensive hair masque penetrates the cortex to deposit essential amino acids and lipids lost through heat styling and environmental exposure.",
-    specifications: {
-      volume: "250ml / 8.5 oz",
-      origin: "Formulated in France",
-      keyIngredients: "Hydrolyzed Keratin Amino Acids, Nilotica Shea Butter, Biotin, Ceramide NP",
-      hairGrade: "Deep Reconstructive Therapy",
-      longevity: "Use bi-weekly for optimal results",
-      texture: "Whipped Velvety Crème"
-    },
-    images: [
-      "/images/products/care-masque-1.jpg",
-      "/images/products/care-masque-2.jpg"
-    ],
-    variants: [
-      { name: "250ml Luxury Jar", length: "", density: "", color: "Ivory Cream", texture: "Masque", price: 28000, stock: 40 }
+      { name: "100ml Matte Black Jar — Night Jasmine", length: "", density: "", color: "Ivory Cream", texture: "Overnight Masque", price: 34000, stock: 40 }
     ],
     inStock: true,
     stockQuantity: 40,
-    isFeatured: false,
-    isBestseller: false,
-    rating: 4.8,
-    reviewsCount: 15,
-    tags: ["hair masque", "keratin", "deep conditioner", "repair"]
+    isFeatured: true,
+    isBestseller: true,
+    rating: 4.9,
+    reviewsCount: 34,
+    tags: ["overnight", "night balm", "hair masque", "keratin", "deep conditioner", "repair", "sleeping treatment"]
   },
   {
-    name: "Anti-Frizz High-Gloss Finishing Serum",
+    name: "Silk Protein & Camellia Glow Serum Duo",
     category: "hair-care",
-    price: 22000,
-    compareAtPrice: 26000,
-    shortDescription: "Featherlight finishing polish providing 48-hour humidity resistance and diamond shine.",
-    description: "A single pump dispenses a featherweight micro-shield that eliminates flyaways, static, and frizz under any tropical climate. Scented with delicate notes of Bulgarian Rose and White Amber.",
+    price: 26000,
+    compareAtPrice: 32000,
+    shortDescription: "Two amber precision serums: Silk Protein Serum for strength + Camellia Glow Serum for luminosity — the complete daily finishing ritual.",
+    description: "Our bestselling two-serum system designed for daily use on human hair wigs and extensions. The Silk Protein Serum (nourish & restore) deposits hydrolyzed silk amino acids directly into the hair shaft to rebuild structural integrity — ideal for straight and body wave textures. The Camellia Glow Serum (illuminate & hydrate) is a lightweight botanical gloss that seals the cuticle and amplifies natural shine by up to 3× without weighing hair down. Use the Silk in the morning before styling; apply one drop of Camellia to finish. Both serums come in 30ml amber glass dropper bottles.",
     specifications: {
-      volume: "80ml / 2.7 fl. oz",
-      origin: "Formulated in Switzerland",
-      keyIngredients: "Dimethiconol, Meadowfoam Seed Oil, Rose Damascena Flower Extract",
-      hairGrade: "High Gloss Polish",
-      longevity: "48-Hour Frizz Defiance",
-      texture: "Featherlight Serum"
+      volume: "2 × 30ml Amber Glass Dropper Bottles",
+      origin: "Formulated in the UK",
+      keyIngredients: "Hydrolyzed Silk Protein, Camellia Japonica Seed Oil, Jasmine Extract, Squalane, Vitamin E",
+      productType: "Serum",
+      hairGrade: "Daily Use — For all hair textures including coloured and bleached",
+      longevity: "Each bottle lasts ~3 months daily use | Shelf life 24 months",
+      scentProfile: "White Jasmine · Green Tea · Clean Musk",
+      texture: "Ultra-lightweight serum — applies dry, no oiliness"
     },
     images: [
+      "/images/products/care-silk-serum.jpg",
       "/images/products/care-serum-1.jpg"
     ],
     variants: [
-      { name: "80ml Luxury Pump", length: "", density: "", color: "Crystal Clear", texture: "Serum", price: 22000, stock: 45 }
+      { name: "Silk Protein + Camellia Glow Duo (2 × 30ml)", length: "", density: "", color: "Amber Gold", texture: "Dual Serum", price: 26000, stock: 50 },
+      { name: "Silk Protein Serum Only (30ml)", length: "", density: "", color: "Amber Gold", texture: "Serum", price: 14500, stock: 30 },
+      { name: "Camellia Glow Serum Only (30ml)", length: "", density: "", color: "Amber Gold", texture: "Serum", price: 14500, stock: 30 }
+    ],
+    inStock: true,
+    stockQuantity: 110,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 4.9,
+    reviewsCount: 47,
+    tags: ["serum", "silk protein", "camellia", "shine", "hydration", "daily care", "duo", "finishing serum"]
+  },
+  {
+    name: "Invisible Lace Melt Mist",
+    category: "hair-care",
+    price: 19500,
+    compareAtPrice: 24000,
+    shortDescription: "Alcohol-free HD lace bonding mist — melts Swiss and HD lace invisibly into skin with a 24–48 hour hold and zero white residue.",
+    description: "Achieve the coveted undetectable hairline in seconds. Our Invisible Lace Melt Mist bonds HD lace, Swiss lace, and thin-skin units seamlessly to the scalp using a proprietary film-forming complex that dries completely clear and colorless — even on deeper skin tones. Alcohol-free and latex-free, it resists humidity, sweat, and coastal heat while remaining gentle enough for daily use. Removes cleanly with warm water or micellar cleanser without snagging knots or damaging delicate HD lace. Formulated with hydrolyzed silk to condition and protect the hairline skin.",
+    specifications: {
+      volume: "200ml / 6.8 fl. oz (Frosted Glass Pump Bottle)",
+      origin: "Formulated in London, UK",
+      keyIngredients: "Hydrolyzed Silk Protein, Rosewater Distillate, Polyquaternium-11 Film Former, Panthenol Provitamin B5, Allantoin",
+      productType: "Spray",
+      hairGrade: "Dermatologist Tested | Latex-Free | Alcohol-Free | Fragrance-Free",
+      longevity: "24–48 hour secure hold per application | Shelf life 18 months",
+      scentProfile: "Fragrance-Free",
+      texture: "Ultra-fine mist spray — dries invisible in 60 seconds"
+    },
+    images: [
+      "/images/products/care-lace-spray.jpg",
+      "/images/products/care-lace-spray-2.jpg",
+      "/images/products/care-lace-spray.jpg"
+    ],
+    variants: [
+      { name: "200ml Frosted Glass Pump — Fragrance Free", length: "", density: "", color: "Crystal Clear", texture: "Fine Mist Spray", price: 19500, stock: 65 },
+      { name: "400ml Salon Refill Pump — Fragrance Free", length: "", density: "", color: "Crystal Clear", texture: "Fine Mist Spray", price: 34000, stock: 20 }
+    ],
+    inStock: true,
+    stockQuantity: 85,
+    isFeatured: true,
+    isBestseller: true,
+    rating: 4.9,
+    reviewsCount: 53,
+    tags: ["lace melt", "lace spray", "hd lace", "swiss lace", "glueless", "hold spray", "hairline"]
+  },
+  {
+    name: "Anti-Frizz Diamond Gloss Finishing Serum",
+    category: "hair-care",
+    price: 22000,
+    compareAtPrice: 27000,
+    shortDescription: "48-hour frizz-defiant micro-serum that locks in diamond shine and eliminates flyaways in tropical humidity.",
+    description: "One pump. Instant perfection. The Diamond Gloss Finishing Serum is the last step in your styling routine — a featherweight silicone micro-emulsion that deposits an invisible shield around every strand, eliminating frizz, static, and flyaways for up to 48 hours. Safe for use on straight, wavy, and lightly curled extensions. The lightweight formula won't flatten body-wave or loose-curl textures — it defines without heaviness. Scented with delicate notes of Bulgarian Rose and White Amber. The frosted pump bottle dispenses the exact right amount every press.",
+    specifications: {
+      volume: "80ml / 2.7 fl. oz (Frosted Pump Bottle)",
+      origin: "Formulated in Zurich, Switzerland",
+      keyIngredients: "Dimethiconol Micro-Silicone, Meadowfoam Seed Oil, Rose Damascena Flower Extract, Camellia Seed Oil, UV Absorber",
+      productType: "Serum",
+      hairGrade: "Finishing Gloss — For all textures, safe on colored and bleached hair",
+      longevity: "48-hour frizz resistance | ~200 applications per bottle",
+      scentProfile: "Bulgarian Rose · White Amber · Light Musk",
+      texture: "Featherweight serum — absorbs instantly, non-greasy"
+    },
+    images: [
+      "/images/products/care-silk-serum.jpg",
+      "/images/products/care-serum-1.jpg"
+    ],
+    variants: [
+      { name: "80ml Frosted Pump — Rose & White Amber", length: "", density: "", color: "Crystal Clear", texture: "Finishing Serum", price: 22000, stock: 45 }
     ],
     inStock: true,
     stockQuantity: 45,
     isFeatured: false,
     isBestseller: false,
-    rating: 4.9,
-    reviewsCount: 20,
-    tags: ["finishing serum", "anti-frizz", "shine", "luxury"]
+    rating: 4.8,
+    reviewsCount: 28,
+    tags: ["finishing serum", "anti-frizz", "shine", "gloss", "flyaway control", "humidity", "tropical"]
   }
+
 ];
 
 async function runSeed(shouldDisconnect = true) {
   try {
-    const rawUri = process.env.MONGODB_URI || ATLAS_FALLBACK_URI;
-    const mongoUri = formatMongoUri(rawUri);
+    const mongoUri = resolveMongoUri();
     console.log(`[Seed] Connecting to MongoDB: ${mongoUri.replace(/:([^@]+)@/, ':***@')}`);
     await mongoose.connect(mongoUri);
 
