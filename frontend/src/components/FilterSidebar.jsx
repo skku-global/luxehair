@@ -194,17 +194,20 @@ export default function FilterSidebar({
       {/* ========================================================================= */}
       {activeCategory === 'attachments' && (
         <>
-          {/* Attachment Type Filter */}
+          {/* Extension Method Filter */}
           <div style={{ marginBottom: '28px' }}>
             <h4 style={{ fontSize: '12px', color: '#C9A876', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '12px', fontWeight: 600 }}>
-              Attachment Type
+              Extension Method
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px' }}>
               {[
-                { id: 'all', label: 'All Types' },
-                { id: 'Clip-In', label: 'Clip-In Sets' },
-                { id: 'Tape-In', label: 'Invisible Tape-Ins' },
-                { id: 'Ponytail', label: 'Wrap-Around Ponytails' }
+                { id: 'all', label: 'All Extension Methods' },
+                { id: 'Clip-In', label: 'Clip-In Sets (Instant DIY)' },
+                { id: 'Tape-In', label: 'Invisible Tape-In (Flat Skin Weft)' },
+                { id: 'Weft', label: 'Secret Weft (Hand-Tied / Beaded Row)' },
+                { id: 'Keratin', label: 'Italian Keratin K-Tip (360° Fusion)' },
+                { id: 'Nano-Tip', label: 'Nano-Tip Micro Ring (Cold Fusion)' },
+                { id: 'Ponytail', label: 'Sleek Wrap-Around Ponytail' }
               ].map(itemType => (
                 <label
                   key={itemType.id}
@@ -241,10 +244,12 @@ export default function FilterSidebar({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px' }}>
               {[
                 { id: 'all', label: 'All Shades' },
-                { id: 'Natural Black', label: 'Natural Black #1B' },
                 { id: 'Jet Black', label: 'Jet Black #1' },
-                { id: 'Balayage', label: 'Honey Blonde / Balayage #27' },
-                { id: 'Brown', label: 'Chocolate Brown #4' }
+                { id: 'Natural Black', label: 'Natural Black #1B' },
+                { id: 'Brown', label: 'Chocolate Brown #4' },
+                { id: 'Caramel', label: 'Chocolate Caramel #8/27' },
+                { id: 'Balayage', label: 'Honey Balayage #27' },
+                { id: 'Platinum', label: 'Icy Platinum #613' }
               ].map(col => (
                 <label
                   key={col.id}

@@ -52,10 +52,10 @@ export const BRAND = {
     {
       id: 'attachments',
       name: 'Hair Attachments',
-      fullName: 'Luxury Hair Attachments',
+      fullName: 'Luxury Hair Extensions & Attachments',
       slug: 'attachments',
-      description: 'Seamless clip-ins, invisible tape-ins, and couture ponytails.',
-      image: '/images/products/attachment-clipin-1.jpg'
+      description: 'Seamless clip-ins, invisible tape-ins, hand-tied secret wefts, keratin fusion, and couture ponytails.',
+      image: '/images/products/attachment-genius-clipin.jpg'
     },
     {
       id: 'hair-care',
@@ -63,7 +63,7 @@ export const BRAND = {
       fullName: 'Hair Care & Maintenance',
       slug: 'hair-care',
       description: 'Botanical elixirs, lace melting mists, and restorative masques.',
-      image: '/images/products/care-elixir-1.jpg'
+      image: '/images/products/care-argan-oil.jpg'
     }
   ],
 

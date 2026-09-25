@@ -12,15 +12,21 @@ const WIG_TEXTURES = [
 
 const ATTACHMENT_TYPES = [
   'Clip-In',
+  'Weft',
   'Tape-In',
+  'Nano-Tip',
+  'Keratin',
   'Ponytail'
 ];
 
 const ATTACHMENT_COLORS = [
-  'Natural Black (#1B)',
   'Jet Black (#1)',
+  'Natural Black (#1B)',
+  'Dark Brown (#2)',
+  'Chocolate Brown (#4)',
+  'Chocolate Caramel (#8/27)',
   'Honey Balayage (#27)',
-  'Chocolate Brown (#4)'
+  'Icy Platinum (#613)'
 ];
 
 const HAIR_CARE_TYPES = [

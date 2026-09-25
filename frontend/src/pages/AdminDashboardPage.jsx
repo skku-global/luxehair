@@ -22,6 +22,17 @@ export default function AdminDashboardPage() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
+  // Non-blocking status banner; replaces the browser alert() dialogs
+  const [toast, setToast] = useState(null); // { type: 'error' | 'success', message: string }
+
+  const notify = (type, message) => setToast({ type, message });
+
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timer = setTimeout(() => setToast(null), 5000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -36,6 +47,7 @@ export default function AdminDashboardPage() {
       if (custRes.success) setCustomers(custRes.customers || []);
     } catch (err) {
       console.error('Failed to load admin data:', err);
+      notify('error', err.message || 'Could not load dashboard data.');
     } finally {
       setLoading(false);
     }
@@ -49,9 +61,10 @@ export default function AdminDashboardPage() {
     if (window.confirm(`Are you sure you want to permanently remove "${name}" from the boutique catalog?`)) {
       try {
         await api.deleteProduct(id);
+        notify('success', `"${name}" was removed from the catalog.`);
         fetchData();
       } catch (err) {
-        alert(err.message || 'Error deleting product');
+        notify('error', err.message || 'Could not delete that product.');
       }
     }
   };
@@ -59,18 +72,20 @@ export default function AdminDashboardPage() {
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
       await api.updateOrderStatus(orderId, { orderStatus: newStatus });
+      notify('success', `Order status updated to "${newStatus}".`);
       fetchData();
     } catch (err) {
-      alert(err.message || 'Failed to update order status');
+      notify('error', err.message || 'Could not update the order status.');
     }
   };
 
   const handleUpdatePaymentStatus = async (orderId, newPayStatus) => {
     try {
       await api.updateOrderStatus(orderId, { paymentStatus: newPayStatus });
+      notify('success', `Payment status updated to "${newPayStatus}".`);
       fetchData();
     } catch (err) {
-      alert(err.message || 'Failed to update payment status');
+      notify('error', err.message || 'Could not update the payment status.');
     }
   };
 
@@ -105,8 +120,38 @@ export default function AdminDashboardPage() {
   });
 
   return (
-    <div style={{ backgroundColor: '#0E0D0C', color: '#F2EFEA', minHeight: '95vh', padding: '40px 0 100px' }}>
+    <div style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-primary)', minHeight: '95vh', padding: '40px 0 100px' }}>
       <div className="container">
+        {/* Inline status banner - replaces blocking alert() dialogs */}
+        {toast && (
+          <div
+            role="alert"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '16px',
+              marginBottom: '24px',
+              padding: '13px 16px',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '13px',
+              backgroundColor: toast.type === 'error' ? 'rgba(220, 105, 95, 0.08)' : 'rgba(201, 168, 118, 0.08)',
+              border: `1px solid ${toast.type === 'error' ? 'rgba(220, 105, 95, 0.35)' : 'var(--border-gold)'}`,
+              color: toast.type === 'error' ? '#E8938B' : 'var(--gold-primary)'
+            }}
+          >
+            <span>{toast.message}</span>
+            <button
+              type="button"
+              onClick={() => setToast(null)}
+              aria-label="Dismiss notification"
+              style={{ color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', background: 'none', border: 'none' }}
+            >
+              <X size={15} />
+            </button>
+          </div>
+        )}
+
         {/* Top Header */}
         <div style={{
           display: 'flex',

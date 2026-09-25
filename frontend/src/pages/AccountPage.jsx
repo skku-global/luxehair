@@ -669,7 +669,7 @@ export default function AccountPage() {
                                 )}
                               </div>
                               <div style={{ fontSize: '13px', color: '#C9A876' }}>
-                                {it.quantity} × {formatPrice(it.price)}
+                                {it.quantity} × {formatPrice(it.price, ord.currency || 'NGN')}
                               </div>
                             </div>
                           ))}
@@ -680,7 +680,7 @@ export default function AccountPage() {
                             Payment: <strong style={{ color: '#F2EFEA', textTransform: 'capitalize' }}>{ord.paymentMethod}</strong> ({ord.paymentStatus})
                           </span>
                           <span style={{ fontSize: '16px', fontWeight: 600, color: '#F2EFEA' }}>
-                            Total: <span style={{ color: '#C9A876' }}>{formatPrice(ord.pricingBreakdown.total)}</span>
+                            Total: <span style={{ color: '#C9A876' }}>{formatPrice(ord.pricingBreakdown.total, ord.currency || 'NGN')}</span>
                           </span>
                         </div>
 

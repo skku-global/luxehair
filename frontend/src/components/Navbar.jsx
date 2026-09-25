@@ -1,23 +1,35 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, User, Search, Menu, X, ShieldCheck, LogOut, Sun, Moon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { ShoppingBag, User, Search, Menu, X, ShieldCheck, LogOut } from 'lucide-react';
 import { BRAND } from '../config/brand';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
-import { useTheme } from '../context/ThemeContext';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const { totalItemsCount, setIsCartOpen } = useCart();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { currency, setCurrency, isUsd } = useCurrency();
-  const { theme, setTheme, isDark } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setUserDropdownOpen(false);
+  }, [location.pathname]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -28,311 +40,139 @@ export default function Navbar() {
     }
   };
 
+  const navLinks = [
+    { to: '/shop', label: 'Collection' },
+    { to: '/shop?category=wigs', label: 'Wigs' },
+    { to: '/shop?category=attachments', label: 'Hair Extensions' },
+    { to: '/shop?category=hair-care', label: 'Hair Care' },
+  ];
+
   return (
     <>
-      {/* Top Announcement, Currency & Theme Switcher Bar */}
-      <div style={{
-        backgroundColor: 'var(--bg-surface-2)',
-        borderBottom: '1px solid var(--border-subtle)',
-        fontSize: '11px',
-        letterSpacing: '0.08em',
-        color: 'var(--text-secondary)',
-        padding: '6px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '12px',
-        transition: 'background-color 0.3s ease, color 0.3s ease'
-      }}>
-        <div style={{ textTransform: 'uppercase', flex: 1, textAlign: 'center' }}>
+      {/* ── Announcement Bar (hidden on mobile) ─────────────────── */}
+      <div className="announcement-bar">
+        <div className="announcement-text">
           {isUsd ? (
             <span>
-              Worldwide DHL Express Dispatch • International Card Payment Powered by <strong style={{ color: '#6772E5' }}>STRIPE</strong>
+              Worldwide DHL Express Dispatch&nbsp;•&nbsp;International Card Payment Powered by{' '}
+              <strong style={{ color: '#6772E5' }}>STRIPE</strong>
             </span>
           ) : (
             <span>
-              Complimentary Lagos Delivery Above ₦250,000 • Privilege Code <strong style={{ color: 'var(--gold-primary)' }}>LUXE10</strong> for 10% Off
+              Complimentary Lagos Delivery Above ₦250,000&nbsp;•&nbsp;Code{' '}
+              <strong style={{ color: 'var(--gold-primary)' }}>LUXE10</strong> for 10% Off
             </span>
           )}
         </div>
-
-        {/* Right Controls: Theme Toggle & Currency Switcher */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
-          {/* Theme Switcher Toggle (Noir / Blanc) */}
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            border: '1px solid var(--border-medium)',
-            borderRadius: '2px',
-            backgroundColor: 'var(--bg-surface-1)',
-            overflow: 'hidden'
-          }}>
-            <button
-              type="button"
-              onClick={() => setTheme('dark')}
-              title="Noir Luxury Aesthetic"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                padding: '3px 8px',
-                fontSize: '10px',
-                fontWeight: isDark ? 700 : 400,
-                backgroundColor: isDark ? 'var(--gold-primary)' : 'transparent',
-                color: isDark ? '#0E0D0C' : 'var(--text-muted)',
-                cursor: 'pointer',
-                border: 'none',
-                transition: 'all 0.2s'
-              }}
-            >
-              <Moon size={11} />
-              <span>Noir</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setTheme('light')}
-              title="Clean Parisian White Luxury Aesthetic"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                padding: '3px 8px',
-                fontSize: '10px',
-                fontWeight: !isDark ? 700 : 400,
-                backgroundColor: !isDark ? 'var(--gold-primary)' : 'transparent',
-                color: !isDark ? '#0E0D0C' : 'var(--text-muted)',
-                cursor: 'pointer',
-                border: 'none',
-                transition: 'all 0.2s'
-              }}
-            >
-              <Sun size={11} />
-              <span>Blanc</span>
-            </button>
-          </div>
-
-          {/* Currency Switcher Toggle */}
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            border: '1px solid var(--border-medium)',
-            borderRadius: '2px',
-            backgroundColor: 'var(--bg-surface-1)',
-            overflow: 'hidden'
-          }}>
+        <div className="announcement-controls">
+          {/* Currency Toggle */}
+          <div className="toggle-group">
             <button
               type="button"
               onClick={() => setCurrency('NGN')}
-              style={{
-                padding: '3px 8px',
-                fontSize: '10px',
-                fontWeight: currency === 'NGN' ? 700 : 400,
-                backgroundColor: currency === 'NGN' ? 'var(--gold-primary)' : 'transparent',
-                color: currency === 'NGN' ? '#0E0D0C' : 'var(--text-muted)',
-                cursor: 'pointer',
-                border: 'none',
-                transition: 'all 0.2s'
-              }}
+              className={`toggle-btn ${currency === 'NGN' ? 'toggle-btn-active' : ''}`}
             >
-              🇳🇬 ₦ NGN
+              ₦ NGN
             </button>
             <button
               type="button"
               onClick={() => setCurrency('USD')}
-              style={{
-                padding: '3px 8px',
-                fontSize: '10px',
-                fontWeight: currency === 'USD' ? 700 : 400,
-                backgroundColor: currency === 'USD' ? 'var(--gold-primary)' : 'transparent',
-                color: currency === 'USD' ? '#0E0D0C' : 'var(--text-muted)',
-                cursor: 'pointer',
-                border: 'none',
-                transition: 'all 0.2s'
-              }}
+              className={`toggle-btn ${currency === 'USD' ? 'toggle-btn-active' : ''}`}
             >
-              🌐 $ USD
+              $ USD
             </button>
           </div>
         </div>
       </div>
 
-      {/* Main Luxury Header */}
-      <header style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 40,
-        backgroundColor: 'var(--bg-surface-glass)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid var(--border-subtle)',
-        transition: 'background-color 0.3s ease, border-color 0.3s ease'
-      }}>
-        <div className="container" style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: '76px'
-        }}>
-          {/* Mobile Menu Trigger */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{ display: 'none', color: 'var(--text-primary)', padding: '6px' }}
-            className="mobile-toggle-btn"
-            aria-label="Toggle navigation menu"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+      {/* ── Main Editorial Navbar ────────────────────────────────── */}
+      <header className={`luxe-navbar ${scrolled ? 'luxe-navbar-scrolled' : ''}`}>
+        <div className="luxe-navbar-inner">
 
-          {/* Desktop Nav Links (Left) */}
-          <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-            <Link to="/shop" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
-              The Collection
-            </Link>
-            <Link to="/shop?category=wigs" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
-              Virgin Wigs
-            </Link>
-            <Link to="/shop?category=attachments" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
-              Attachments
-            </Link>
-            <Link to="/shop?category=hair-care" style={{ fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
-              Hair Care
-            </Link>
-          </nav>
-
-          {/* Centered Brand Mark */}
-          <Link to="/" style={{ textAlign: 'center', textDecoration: 'none' }}>
-            <div style={{
-              fontFamily: "'Cinzel', 'Cormorant Garamond', Georgia, serif",
-              fontSize: '22px',
-              letterSpacing: '0.22em',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              justifyContent: 'center'
-            }}>
-              <span style={{ color: 'var(--gold-primary)', fontSize: '16px' }}>✦</span>
-              <span>{BRAND.name}</span>
-              <span style={{ color: 'var(--gold-primary)', fontSize: '16px' }}>✦</span>
-            </div>
-            <div style={{
-              fontSize: '9px',
-              letterSpacing: '0.3em',
-              color: 'var(--gold-dark, #8F7246)',
-              textTransform: 'uppercase',
-              marginTop: '2px'
-            }}>
-              Haute Coiffure
-            </div>
+          {/* LEFT: Logo */}
+          <Link to="/" className="luxe-brand" aria-label={BRAND.name + ' Home'}>
+            <span className="luxe-brand-name">{BRAND.name}</span>
+            <span className="luxe-brand-sub">Haute Coiffure</span>
           </Link>
 
-          {/* Header Actions (Right) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            {/* Search Trigger */}
+          {/* CENTER: Desktop Nav Links */}
+          <nav className="luxe-nav-links" aria-label="Main navigation">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="luxe-nav-link"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* RIGHT: Actions */}
+          <div className="luxe-nav-actions">
+            {/* Search */}
             <button
+              type="button"
               onClick={() => setSearchOpen(!searchOpen)}
-              style={{ color: 'var(--text-secondary)', padding: '6px', transition: 'color 0.2s' }}
-              title="Search Catalog"
+              className="luxe-icon-btn"
               aria-label="Search"
+              title="Search Catalog"
             >
-              <Search size={20} />
+              <Search size={18} />
             </button>
 
-            {/* Admin Badge link if admin */}
+            {/* Admin */}
             {isAdmin && (
               <Link
                 to="/admin"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  backgroundColor: 'rgba(201, 168, 118, 0.15)',
-                  border: '1px solid rgba(201, 168, 118, 0.3)',
-                  color: '#C9A876',
-                  fontSize: '11px',
-                  padding: '4px 10px',
-                  borderRadius: '2px',
-                  letterSpacing: '0.05em'
-                }}
+                className="luxe-admin-badge"
+                title="Store Management"
               >
                 <ShieldCheck size={14} />
                 <span>Admin</span>
               </Link>
             )}
 
-            {/* User Account Dropdown */}
+            {/* User Account */}
             <div style={{ position: 'relative' }}>
               <button
+                type="button"
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                style={{
-                  color: isAuthenticated ? '#C9A876' : '#C0BAB0',
-                  padding: '6px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
+                className={`luxe-icon-btn ${isAuthenticated ? 'luxe-icon-btn-gold' : ''}`}
+                aria-label="Account"
                 title={isAuthenticated ? user?.name : 'Account'}
               >
-                <User size={20} />
+                <User size={18} />
               </button>
 
               {userDropdownOpen && (
-                <div
-                  className="card-luxury animate-fade-in"
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 12px)',
-                    right: 0,
-                    width: '230px',
-                    backgroundColor: '#141312',
-                    border: '1px solid #2A2824',
-                    padding: '12px 0',
-                    zIndex: 50,
-                    boxShadow: '0 12px 32px rgba(0,0,0,0.7)'
-                  }}
-                >
+                <div className="luxe-dropdown animate-fade-in">
                   {isAuthenticated ? (
                     <>
-                      <div style={{ padding: '8px 18px', borderBottom: '1px solid #24221F', marginBottom: '6px' }}>
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#F2EFEA' }}>{user?.name}</div>
-                        <div style={{ fontSize: '11px', color: '#A6A095', marginTop: '2px' }}>{user?.email}</div>
+                      <div className="luxe-dropdown-header">
+                        <div className="luxe-dropdown-name">{user?.name}</div>
+                        <div className="luxe-dropdown-email">{user?.email}</div>
                       </div>
                       <Link
                         to="/account"
                         onClick={() => setUserDropdownOpen(false)}
-                        style={{ display: 'block', padding: '8px 18px', fontSize: '13px', color: '#C0BAB0' }}
+                        className="luxe-dropdown-item"
                       >
-                        Orders & Addresses
+                        Orders &amp; Addresses
                       </Link>
                       {isAdmin && (
                         <Link
                           to="/admin"
                           onClick={() => setUserDropdownOpen(false)}
-                          style={{ display: 'block', padding: '8px 18px', fontSize: '13px', color: '#C9A876' }}
+                          className="luxe-dropdown-item luxe-dropdown-item-gold"
                         >
                           Store Management
                         </Link>
                       )}
                       <button
-                        onClick={() => {
-                          logout();
-                          setUserDropdownOpen(false);
-                          navigate('/');
-                        }}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          width: '100%',
-                          textAlign: 'left',
-                          padding: '8px 18px',
-                          fontSize: '13px',
-                          color: '#E06C75',
-                          borderTop: '1px solid #24221F',
-                          marginTop: '6px'
-                        }}
+                        type="button"
+                        onClick={() => { logout(); setUserDropdownOpen(false); navigate('/'); }}
+                        className="luxe-dropdown-item luxe-dropdown-item-danger"
                       >
                         <LogOut size={14} />
                         <span>Sign Out</span>
@@ -340,13 +180,13 @@ export default function Navbar() {
                     </>
                   ) : (
                     <>
-                      <div style={{ padding: '8px 18px', fontSize: '12px', color: '#A6A095', borderBottom: '1px solid #24221F' }}>
-                        Welcome to {BRAND.name}
+                      <div className="luxe-dropdown-header">
+                        <div className="luxe-dropdown-email">Welcome to {BRAND.name}</div>
                       </div>
                       <Link
                         to="/account"
                         onClick={() => setUserDropdownOpen(false)}
-                        style={{ display: 'block', padding: '10px 18px', fontSize: '13px', color: '#C9A876', fontWeight: 600 }}
+                        className="luxe-dropdown-item luxe-dropdown-item-gold"
                       >
                         Sign In / Register
                       </Link>
@@ -356,54 +196,53 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Shopping Bag Trigger */}
+            {/* Cart Bag */}
             <button
+              type="button"
               onClick={() => setIsCartOpen(true)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: '#F2EFEA',
-                padding: '6px 12px',
-                borderRadius: '2px',
-                backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid #24221F',
-                transition: 'all 0.2s'
-              }}
-              aria-label="Open Shopping Bag"
+              className="luxe-cart-btn"
+              aria-label={`Open shopping bag, ${totalItemsCount} items`}
             >
-              <ShoppingBag size={18} style={{ color: '#C9A876' }} />
-              <span style={{ fontSize: '13px', fontWeight: 600 }}>{totalItemsCount}</span>
+              <ShoppingBag size={18} />
+              {totalItemsCount > 0 && (
+                <span className="luxe-cart-count">{totalItemsCount}</span>
+              )}
+            </button>
+
+            {/* Mobile Hamburger */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="luxe-icon-btn luxe-mobile-trigger"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
 
-        {/* Expandable Search Input Bar */}
+        {/* ── Expandable Search Bar ───────────────────────────── */}
         {searchOpen && (
-          <div style={{
-            backgroundColor: '#141312',
-            borderTop: '1px solid #24221F',
-            padding: '16px 0'
-          }}>
+          <div className="luxe-search-bar">
             <div className="container">
-              <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '12px' }}>
+              <form onSubmit={handleSearchSubmit} className="luxe-search-form">
                 <input
                   type="text"
                   placeholder="Search raw wigs, HD frontals, clip-ins, argan oils..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
-                  className="input-luxury"
-                  style={{ flex: 1 }}
+                  className="input-luxury luxe-search-input"
                 />
-                <button type="submit" className="btn-gold" style={{ padding: '0 24px' }}>
+                <button type="submit" className="btn-gold" style={{ padding: '0 22px' }}>
                   Search
                 </button>
                 <button
                   type="button"
                   onClick={() => setSearchOpen(false)}
                   className="btn-dark"
-                  style={{ padding: '0 16px' }}
+                  style={{ padding: '0 14px' }}
                 >
                   <X size={18} />
                 </button>
@@ -412,59 +251,411 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* Mobile Navigation Drawer */}
+        {/* ── Mobile Drawer ───────────────────────────────────── */}
         {mobileMenuOpen && (
-          <div style={{
-            backgroundColor: '#0E0D0C',
-            borderBottom: '1px solid #24221F',
-            padding: '24px 20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '18px'
-          }}>
-            <Link
-              to="/shop"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{ fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
-            >
-              The Full Collection
-            </Link>
-            <Link
-              to="/shop?category=wigs"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{ fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C9A876' }}
-            >
-              Raw & Virgin Wigs
-            </Link>
-            <Link
-              to="/shop?category=attachments"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{ fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C9A876' }}
-            >
-              Hair Attachments
-            </Link>
-            <Link
-              to="/shop?category=hair-care"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{ fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C9A876' }}
-            >
-              Hair Care & Maintenance
-            </Link>
+          <nav className="luxe-mobile-menu" aria-label="Mobile navigation">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setMobileMenuOpen(false)}
+                className="luxe-mobile-link"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <div className="luxe-mobile-divider" />
             <Link
               to="/account"
               onClick={() => setMobileMenuOpen(false)}
-              style={{ fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.1em', borderTop: '1px solid #1C1B19', paddingTop: '16px' }}
+              className="luxe-mobile-link"
             >
               {isAuthenticated ? 'My Orders & Account' : 'Sign In / Register'}
             </Link>
-          </div>
+            {/* Mobile currency controls */}
+            <div className="luxe-mobile-controls">
+              <div className="toggle-group">
+                <button type="button" onClick={() => setCurrency('NGN')} className={`toggle-btn ${currency === 'NGN' ? 'toggle-btn-active' : ''}`}>₦ NGN</button>
+                <button type="button" onClick={() => setCurrency('USD')} className={`toggle-btn ${currency === 'USD' ? 'toggle-btn-active' : ''}`}>$ USD</button>
+              </div>
+            </div>
+          </nav>
         )}
       </header>
 
       <style>{`
+        /* ── Announcement Bar ──────────────────────────────────── */
+        .announcement-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 7px 24px;
+          background: var(--bg-surface-2);
+          border-bottom: 1px solid var(--border-subtle);
+          font-size: 11px;
+          letter-spacing: 0.07em;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          transition: background-color 0.3s ease;
+        }
+        .announcement-text {
+          flex: 1;
+          text-align: center;
+        }
+        .announcement-controls {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+          .announcement-bar { display: none; }
+        }
+
+        /* ── Toggle Groups ─────────────────────────────────────── */
+        .toggle-group {
+          display: inline-flex;
+          align-items: center;
+          border: 1px solid var(--border-medium);
+          border-radius: 3px;
+          background: var(--bg-surface-1);
+          overflow: hidden;
+        }
+        .toggle-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 3px 9px;
+          font-size: 10px;
+          font-weight: 600;
+          font-family: inherit;
+          background: transparent;
+          color: var(--text-muted);
+          border: none;
+          cursor: pointer;
+          transition: all 0.18s ease;
+          letter-spacing: 0.04em;
+        }
+        .toggle-btn-active {
+          background: var(--gold-primary);
+          color: #0E0D0C;
+        }
+        .toggle-btn:not(.toggle-btn-active):hover {
+          color: var(--text-primary);
+        }
+
+        /* ── Editorial Navbar Shell ────────────────────────────── */
+        .luxe-navbar {
+          position: sticky;
+          top: 0;
+          z-index: 40;
+          background: var(--bg-surface-glass);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-bottom: 1px solid var(--border-subtle);
+          transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .luxe-navbar-scrolled {
+          box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+          border-bottom-color: var(--border-medium);
+        }
+        .luxe-navbar-inner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 70px;
+          max-width: 1320px;
+          margin: 0 auto;
+          padding: 0 24px;
+          gap: 24px;
+        }
+
+        /* ── Brand Logo (LEFT) ────────────────────────────────── */
+        .luxe-brand {
+          text-decoration: none;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          flex-shrink: 0;
+          gap: 1px;
+        }
+        .luxe-brand-name {
+          font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+          font-size: 19px;
+          font-weight: 600;
+          letter-spacing: 0.16em;
+          color: var(--text-primary);
+          line-height: 1;
+          transition: color 0.2s ease;
+        }
+        .luxe-brand:hover .luxe-brand-name {
+          color: var(--gold-primary);
+        }
+        .luxe-brand-sub {
+          font-size: 8px;
+          letter-spacing: 0.32em;
+          text-transform: uppercase;
+          color: var(--gold-dark);
+          font-family: var(--font-sans);
+          font-weight: 500;
+          line-height: 1;
+        }
+
+        /* ── Desktop Nav Links (CENTER) ───────────────────────── */
+        .luxe-nav-links {
+          display: flex;
+          align-items: center;
+          gap: 36px;
+          flex: 1;
+          justify-content: center;
+        }
+        .luxe-nav-link {
+          font-size: 12.5px;
+          font-weight: 500;
+          letter-spacing: 0.09em;
+          text-transform: uppercase;
+          color: var(--text-secondary);
+          text-decoration: none;
+          position: relative;
+          padding-bottom: 2px;
+          transition: color 0.2s ease;
+        }
+        .luxe-nav-link::after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          width: 0;
+          height: 1px;
+          background: var(--gold-primary);
+          transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .luxe-nav-link:hover {
+          color: var(--text-primary);
+        }
+        .luxe-nav-link:hover::after {
+          width: 100%;
+        }
+
+        /* ── Actions (RIGHT) ──────────────────────────────────── */
+        .luxe-nav-actions {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          flex-shrink: 0;
+        }
+        .luxe-icon-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 38px;
+          height: 38px;
+          border-radius: 6px;
+          color: var(--text-secondary);
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          transition: color 0.2s ease, background 0.2s ease;
+        }
+        .luxe-icon-btn:hover {
+          color: var(--text-primary);
+          background: rgba(255,255,255,0.04);
+        }
+        .luxe-icon-btn-gold {
+          color: var(--gold-primary);
+        }
+        .luxe-icon-btn-gold:hover {
+          color: var(--gold-light);
+        }
+        .luxe-admin-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 4px 10px;
+          background: rgba(201, 168, 118, 0.1);
+          border: 1px solid rgba(201, 168, 118, 0.28);
+          border-radius: 4px;
+          color: var(--gold-primary);
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+          transition: background 0.2s ease;
+        }
+        .luxe-admin-badge:hover {
+          background: rgba(201, 168, 118, 0.18);
+        }
+
+        /* Cart Button */
+        .luxe-cart-btn {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          border-radius: 8px;
+          background: rgba(201, 168, 118, 0.1);
+          border: 1px solid rgba(201, 168, 118, 0.25);
+          color: var(--gold-primary);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          margin-left: 4px;
+        }
+        .luxe-cart-btn:hover {
+          background: rgba(201, 168, 118, 0.2);
+          border-color: var(--gold-primary);
+          transform: translateY(-1px);
+        }
+        .luxe-cart-count {
+          position: absolute;
+          top: -5px;
+          right: -5px;
+          min-width: 16px;
+          height: 16px;
+          padding: 0 4px;
+          background: var(--gold-primary);
+          color: #0E0D0C;
+          font-size: 10px;
+          font-weight: 700;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          letter-spacing: 0;
+          line-height: 1;
+        }
+
+        /* Mobile Trigger - hidden on desktop */
+        .luxe-mobile-trigger { display: none; }
+
+        /* ── Dropdown ──────────────────────────────────────────── */
+        .luxe-dropdown {
+          position: absolute;
+          top: calc(100% + 10px);
+          right: 0;
+          width: 220px;
+          background: var(--bg-surface-1);
+          border: 1px solid var(--border-subtle);
+          border-radius: 10px;
+          padding: 8px 0;
+          z-index: 50;
+          box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+          overflow: hidden;
+        }
+        .luxe-dropdown-header {
+          padding: 10px 16px 10px;
+          border-bottom: 1px solid var(--border-subtle);
+          margin-bottom: 4px;
+        }
+        .luxe-dropdown-name {
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+        .luxe-dropdown-email {
+          font-size: 11px;
+          color: var(--text-muted);
+          margin-top: 2px;
+        }
+        .luxe-dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 9px 16px;
+          font-size: 13px;
+          color: var(--text-secondary);
+          text-decoration: none;
+          transition: color 0.2s ease, background 0.2s ease;
+          width: 100%;
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-family: inherit;
+          text-align: left;
+        }
+        .luxe-dropdown-item:hover {
+          color: var(--text-primary);
+          background: rgba(255,255,255,0.04);
+        }
+        .luxe-dropdown-item-gold { color: var(--gold-primary) !important; }
+        .luxe-dropdown-item-danger { 
+          color: #E06C75 !important;
+          border-top: 1px solid var(--border-subtle);
+          margin-top: 4px;
+        }
+
+        /* ── Search Bar ────────────────────────────────────────── */
+        .luxe-search-bar {
+          background: var(--bg-surface-1);
+          border-top: 1px solid var(--border-subtle);
+          padding: 14px 0;
+          animation: slideDown 0.2s ease;
+        }
+        .luxe-search-form {
+          display: flex;
+          gap: 10px;
+        }
+        .luxe-search-input {
+          flex: 1;
+        }
+
+        /* ── Mobile Menu ───────────────────────────────────────── */
+        .luxe-mobile-menu {
+          background: var(--bg-surface-1);
+          border-top: 1px solid var(--border-subtle);
+          padding: 20px 24px 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          animation: slideDown 0.2s ease;
+        }
+        .luxe-mobile-link {
+          font-size: 14px;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.09em;
+          color: var(--text-secondary);
+          padding: 10px 4px;
+          border-bottom: 1px solid var(--border-subtle);
+          text-decoration: none;
+          transition: color 0.2s ease;
+        }
+        .luxe-mobile-link:last-of-type {
+          border-bottom: none;
+        }
+        .luxe-mobile-link:hover {
+          color: var(--gold-primary);
+        }
+        .luxe-mobile-divider {
+          height: 1px;
+          background: var(--border-medium);
+          margin: 8px 0;
+        }
+        .luxe-mobile-controls {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          padding-top: 12px;
+        }
+
+        /* ── Responsive ────────────────────────────────────────── */
         @media (max-width: 880px) {
-          .desktop-nav { display: none !important; }
-          .mobile-toggle-btn { display: block !important; }
+          .luxe-nav-links { display: none; }
+          .luxe-mobile-trigger { display: inline-flex !important; }
+        }
+        @media (max-width: 640px) {
+          .luxe-navbar-inner { padding: 0 16px; }
+          .luxe-brand-name { font-size: 16px; }
+        }
+
+        /* ── Animation ─────────────────────────────────────────── */
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: slideDown 0.2s ease;
         }
       `}</style>
     </>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ShoppingBag, Star, ShieldCheck, Truck, Sparkles, ChevronRight, ChevronLeft,
@@ -10,28 +10,141 @@ import { useCart } from "../context/CartContext";
 import { useCurrency } from "../context/CurrencyContext";
 import ProductCard from "../components/ProductCard";
 
+/* ── Hair Mannequin SVG Icons ──────────────────────────────── */
+const MannequinIcons = {
+  /** Model Editorial: full silhouette with styled flowing hair */
+  model: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Head */}
+      <ellipse cx="12" cy="7" rx="4.5" ry="5" fill="currentColor" opacity="0.9"/>
+      {/* Flowing hair left */}
+      <path d="M7.5 5 C5 4, 4 7, 4.5 10 C5 13, 6 15, 7 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7"/>
+      {/* Flowing hair right */}
+      <path d="M16.5 5 C19 4, 20 7, 19.5 10 C19 13, 18 15, 17 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7"/>
+      {/* Neck + shoulder bust */}
+      <path d="M10 12 L10 15 Q12 16.5 14 15 L14 12" fill="currentColor" opacity="0.7"/>
+      <path d="M8 15 Q12 18 16 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+      {/* Sparkle editorial accent */}
+      <circle cx="12" cy="2.5" r="0.8" fill="currentColor" opacity="0.6"/>
+    </svg>
+  ),
+
+  /** 0° Front: straight-on face, symmetrical hair drape */
+  front: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Head circle */}
+      <circle cx="12" cy="8" r="5" fill="currentColor" opacity="0.85"/>
+      {/* Left hair curtain */}
+      <path d="M7 6 C5.5 5, 5 8, 5 11 C5 14, 5.5 16, 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none"/>
+      {/* Right hair curtain (mirrored) */}
+      <path d="M17 6 C18.5 5, 19 8, 19 11 C19 14, 18.5 16, 18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none"/>
+      {/* Eyes (facing forward indicator) */}
+      <circle cx="10.2" cy="8" r="0.9" fill="var(--bg-surface-1, #141312)"/>
+      <circle cx="13.8" cy="8" r="0.9" fill="var(--bg-surface-1, #141312)"/>
+      {/* Chin */}
+      <path d="M9 12 Q12 14 15 12" stroke="currentColor" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.6"/>
+    </svg>
+  ),
+
+  /** 45°: three-quarter angled head, slight hair sweep */
+  angle45: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Head slightly shifted right to show angle */}
+      <ellipse cx="12.5" cy="8" rx="4.8" ry="5" fill="currentColor" opacity="0.85"/>
+      {/* Hair sweep to the right at 45° */}
+      <path d="M17 5 C19 4, 21 6, 21 9 C21 12, 20 15, 19 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none"/>
+      {/* Short left hair (foreshortened) */}
+      <path d="M8 6 C6.5 5.5, 6 8, 6.5 11" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.6"/>
+      {/* One eye visible (angled face) */}
+      <circle cx="11" cy="7.8" r="0.9" fill="var(--bg-surface-1, #141312)"/>
+      {/* Diagonal angle arrows (visual hint) */}
+      <path d="M3 3 L5.5 3 M3 3 L3 5.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.4"/>
+      <path d="M21 21 L18.5 21 M21 21 L21 18.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.4"/>
+    </svg>
+  ),
+
+  /** 90°: pure side profile */
+  profile90: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Side head profile shape */}
+      <path d="M14 3 C17 3, 19 5.5, 19 8 C19 11, 17 13, 14 13.5 L13 14 L12 14 L12 12.5 C10 12, 9 10, 9 8 C9 5 11 3 14 3Z" fill="currentColor" opacity="0.85"/>
+      {/* Nose bump */}
+      <path d="M19 9 C19.8 9, 20.2 10, 19.5 11" stroke="currentColor" strokeWidth="1" strokeLinecap="round" fill="none"/>
+      {/* Hair flowing downward from back of head */}
+      <path d="M12 4 C10 3.5, 8 5, 7.5 8 C7 11, 7.5 14, 8 17 C8.5 20, 9 21, 10 22" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+      {/* Eye */}
+      <circle cx="16.5" cy="7.5" r="0.9" fill="var(--bg-surface-1, #141312)"/>
+      {/* Chin jaw line */}
+      <path d="M12 13 Q11 16 11 17" stroke="currentColor" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.6"/>
+    </svg>
+  ),
+
+  /** 180°: back of head, hair length showcase */
+  back180: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Back of head (slightly wider at top) */}
+      <ellipse cx="12" cy="7.5" rx="5" ry="5.5" fill="currentColor" opacity="0.8"/>
+      {/* Hair centre parting line */}
+      <line x1="12" y1="3" x2="12" y2="8" stroke="var(--bg-surface-1, #141312)" strokeWidth="0.8" opacity="0.7"/>
+      {/* Left hair panel flowing down */}
+      <path d="M7 8 C6 10, 5.5 13, 5.5 16 C5.5 19, 6 21, 7 22" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+      {/* Right hair panel flowing down */}
+      <path d="M17 8 C18 10, 18.5 13, 18.5 16 C18.5 19, 18 21, 17 22" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+      {/* Mid-back hair */}
+      <path d="M10 9 C9.5 12, 9 16, 9.5 20" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" fill="none" opacity="0.6"/>
+      <path d="M14 9 C14.5 12, 15 16, 14.5 20" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" fill="none" opacity="0.6"/>
+      {/* Backward arrow hint */}
+      <path d="M4.5 18 L6.5 16 M4.5 18 L6.5 20" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.45"/>
+    </svg>
+  ),
+
+  /** Lace / texture detail closeup */
+  detail: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Magnifying glass */}
+      <circle cx="10" cy="10" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+      <line x1="14.5" y1="14.5" x2="20" y2="20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      {/* Lace grid dots inside */}
+      <circle cx="8.5" cy="8.5" r="0.8" fill="currentColor" opacity="0.7"/>
+      <circle cx="10.5" cy="8.5" r="0.8" fill="currentColor" opacity="0.7"/>
+      <circle cx="9.5" cy="10.5" r="0.8" fill="currentColor" opacity="0.7"/>
+      <circle cx="11.5" cy="10.5" r="0.8" fill="currentColor" opacity="0.7"/>
+    </svg>
+  ),
+
+  /** Generic atelier view */
+  generic: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="12" cy="8" r="5" fill="currentColor" opacity="0.8"/>
+      <path d="M9 13 Q12 16 15 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+      <path d="M8 7 C6 6, 5 9, 5.5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>
+      <path d="M16 7 C18 6, 19 9, 18.5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>
+    </svg>
+  ),
+};
+
 export function getImageAngleInfo(url, index) {
   const lower = (url || "").toLowerCase();
   if (lower.includes("model") || lower.includes("editorial")) {
-    return { label: "Model Editorial", short: "Model", icon: "✦", degree: null, is360: false };
+    return { label: "Model Editorial", short: "Model", icon: MannequinIcons.model, degree: null, is360: false };
   }
   if (lower.includes("quarter") || lower.includes("45")) {
-    return { label: "45° Three-Quarter View", short: "45° Angle", icon: "◈", degree: "45°", is360: true };
+    return { label: "45° Three-Quarter View", short: "45° Angle", icon: MannequinIcons.angle45, degree: "45°", is360: true };
   }
   if (lower.includes("side") || lower.includes("profile") || lower.includes("90")) {
-    return { label: "90° Side Profile View", short: "90° Profile", icon: "◆", degree: "90°", is360: true };
+    return { label: "90° Side Profile View", short: "90° Profile", icon: MannequinIcons.profile90, degree: "90°", is360: true };
   }
   if (lower.includes("back") || lower.includes("rear") || lower.includes("180")) {
-    return { label: "180° Rear Drape View", short: "180° Back", icon: "◉", degree: "180°", is360: true };
+    return { label: "180° Rear Drape View", short: "180° Back", icon: MannequinIcons.back180, degree: "180°", is360: true };
   }
   if (lower.includes("bust") || lower.includes("front")) {
-    return { label: "0° Front Bust View", short: "0° Front", icon: "⯀", degree: "0°", is360: true };
+    return { label: "0° Front Bust View", short: "0° Front", icon: MannequinIcons.front, degree: "0°", is360: true };
   }
   if (lower.includes("detail") || lower.includes("lace") || lower.includes("texture") || lower.includes("knot")) {
-    return { label: "Macro Lace & Knot Detail", short: "Lace Detail", icon: "🔍", degree: null, is360: false };
+    return { label: "Macro Lace & Knot Detail", short: "Lace Detail", icon: MannequinIcons.detail, degree: null, is360: false };
   }
 
-  return { label: `Atelier View ${index + 1}`, short: `View ${index + 1}`, icon: "✧", degree: null, is360: false };
+  return { label: `Atelier View ${index + 1}`, short: `View ${index + 1}`, icon: MannequinIcons.generic, degree: null, is360: false };
 }
 
 export default function ProductDetailPage() {
@@ -64,32 +177,66 @@ export default function ProductDetailPage() {
   const [newReview, setNewReview] = useState({ name: '', email: '', rating: 5, title: '', comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState('');
+  const [reviewError, setReviewError] = useState('');
+  const successTimerRef = useRef(null);
+  const addedTimerRef = useRef(null);
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    if (!newReview.name || !newReview.comment) return;
+    setReviewError('');
+
+    const name = newReview.name.trim();
+    const comment = newReview.comment.trim();
+
+    if (name.length < 2) {
+      setReviewError('Please enter your name (at least 2 characters).');
+      return;
+    }
+    if (comment.length < 10) {
+      setReviewError('Please share at least 10 characters about this piece.');
+      return;
+    }
+
     setSubmittingReview(true);
     try {
+      // The verified-purchase badge is awarded by the server from order
+      // history — the client deliberately does not claim it.
       const res = await api.addProductReview(product._id, {
-        ...newReview,
-        verifiedPurchase: true
+        name,
+        email: newReview.email.trim(),
+        rating: newReview.rating,
+        title: newReview.title.trim(),
+        comment
       });
+
       if (res.success) {
         setReviews([res.review, ...reviews]);
-        if (product) {
-          setProduct({ ...product, rating: res.rating, reviewsCount: res.reviewsCount });
-        }
-        setReviewSuccessMsg("Thank you! Your verified atelier review has been published.");
+        setProduct((prev) => (prev ? { ...prev, rating: res.rating, reviewsCount: res.reviewsCount } : prev));
+        setReviewSuccessMsg(res.message || 'Thank you! Your atelier review has been published.');
         setNewReview({ name: '', email: '', rating: 5, title: '', comment: '' });
         setShowReviewForm(false);
-        setTimeout(() => setReviewSuccessMsg(''), 4000);
+        clearTimeout(successTimerRef.current);
+        successTimerRef.current = setTimeout(() => setReviewSuccessMsg(''), 5000);
+      } else {
+        setReviewError(res.message || 'We could not publish your review. Please try again.');
       }
     } catch (err) {
-      alert(err.message || "Failed to submit review");
+      setReviewError(err.message || 'We could not publish your review. Please try again.');
     } finally {
       setSubmittingReview(false);
     }
   };
+
+  // A variant switch can lower the ceiling — never leave a stale higher quantity
+  useEffect(() => {
+    setQuantity(1);
+  }, [selectedVariant]);
+
+  // Clear pending UI timers on unmount
+  useEffect(() => () => {
+    clearTimeout(successTimerRef.current);
+    clearTimeout(addedTimerRef.current);
+  }, []);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -128,14 +275,27 @@ export default function ProductDetailPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  const currentImages = product?.images?.length > 0
-    ? product.images
-    : ["https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&auto=format&fit=crop&q=80"];
+  const currentImages = useMemo(
+    () => (product?.images?.length > 0 ? product.images : ["/images/products/placeholder-hair.jpg"]),
+    [product]
+  );
 
-  const has360Rotation = currentImages.filter((img, idx) => {
-    const info = getImageAngleInfo(img, idx);
-    return info.is360;
-  }).length >= 3;
+  // Angle metadata is derived once per image set rather than recomputed
+  // on every render (it was previously called ~8 times per paint).
+  const angleInfos = useMemo(
+    () => currentImages.map((img, idx) => getImageAngleInfo(img, idx)),
+    [currentImages]
+  );
+
+  const angleAt = useCallback(
+    (idx) => angleInfos[idx] || getImageAngleInfo(currentImages[idx], idx),
+    [angleInfos, currentImages]
+  );
+
+  const has360Rotation = useMemo(
+    () => angleInfos.filter((info) => info.is360).length >= 3,
+    [angleInfos]
+  );
 
   // 360 Auto-spin Interval
   useEffect(() => {
@@ -197,12 +357,24 @@ export default function ProductDetailPage() {
 
   const currentPrice = selectedVariant ? selectedVariant.price : product.price;
 
+  // Availability comes from the selected variant when present, else the product
+  const availableStock = selectedVariant?.stock ?? product.stockQuantity ?? 0;
+  const isSoldOut = product.inStock === false || availableStock <= 0;
+  const isLowStock = !isSoldOut && availableStock <= 5;
+  const maxQuantity = isSoldOut ? 1 : Math.max(1, Math.min(availableStock, 10));
+
   const handleAddToCart = () => {
+    if (isSoldOut) return;
     addToCart(product, selectedVariant, quantity);
     setAddedNotification(true);
-    setTimeout(() => setAddedNotification(false), 3000);
+    clearTimeout(addedTimerRef.current);
+    addedTimerRef.current = setTimeout(() => setAddedNotification(false), 3000);
   };
-  const handleBuyNow = () => { addToCart(product, selectedVariant, quantity); navigate("/checkout"); };
+  const handleBuyNow = () => {
+    if (isSoldOut) return;
+    addToCart(product, selectedVariant, quantity);
+    navigate("/checkout");
+  };
   const openLightbox = (idx) => { setLightboxIndex(idx); setIsLightboxOpen(true); };
   const navigateImage = (dir) => {
     const next = activeImageIndex + dir;
@@ -286,8 +458,8 @@ export default function ProductDetailPage() {
             ))}
           </div>
           <div style={{ position: "absolute", top: "22px", left: "50%", transform: "translateX(-50%)", backgroundColor: "rgba(201,168,118,0.14)", border: "1px solid rgba(201,168,118,0.35)", color: "#C9A876", padding: "6px 18px", borderRadius: "20px", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", gap: "8px" }}>
-            <span>{getImageAngleInfo(currentImages[lightboxIndex], lightboxIndex).icon}</span>
-            <span>{getImageAngleInfo(currentImages[lightboxIndex], lightboxIndex).label}</span>
+            <span>{angleAt(lightboxIndex).icon}</span>
+            <span>{angleAt(lightboxIndex).label}</span>
           </div>
         </div>
       )}
@@ -327,7 +499,7 @@ export default function ProductDetailPage() {
                   <RotateCw size={12} className={isAutoSpinning ? "spin-animation" : ""} />
                   <span>{has360Rotation ? "360° Studio Turntable" : "Atelier Gallery"}</span>
                 </div>
-                {has360Rotation && getImageAngleInfo(currentImages[activeImageIndex], activeImageIndex).degree && (
+                {has360Rotation && angleAt(activeImageIndex).degree && (
                   <span style={{
                     fontSize: "10px",
                     fontWeight: 700,
@@ -338,7 +510,7 @@ export default function ProductDetailPage() {
                     padding: "2px 8px",
                     backgroundColor: "rgba(201,168,118,0.12)"
                   }}>
-                    {getImageAngleInfo(currentImages[activeImageIndex], activeImageIndex).degree}
+                    {angleAt(activeImageIndex).degree}
                   </span>
                 )}
               </div>
@@ -383,7 +555,8 @@ export default function ProductDetailPage() {
               onTouchStart={handleDragStart}
               onTouchMove={handleDragMove}
               onTouchEnd={handleDragEnd}
-              style={{
+              className="pdp-main-image-stage"
+            style={{
                 position: "relative",
                 width: "100%",
                 paddingTop: "118%",
@@ -399,7 +572,7 @@ export default function ProductDetailPage() {
               <img
                 key={activeImageIndex}
                 src={currentImages[activeImageIndex]}
-                alt={`${product.name} - ${getImageAngleInfo(currentImages[activeImageIndex], activeImageIndex).label}`}
+                alt={`${product.name} - ${angleAt(activeImageIndex).label}`}
                 style={{
                   position: "absolute",
                   top: 0,
@@ -440,10 +613,10 @@ export default function ProductDetailPage() {
                 boxShadow: "0 4px 16px rgba(0,0,0,0.4)"
               }}>
                 <span style={{ color: "var(--gold-primary)", fontSize: "12px" }}>
-                  {getImageAngleInfo(currentImages[activeImageIndex], activeImageIndex).icon}
+                  {angleAt(activeImageIndex).icon}
                 </span>
                 <span style={{ fontWeight: 600 }}>
-                  {getImageAngleInfo(currentImages[activeImageIndex], activeImageIndex).label}
+                  {angleAt(activeImageIndex).label}
                 </span>
               </div>
 
@@ -524,32 +697,39 @@ export default function ProductDetailPage() {
             {/* Quick 360 Angle Selector Pills */}
             <div style={{ display: "flex", gap: "6px", marginTop: "12px", overflowX: "auto", paddingBottom: "4px", scrollbarWidth: "none" }}>
               {currentImages.map((img, idx) => {
-                const info = getImageAngleInfo(img, idx);
+                const info = angleAt(idx);
                 const isActive = activeImageIndex === idx;
                 return (
                   <button
                     key={idx}
                     type="button"
+                    title={info.label}
                     onClick={() => { setActiveImageIndex(idx); if (isAutoSpinning) setIsAutoSpinning(false); }}
                     style={{
                       display: "inline-flex",
+                      flexDirection: "column",
                       alignItems: "center",
-                      gap: "6px",
-                      padding: "6px 12px",
-                      borderRadius: "20px",
-                      fontSize: "10px",
-                      letterSpacing: "0.08em",
+                      justifyContent: "center",
+                      gap: "4px",
+                      padding: "8px 10px",
+                      borderRadius: "12px",
+                      fontSize: "9px",
+                      letterSpacing: "0.06em",
                       textTransform: "uppercase",
                       fontWeight: isActive ? 700 : 500,
-                      backgroundColor: isActive ? "rgba(201,168,118,0.2)" : "var(--bg-surface-2)",
+                      minWidth: "52px",
+                      backgroundColor: isActive ? "rgba(201,168,118,0.15)" : "var(--bg-surface-2)",
                       color: isActive ? "var(--gold-primary)" : "var(--text-secondary)",
-                      border: isActive ? "1px solid var(--gold-primary)" : "1px solid var(--border-subtle)",
+                      border: isActive ? "1.5px solid var(--gold-primary)" : "1px solid var(--border-subtle)",
                       cursor: "pointer",
                       whiteSpace: "nowrap",
-                      transition: "all 0.2s ease"
+                      transition: "all 0.2s ease",
+                      flexShrink: 0,
                     }}
                   >
-                    <span>{info.icon}</span>
+                    <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20 }}>
+                      {info.icon}
+                    </span>
                     <span>{info.short}</span>
                   </button>
                 );
@@ -559,7 +739,7 @@ export default function ProductDetailPage() {
             {/* Thumbnails Tray */}
             <div style={{ display: "flex", gap: "10px", marginTop: "10px", overflowX: "auto", paddingBottom: "4px" }}>
               {currentImages.map((img, idx) => {
-                const info = getImageAngleInfo(img, idx);
+                const info = angleAt(idx);
                 const isActive = activeImageIndex === idx;
                 return (
                   <button
@@ -656,8 +836,17 @@ export default function ProductDetailPage() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
               <span style={{ fontSize: "10px", letterSpacing: "0.22em", color: "var(--gold-primary)", textTransform: "uppercase", fontWeight: 700 }}>{product.category} Collection</span>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--text-secondary)" }}>
-                <div style={{ display: "flex", color: "var(--gold-primary)" }}>{[...Array(5)].map((_, i) => <Star key={i} size={12} fill="var(--gold-primary)" stroke="var(--gold-primary)" />)}</div>
-                <span>{product.rating} ({product.reviewsCount})</span>
+                <div style={{ display: "flex", color: "var(--gold-primary)" }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      size={12}
+                      stroke="var(--gold-primary)"
+                      fill={star <= Math.round(Number(product.rating) || 0) ? "var(--gold-primary)" : "transparent"}
+                    />
+                  ))}
+                </div>
+                <span>{(Number(product.rating) || 0).toFixed(1)} ({product.reviewsCount || 0})</span>
               </div>
             </div>
 
@@ -722,15 +911,43 @@ export default function ProductDetailPage() {
             )}
 
             <div style={{ marginBottom: "28px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#10B981", marginBottom: "14px" }}>
-                <Check size={14} /><span>In Stock - Ready for dispatch from Victoria Island Atelier</span>
-              </div>
+              {isSoldOut ? (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "14px" }}>
+                  <X size={14} />
+                  <span>Currently sold out &mdash; contact our concierge to reserve the next production run.</span>
+                </div>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#10B981", marginBottom: "14px" }}>
+                  <Check size={14} />
+                  <span>
+                    {isLowStock
+                      ? "Only " + availableStock + " left \u2014 dispatching from the Victoria Island Atelier"
+                      : "In Stock \u2014 ready for dispatch from the Victoria Island Atelier"}
+                  </span>
+                </div>
+              )}
               <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
                 <span style={{ fontSize: "11px", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Qty:</span>
                 <div style={{ display: "inline-flex", alignItems: "center", border: "1px solid var(--border-medium)", backgroundColor: "var(--bg-surface-2)", borderRadius: "4px" }}>
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} style={{ padding: "10px 16px", color: "var(--text-secondary)", cursor: "pointer", fontSize: "18px", lineHeight: 1 }}>-</button>
+                  <button
+                    type="button"
+                    aria-label="Decrease quantity"
+                    disabled={quantity <= 1}
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    style={{ padding: "10px 16px", color: "var(--text-secondary)", cursor: quantity <= 1 ? "not-allowed" : "pointer", opacity: quantity <= 1 ? 0.4 : 1, fontSize: "18px", lineHeight: 1 }}
+                  >
+                    -
+                  </button>
                   <span style={{ padding: "0 16px", fontSize: "15px", fontWeight: 600, color: "var(--text-primary)", minWidth: "30px", textAlign: "center" }}>{quantity}</span>
-                  <button onClick={() => setQuantity(quantity + 1)} style={{ padding: "10px 16px", color: "var(--text-secondary)", cursor: "pointer", fontSize: "18px", lineHeight: 1 }}>+</button>
+                  <button
+                    type="button"
+                    aria-label="Increase quantity"
+                    disabled={quantity >= maxQuantity}
+                    onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
+                    style={{ padding: "10px 16px", color: "var(--text-secondary)", cursor: quantity >= maxQuantity ? "not-allowed" : "pointer", opacity: quantity >= maxQuantity ? 0.4 : 1, fontSize: "18px", lineHeight: 1 }}
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             </div>
@@ -742,10 +959,23 @@ export default function ProductDetailPage() {
             )}
 
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "28px" }}>
-              <button onClick={handleAddToCart} className="btn-gold" style={{ width: "100%", padding: "17px", fontSize: "13px", letterSpacing: "0.12em" }}>
-                <ShoppingBag size={16} /><span>Add to Shopping Bag - {format(currentPrice * quantity)}</span>
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={isSoldOut}
+                className="btn-gold"
+                style={{ width: "100%", padding: "17px", fontSize: "13px", letterSpacing: "0.12em", opacity: isSoldOut ? 0.5 : 1, cursor: isSoldOut ? "not-allowed" : "pointer" }}
+              >
+                <ShoppingBag size={16} />
+                <span>{isSoldOut ? "Sold Out" : "Add to Shopping Bag - " + format(currentPrice * quantity)}</span>
               </button>
-              <button onClick={handleBuyNow} className="btn-dark" style={{ width: "100%", padding: "16px", fontSize: "13px" }}>
+              <button
+                type="button"
+                onClick={handleBuyNow}
+                disabled={isSoldOut}
+                className="btn-dark"
+                style={{ width: "100%", padding: "16px", fontSize: "13px", opacity: isSoldOut ? 0.5 : 1, cursor: isSoldOut ? "not-allowed" : "pointer" }}
+              >
                 Instant Checkout - {isUsd ? "Stripe" : "Paystack"}
               </button>
             </div>
@@ -874,7 +1104,10 @@ export default function ProductDetailPage() {
                   {/* Action Button */}
                   <div style={{ textAlign: 'center' }}>
                     <button
-                      onClick={() => setShowReviewForm(!showReviewForm)}
+                      onClick={() => {
+                        setReviewError('');
+                        setShowReviewForm((open) => !open);
+                      }}
                       className="btn-gold"
                       style={{ padding: '12px 20px', fontSize: '12px', whiteSpace: 'nowrap' }}
                     >
@@ -976,7 +1209,24 @@ export default function ProductDetailPage() {
                       />
                     </div>
 
-                    <button type="submit" disabled={submittingReview} className="btn-gold" style={{ padding: '12px 28px' }}>
+                    {reviewError && (
+                      <div
+                        role="alert"
+                        style={{
+                          backgroundColor: 'rgba(220, 105, 95, 0.08)',
+                          border: '1px solid rgba(220, 105, 95, 0.35)',
+                          color: '#E8938B',
+                          padding: '11px 14px',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: '13px',
+                          marginBottom: '16px'
+                        }}
+                      >
+                        {reviewError}
+                      </div>
+                    )}
+
+                    <button type="submit" disabled={submittingReview} className="btn-gold" style={{ padding: '12px 28px', opacity: submittingReview ? 0.6 : 1 }}>
                       {submittingReview ? 'Publishing Review...' : 'Publish Atelier Review'}
                     </button>
                   </form>
@@ -1066,6 +1316,12 @@ export default function ProductDetailPage() {
       <style>{`
         @media (max-width: 900px) {
           .pdp-layout { grid-template-columns: 1fr !important; gap: 36px !important; }
+        }
+        @media (max-width: 768px) {
+          .pdp-main-image-stage { padding-top: 90% !important; }
+        }
+        @media (max-width: 480px) {
+          .pdp-main-image-stage { padding-top: 100% !important; }
         }
       `}</style>
     </div>

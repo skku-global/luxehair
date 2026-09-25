@@ -1,16 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, Search, RotateCcw, ChevronDown, X } from 'lucide-react';
-import { BRAND, formatPrice } from '../config/brand';
+import { useSearchParams, Link } from 'react-router-dom';
+import { SlidersHorizontal, RotateCcw, X, LayoutGrid, LayoutList, Star } from 'lucide-react';
+import { BRAND } from '../config/brand';
+import { useCurrency } from '../context/CurrencyContext';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import FilterSidebar from '../components/FilterSidebar';
+
+/**
+ * Display priority when no explicit sort is chosen: wigs lead the boutique.
+ * Derived from BRAND.categories so it can never drift out of sync with the
+ * real category slugs (the previous hardcoded map listed categories that
+ * do not exist, so every product fell through to the default weight).
+ */
+const CATEGORY_ORDER = BRAND.categories.reduce((acc, cat, index) => {
+  acc[cat.slug] = index;
+  return acc;
+}, {});
 
 export default function CatalogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
+  const [error, setError] = useState('');
+  const { format } = useCurrency();
 
   // Active filter state synced from URL query params
   const activeCategory = searchParams.get('category') || 'all';
@@ -20,13 +34,12 @@ export default function CatalogPage() {
   const activeColor = searchParams.get('color') || 'all';
   const activeProductType = searchParams.get('productType') || 'all';
   const activeSort = searchParams.get('sort') || 'newest';
-  // Category priority: wigs always first, then frontals, then extensions, then hair-care
-  const CATEGORY_ORDER = { wigs: 0, frontals: 1, extensions: 2, 'hair-care': 3 };
   const searchQuery = searchParams.get('search') || '';
   const maxPriceParam = searchParams.get('maxPrice') || '';
 
   const [localMaxPrice, setLocalMaxPrice] = useState(maxPriceParam || '500000');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
 
   const hasActiveFilters =
     activeCategory !== 'all' ||
@@ -41,6 +54,7 @@ export default function CatalogPage() {
   useEffect(() => {
     const fetchCatalog = async () => {
       setLoading(true);
+      setError('');
       try {
         const params = {};
         if (activeCategory && activeCategory !== 'all') params.category = activeCategory;
@@ -55,17 +69,27 @@ export default function CatalogPage() {
 
         const res = await api.getProducts(params);
         if (res.success) {
-          // Sort: wigs first, then other categories, within same category keep API order
-          const sorted = (res.products || []).slice().sort((a, b) => {
-            const aOrder = CATEGORY_ORDER[a.category] ?? 99;
-            const bOrder = CATEGORY_ORDER[b.category] ?? 99;
-            return aOrder - bOrder;
-          });
-          setProducts(sorted);
+          const incoming = res.products || [];
+
+          // Group wigs first only while browsing the default ordering.
+          // Once the shopper picks a sort (price, rating, popularity) their
+          // choice wins — re-grouping here used to silently override it.
+          const shouldGroupByCategory = activeSort === 'newest' && activeCategory === 'all';
+
+          setProducts(
+            shouldGroupByCategory
+              ? incoming.slice().sort(
+                  (a, b) => (CATEGORY_ORDER[a.category] ?? 99) - (CATEGORY_ORDER[b.category] ?? 99)
+                )
+              : incoming
+          );
           setTotalCount(res.total || 0);
+        } else {
+          setError(res.message || 'We could not load the catalog. Please try again.');
         }
       } catch (err) {
         console.error('Failed to fetch products:', err);
+        setError('We could not reach the boutique. Please check your connection and try again.');
       } finally {
         setLoading(false);
       }
@@ -224,6 +248,7 @@ export default function CatalogPage() {
             </button>
           </div>
 
+          {/* Right side: sort + view toggle + reset */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             {/* Sort Selector */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -248,6 +273,43 @@ export default function CatalogPage() {
                 <option value="price-desc">Price: High to Low</option>
                 <option value="rating">Highest Rated</option>
               </select>
+            </div>
+
+            {/* View Toggle */}
+            <div style={{ display: 'flex', border: '1px solid #24221F', borderRadius: '2px', overflow: 'hidden' }}>
+              <button
+                onClick={() => setViewMode('grid')}
+                title="Grid View"
+                style={{
+                  padding: '7px 10px',
+                  backgroundColor: viewMode === 'grid' ? 'var(--gold-primary)' : '#141312',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: viewMode === 'grid' ? '#0E0D0C' : '#8A847A',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <LayoutGrid size={14} />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                title="List View"
+                style={{
+                  padding: '7px 10px',
+                  backgroundColor: viewMode === 'list' ? 'var(--gold-primary)' : '#141312',
+                  border: 'none',
+                  borderLeft: '1px solid #24221F',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: viewMode === 'list' ? '#0E0D0C' : '#8A847A',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <LayoutList size={14} />
+              </button>
             </div>
 
             {/* Clear Filters Button if any filter is active */}
@@ -293,26 +355,203 @@ export default function CatalogPage() {
           {/* Product Grid Area */}
           <div>
             {loading ? (
-              <div style={{ textAlign: 'center', padding: '80px 20px', color: '#C9A876' }}>
+              <div style={{ textAlign: 'center', padding: '80px 20px', color: 'var(--gold-primary)' }}>
                 ✦ Curating Selected Pieces...
+              </div>
+            ) : error ? (
+              <div
+                role="alert"
+                style={{
+                  textAlign: 'center',
+                  padding: '80px 20px',
+                  backgroundColor: 'var(--bg-surface-1)',
+                  border: '1px solid rgba(220, 105, 95, 0.35)',
+                  borderRadius: 'var(--radius-md)'
+                }}
+              >
+                <p style={{ fontSize: '16px', color: 'var(--text-primary)', marginBottom: '8px' }}>
+                  The catalog is temporarily unavailable.
+                </p>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+                  {error}
+                </p>
+                <button type="button" onClick={() => window.location.reload()} className="btn-gold">
+                  Try Again
+                </button>
               </div>
             ) : products.length === 0 ? (
               <div style={{
                 textAlign: 'center',
                 padding: '80px 20px',
-                backgroundColor: '#121110',
-                border: '1px solid #24221F',
-                borderRadius: '4px'
+                backgroundColor: 'var(--bg-surface-1)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)'
               }}>
-                <p style={{ fontSize: '16px', color: '#F2EFEA', marginBottom: '8px' }}>No creations matched your criteria.</p>
-                <p style={{ fontSize: '13px', color: '#8A847A', marginBottom: '24px' }}>
+                <p style={{ fontSize: '16px', color: 'var(--text-primary)', marginBottom: '8px' }}>No creations matched your criteria.</p>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
                   Try resetting your price filter or browsing all categories.
                 </p>
                 <button onClick={clearAllFilters} className="btn-gold">
                   Show All Products
                 </button>
               </div>
+            ) : viewMode === 'list' ? (
+              // ── PREMIUM LIST VIEW ──
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {products.map((prod) => (
+                  <Link
+                    key={prod._id}
+                    to={`/product/${prod.slug || prod._id}`}
+                    style={{ textDecoration: 'none', display: 'block' }}
+                  >
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '180px 1fr auto',
+                        gap: '0',
+                        backgroundColor: 'var(--bg-surface-1)',
+                        border: '1px solid var(--border-subtle)',
+                        borderRadius: '4px',
+                        overflow: 'hidden',
+                        transition: 'border-color 0.25s, transform 0.2s',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.borderColor = 'var(--gold-primary)';
+                        e.currentTarget.style.transform = 'translateX(3px)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                        e.currentTarget.style.transform = 'translateX(0)';
+                      }}
+                    >
+                      {/* Image */}
+                      <div style={{ position: 'relative', overflow: 'hidden', width: '180px', height: '180px', flexShrink: 0 }}>
+                        <img
+                          src={prod.images?.[0]}
+                          alt={prod.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s' }}
+                          onMouseEnter={e => e.target.style.transform = 'scale(1.06)'}
+                          onMouseLeave={e => e.target.style.transform = 'scale(1)'}
+                          onError={e => { e.target.src = prod.images?.[1] || '/images/placeholder.jpg'; }}
+                        />
+                        {prod.isBestseller && (
+                          <span style={{
+                            position: 'absolute', top: '10px', left: '10px',
+                            backgroundColor: 'var(--gold-primary)', color: '#0E0D0C',
+                            fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em',
+                            textTransform: 'uppercase', padding: '3px 8px', borderRadius: '1px'
+                          }}>Bestseller</span>
+                        )}
+                      </div>
+
+                      {/* Details */}
+                      <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '10px', minWidth: 0 }}>
+                        {/* Category tag */}
+                        <span style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold-primary)' }}>
+                          {prod.category === 'hair-care' ? 'Hair Care' : prod.category === 'attachments' ? 'Extensions' : 'Raw Wigs'}
+                        </span>
+
+                        {/* Name */}
+                        <h3 style={{
+                          fontFamily: "'Cormorant Garamond', Georgia, serif",
+                          fontSize: '18px', fontWeight: 500,
+                          color: 'var(--text-primary)', lineHeight: 1.3, margin: 0
+                        }}>{prod.name}</h3>
+
+                        {/* Short description */}
+                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0, maxWidth: '520px',
+                          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
+                        }}>{prod.shortDescription}</p>
+
+                        {/* Specs badges */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                          {prod.specifications?.hairGrade && (
+                            <span style={{ fontSize: '10px', padding: '3px 8px', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)', borderRadius: '1px', letterSpacing: '0.05em' }}>
+                              {prod.specifications.hairGrade.split('(')[0].trim()}
+                            </span>
+                          )}
+                          {prod.specifications?.origin && (
+                            <span style={{ fontSize: '10px', padding: '3px 8px', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)', borderRadius: '1px' }}>
+                              {prod.specifications.origin}
+                            </span>
+                          )}
+                          {prod.specifications?.longevity && (
+                            <span style={{ fontSize: '10px', padding: '3px 8px', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)', borderRadius: '1px' }}>
+                              {prod.specifications.longevity.split('|')[0].trim()}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Shade swatches */}
+                        {prod.specifications?.availableColors?.length > 0 && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontSize: '10px', color: '#8A847A', letterSpacing: '0.05em' }}>Shades:</span>
+                            {prod.specifications.availableColors.slice(0, 5).map(col => (
+                              <span
+                                key={col.name}
+                                title={col.name}
+                                style={{
+                                  width: '14px', height: '14px', borderRadius: '50%',
+                                  backgroundColor: col.hex,
+                                  border: '1px solid rgba(255,255,255,0.15)',
+                                  display: 'inline-block', flexShrink: 0
+                                }}
+                              />
+                            ))}
+                            {prod.specifications.availableColors.length > 5 && (
+                              <span style={{ fontSize: '10px', color: '#8A847A' }}>+{prod.specifications.availableColors.length - 5}</span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Stars */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          {[1,2,3,4,5].map(s => (
+                            <Star key={s} size={11} style={{ color: s <= Math.round(prod.rating || 5) ? '#C9A876' : '#3A3730', fill: s <= Math.round(prod.rating || 5) ? '#C9A876' : 'none' }} />
+                          ))}
+                          <span style={{ fontSize: '11px', color: '#8A847A', marginLeft: '4px' }}>({prod.reviewsCount || 0})</span>
+                        </div>
+                      </div>
+
+                      {/* Price + CTA */}
+                      <div style={{
+                        padding: '20px 24px',
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'flex-end', justifyContent: 'center',
+                        gap: '12px', borderLeft: '1px solid var(--border-subtle)',
+                        minWidth: '160px', flexShrink: 0
+                      }}>
+                        <div style={{ textAlign: 'right' }}>
+                          {prod.compareAtPrice && prod.compareAtPrice > prod.price && (
+                            <div style={{ fontSize: '11px', color: '#8A847A', textDecoration: 'line-through', marginBottom: '2px' }}>
+                              {format(prod.compareAtPrice)}
+                            </div>
+                          )}
+                          <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--gold-primary)', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                            {format(prod.price)}
+                          </div>
+                          {prod.variants?.length > 1 && (
+                            <div style={{ fontSize: '10px', color: '#8A847A', marginTop: '2px' }}>{prod.variants.length} variants</div>
+                          )}
+                        </div>
+                        <div style={{
+                          padding: '9px 18px',
+                          backgroundColor: 'var(--gold-primary)',
+                          color: '#0E0D0C',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          letterSpacing: '0.1em',
+                          textTransform: 'uppercase',
+                          borderRadius: '2px',
+                          whiteSpace: 'nowrap'
+                        }}>View Details</div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             ) : (
+              // ── GRID VIEW ──
               <div className="grid-products">
                 {products.map((prod) => (
                   <ProductCard key={prod._id} product={prod} />

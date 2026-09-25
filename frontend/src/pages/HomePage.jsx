@@ -1,31 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, ShieldCheck, Gem, Compass, ChevronRight, BadgeCheck, Truck } from 'lucide-react';
-import { BRAND, formatPrice } from '../config/brand';
+import { ArrowRight, Sparkles, ShieldCheck, BadgeCheck, Truck } from 'lucide-react';
+import { BRAND } from '../config/brand';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
+
+/**
+ * Display priority for the home showcases: wigs lead, then attachments, then care.
+ * Derived from BRAND.categories so the keys always match the real category slugs.
+ */
+const CATEGORY_ORDER = BRAND.categories.reduce((acc, cat, index) => {
+  acc[cat.slug] = index;
+  return acc;
+}, {});
+
+const sortByCategoryPriority = (arr) =>
+  (arr || [])
+    .slice()
+    .sort((a, b) => (CATEGORY_ORDER[a.category] ?? 99) - (CATEGORY_ORDER[b.category] ?? 99));
 
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [bestsellers, setBestsellers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
         const res = await api.getFeaturedProducts();
         if (res.success) {
-          // Always put wigs first, then frontals, extensions, hair-care
-          const CATEGORY_ORDER = { wigs: 0, frontals: 1, extensions: 2, 'hair-care': 3 };
-          const sortByWigsFirst = (arr) =>
-            (arr || []).slice().sort((a, b) =>
-              (CATEGORY_ORDER[a.category] ?? 99) - (CATEGORY_ORDER[b.category] ?? 99)
-            );
-          setFeaturedProducts(sortByWigsFirst(res.featured));
-          setBestsellers(sortByWigsFirst(res.bestsellers));
+          setFeaturedProducts(sortByCategoryPriority(res.featured));
+          setBestsellers(sortByCategoryPriority(res.bestsellers));
+        } else {
+          setError(res.message || 'We could not load the collection right now.');
         }
       } catch (err) {
         console.error('Failed to load home products:', err);
+        setError('We could not reach the boutique. Please check your connection.');
       } finally {
         setLoading(false);
       }
@@ -47,7 +59,7 @@ export default function HomePage() {
         backgroundSize: 'cover',
         backgroundPosition: 'center 30%',
         backgroundRepeat: 'no-repeat',
-        borderBottom: '1px solid #1C1B19',
+        borderBottom: '1px solid var(--border-subtle)',
         overflow: 'hidden'
       }}>
         {/* Subtle Ambient Radial Glow */}
@@ -226,18 +238,35 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 3. Category Banner Tiles (Wigs & Attachments) */}
+      {/* 3. Category Banner Tiles */}
       <section className="category-banner-section">
         <div className="container">
-          <div className="category-banner-grid">
+          {/* Section Header */}
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <span className="section-tag" style={{ color: 'var(--gold-primary)', display: 'block', marginBottom: '12px' }}>
+              Shop By Category
+            </span>
+            <h2 style={{
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: 'clamp(28px, 3.5vw, 40px)',
+              fontWeight: 300,
+              color: 'var(--text-primary)',
+              letterSpacing: '0.02em',
+              marginBottom: '10px'
+            }}>
+              The Complete Atelier
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '13px', letterSpacing: '0.04em' }}>
+              Raw virgin wigs · Seamless extensions · Botanical formulations
+            </p>
+          </div>
+
+          <div className="category-banner-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
             {/* Tile 1: Wigs */}
-            <Link
-              to="/shop?category=wigs"
-              className="category-banner-tile"
-            >
+            <Link to="/shop?category=wigs" className="category-banner-tile">
               <img
                 src="/images/banners/banner-wigs.jpg"
-                alt="Wigs Collection"
+                alt="Raw Virgin Wigs Collection"
                 className="category-banner-img"
                 onError={(e) => {
                   e.target.src = 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=1200&auto=format&fit=crop&q=85';
@@ -245,24 +274,22 @@ export default function HomePage() {
               />
               <div className="category-banner-overlay" />
               <div className="category-banner-content">
-                <h3 className="category-banner-title">
-                  Wigs
-                </h3>
+                <span style={{ display: 'block', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(201,168,118,0.85)', marginBottom: '8px' }}>
+                  HD Lace · Full Lace · 360°
+                </span>
+                <h3 className="category-banner-title">Raw Virgin<br />Wigs</h3>
                 <span className="category-banner-link">
-                  <span>Shop Now</span>
+                  <span>Shop Wigs</span>
                   <ArrowRight size={14} />
                 </span>
               </div>
             </Link>
 
-            {/* Tile 2: Attachments */}
-            <Link
-              to="/shop?category=attachments"
-              className="category-banner-tile"
-            >
+            {/* Tile 2: Attachments — Hush Hair inspired */}
+            <Link to="/shop?category=attachments" className="category-banner-tile">
               <img
                 src="/images/banners/banner-attachments.jpg"
-                alt="Attachments Collection"
+                alt="Premium Hair Extensions & Attachments"
                 className="category-banner-img"
                 onError={(e) => {
                   e.target.src = 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=1200&auto=format&fit=crop&q=85';
@@ -270,11 +297,35 @@ export default function HomePage() {
               />
               <div className="category-banner-overlay" />
               <div className="category-banner-content">
-                <h3 className="category-banner-title">
-                  Attachments
-                </h3>
+                <span style={{ display: 'block', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(201,168,118,0.85)', marginBottom: '8px' }}>
+                  Clip-In · Weft · Tape-In · Nano · Keratin
+                </span>
+                <h3 className="category-banner-title">Extensions &amp;<br />Attachments</h3>
                 <span className="category-banner-link">
-                  <span>Shop Now</span>
+                  <span>Shop Extensions</span>
+                  <ArrowRight size={14} />
+                </span>
+              </div>
+            </Link>
+
+            {/* Tile 3: Hair Care */}
+            <Link to="/shop?category=hair-care" className="category-banner-tile">
+              <img
+                src="/images/banners/banner-haircare.jpg"
+                alt="Botanical Hair Care Formulations"
+                className="category-banner-img"
+                onError={(e) => {
+                  e.target.src = 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&auto=format&fit=crop&q=85';
+                }}
+              />
+              <div className="category-banner-overlay" />
+              <div className="category-banner-content">
+                <span style={{ display: 'block', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(201,168,118,0.85)', marginBottom: '8px' }}>
+                  Oils · Serums · Elixirs
+                </span>
+                <h3 className="category-banner-title">Botanical<br />Hair Care</h3>
+                <span className="category-banner-link">
+                  <span>Shop Care</span>
                   <ArrowRight size={14} />
                 </span>
               </div>
@@ -284,7 +335,7 @@ export default function HomePage() {
       </section>
 
       {/* Signature Curated Collection (Featured Products) */}
-      <section style={{ padding: '60px 0 90px', borderTop: '1px solid #1C1B19' }}>
+      <section style={{ padding: '60px 0 90px', borderTop: '1px solid var(--border-subtle)' }}>
         <div className="container">
           <div style={{
             display: 'flex',
@@ -304,8 +355,24 @@ export default function HomePage() {
           </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '60px', color: '#C9A876' }}>
+            <div style={{ textAlign: 'center', padding: '60px', color: 'var(--gold-primary)' }}>
               ✦ Loading Couture Catalog...
+            </div>
+          ) : error ? (
+            <div
+              role="alert"
+              style={{
+                textAlign: 'center',
+                padding: '60px 24px',
+                backgroundColor: 'var(--bg-surface-1)',
+                border: '1px solid rgba(220, 105, 95, 0.35)',
+                borderRadius: 'var(--radius-md)'
+              }}
+            >
+              <p style={{ color: 'var(--text-primary)', marginBottom: '8px', fontSize: '15px' }}>
+                The collection is temporarily unavailable.
+              </p>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>{error}</p>
             </div>
           ) : (
             <div className="grid-products">
@@ -335,21 +402,21 @@ export default function HomePage() {
             <div>
               <span className="section-tag">Uncompromising Sourcing</span>
               <h2 className="section-title">Why Single-Donor Raw Hair Is An Incomparable Investment</h2>
-              <p style={{ color: '#A6A095', lineHeight: 1.8, marginBottom: '24px', fontSize: '15px' }}>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: '24px', fontSize: '15px' }}>
                 Ordinary commercial hair is acid-bathed, chemically stripped of its cuticle, and coated in synthetic silicone that washes away in three weeks. 
               </p>
-              <p style={{ color: '#A6A095', lineHeight: 1.8, marginBottom: '32px', fontSize: '15px' }}>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: '32px', fontSize: '15px' }}>
                 At {BRAND.name}, every bundle comes from a single living donor. The outer cuticle scales face in identical alignment, creating natural luster, zero knotting, and allowing the hair to be bleached, flat-ironed, and worn for 3 to 5 years without deterioration.
               </p>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                <div style={{ borderLeft: '2px solid #C9A876', paddingLeft: '16px' }}>
-                  <div style={{ fontSize: '20px', fontWeight: 600, color: '#F2EFEA', marginBottom: '4px' }}>14A Grade</div>
-                  <div style={{ fontSize: '12px', color: '#8A847A' }}>Double-drawn thickness from root to tip.</div>
+                <div style={{ borderLeft: '2px solid var(--gold-primary)', paddingLeft: '16px' }}>
+                  <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>14A Grade</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Double-drawn thickness from root to tip.</div>
                 </div>
-                <div style={{ borderLeft: '2px solid #C9A876', paddingLeft: '16px' }}>
-                  <div style={{ fontSize: '20px', fontWeight: 600, color: '#F2EFEA', marginBottom: '4px' }}>Zero Acid Bath</div>
-                  <div style={{ fontSize: '12px', color: '#8A847A' }}>Pure botanical steam treatment only.</div>
+                <div style={{ borderLeft: '2px solid var(--gold-primary)', paddingLeft: '16px' }}>
+                  <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Zero Acid Bath</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Pure botanical steam treatment only.</div>
                 </div>
               </div>
             </div>
@@ -360,7 +427,7 @@ export default function HomePage() {
                 paddingTop: '120%',
                 borderRadius: '4px',
                 overflow: 'hidden',
-                border: '1px solid #2A2824'
+                border: '1px solid var(--border-medium)'
               }}>
                 <img
                   src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=900&auto=format&fit=crop&q=80"
@@ -379,13 +446,13 @@ export default function HomePage() {
                 position: 'absolute',
                 bottom: '-20px',
                 right: '20px',
-                backgroundColor: '#161514',
-                border: '1px solid #C9A876',
+                backgroundColor: 'var(--bg-surface-1)',
+                border: '1px solid var(--gold-primary)',
                 padding: '16px 24px',
                 boxShadow: '0 8px 30px rgba(0,0,0,0.8)'
               }}>
-                <span style={{ fontSize: '11px', letterSpacing: '0.15em', color: '#C9A876', textTransform: 'uppercase' }}>Certificate</span>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: '#F2EFEA' }}>100% Verified Donor Origin</div>
+                <span style={{ fontSize: '11px', letterSpacing: '0.15em', color: 'var(--gold-primary)', textTransform: 'uppercase' }}>Certificate</span>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>100% Verified Donor Origin</div>
               </div>
             </div>
           </div>
@@ -403,11 +470,19 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid-products">
-            {bestsellers.slice(0, 4).map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
+          {bestsellers.length > 0 ? (
+            <div className="grid-products">
+              {bestsellers.slice(0, 4).map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+          ) : (
+            !loading && (
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+                Bestsellers are being restocked. Browse the full boutique in the meantime.
+              </p>
+            )
+          )}
         </div>
       </section>
     </div>

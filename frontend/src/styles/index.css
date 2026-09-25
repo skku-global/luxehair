@@ -439,8 +439,8 @@ img {
 
 .category-banner-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
 .category-banner-tile {
@@ -543,12 +543,12 @@ img {
     padding-right: 16px;
   }
   .category-banner-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
   }
   .category-banner-tile {
-    height: 380px;
-    padding: 28px;
+    height: 340px;
+    padding: 24px;
   }
 }
 
@@ -565,6 +565,14 @@ img {
   .trust-badge-grid {
     grid-template-columns: 1fr;
     gap: 16px;
+  }
+  .category-banner-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .category-banner-tile {
+    height: 300px;
+    padding: 22px;
   }
 }
 
