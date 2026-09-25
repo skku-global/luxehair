@@ -9,7 +9,7 @@ import { api } from '../services/api';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const { cartItems, finalSubtotal, discountAmount, clearCart } = useCart();
+  const { cartItems, finalSubtotal, discountAmount, couponCode, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
   const { currency, setCurrency, isUsd, format, formatDirect } = useCurrency();
 
@@ -175,6 +175,8 @@ export default function CheckoutPage() {
         paymentMethod,
         currency: isUsd ? 'USD' : 'NGN',
         shippingFee: calculatedShippingFee,
+        // The code only. The server looks up the percentage and owns the total.
+        couponCode,
         notes: orderNotes
       };
 

@@ -94,6 +94,32 @@ function resolveShippingFee(requestedFee, isUsd, subtotalInCurrency) {
 }
 
 /**
+ * Look up a promo code in the server-side table and return the discount we are
+ * willing to grant. The client sends a code only -- any percentage or amount in
+ * the request is ignored, the same way variant prices and shipping fees are.
+ */
+function resolveDiscount(requestedCode, subtotalInCurrency) {
+  const none = { discount: 0, couponCode: '', percentOff: 0 };
+
+  if (!requestedCode || typeof requestedCode !== 'string') return none;
+
+  const clean = requestedCode.trim().toUpperCase();
+  if (!clean) return none;
+
+  const coupon = (brandConfig.coupons || []).find(c => c.code === clean);
+  if (!coupon) return none;
+
+  const subtotal = Number(subtotalInCurrency);
+  if (!Number.isFinite(subtotal) || subtotal <= 0) return none;
+
+  // Round to whole naira, or to cents in USD, and never below zero
+  const raw = subtotal * (coupon.percentOff / 100);
+  const discount = Math.max(0, Math.min(subtotal, Math.round(raw * 100) / 100));
+
+  return { discount, couponCode: coupon.code, percentOff: coupon.percentOff };
+}
+
+/**
  * @route   POST /api/orders
  * @desc    Create a new order (Supports logged-in user and guest checkout, NGN and USD currencies)
  * @access  Public / Optional Auth
@@ -107,6 +133,7 @@ router.post('/', checkoutLimiter, optionalAuth, async (req, res, next) => {
       paymentMethod,
       currency = 'NGN',
       shippingFee = 0,
+      couponCode = '',
       notes = ''
     } = req.body;
 
@@ -205,7 +232,13 @@ router.post('/', checkoutLimiter, optionalAuth, async (req, res, next) => {
     // Validated against the server-side table, not taken from the request
     const calculatedShipping = resolveShippingFee(shippingFee, isUsd, orderSubtotal);
 
-    const total = Math.round((orderSubtotal + calculatedShipping) * 100) / 100;
+    // Resolved from the code alone; the request cannot dictate the amount
+    const { discount: calculatedDiscount, couponCode: appliedCoupon } =
+      resolveDiscount(couponCode, orderSubtotal);
+
+    const total = Math.round(
+      (orderSubtotal - calculatedDiscount + calculatedShipping) * 100
+    ) / 100;
 
     if (paymentMethod === 'payOnDelivery' && total > 350000) {
       return res.status(400).json({
@@ -240,7 +273,8 @@ router.post('/', checkoutLimiter, optionalAuth, async (req, res, next) => {
       pricingBreakdown: {
         subtotal: orderSubtotal,
         shippingFee: calculatedShipping,
-        discount: 0,
+        discount: calculatedDiscount,
+        couponCode: appliedCoupon,
         total,
         currency: isUsd ? 'USD' : 'NGN',
         baseTotalNgn: isUsd ? Math.round(total * usdRate) : total
@@ -393,3 +427,4 @@ module.exports = router;
 // Exported for testing: these two decide what a customer is actually charged.
 module.exports.resolveUnitPriceNgn = resolveUnitPriceNgn;
 module.exports.resolveShippingFee = resolveShippingFee;
+module.exports.resolveDiscount = resolveDiscount;

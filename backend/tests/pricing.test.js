@@ -5,7 +5,7 @@
  * the chosen variant, and the shipping fee. Run with: node backend/tests/pricing.test.js
  */
 const assert = require('assert');
-const { resolveUnitPriceNgn, resolveShippingFee } = require('../routes/orderRoutes');
+const { resolveUnitPriceNgn, resolveShippingFee, resolveDiscount } = require('../routes/orderRoutes');
 
 let passed = 0;
 function check(label, fn) {
@@ -83,6 +83,53 @@ check('honours free shipping above the USD threshold', () => {
 
 check('does not give free shipping below the threshold', () => {
   assert.strictEqual(resolveShippingFee(0, false, 249999), 3500);
+});
+
+console.log('\nPromo codes');
+
+check('grants the LUXE10 percentage', () => {
+  assert.strictEqual(resolveDiscount('LUXE10', 100000).discount, 10000);
+});
+
+check('grants the FIRSTLUXE percentage', () => {
+  assert.strictEqual(resolveDiscount('FIRSTLUXE', 100000).discount, 15000);
+});
+
+check('is case- and whitespace-insensitive', () => {
+  assert.strictEqual(resolveDiscount('  luxe10 ', 100000).discount, 10000);
+});
+
+check('IGNORES an invented code', () => {
+  assert.strictEqual(resolveDiscount('FREESTUFF', 100000).discount, 0);
+});
+
+check('IGNORES a percentage supplied by the client', () => {
+  // Only the code travels; an object carrying percentOff must not be honoured
+  assert.strictEqual(resolveDiscount({ code: 'LUXE10', percentOff: 100 }, 100000).discount, 0);
+});
+
+check('grants nothing when no code is sent', () => {
+  assert.strictEqual(resolveDiscount('', 100000).discount, 0);
+  assert.strictEqual(resolveDiscount(null, 100000).discount, 0);
+  assert.strictEqual(resolveDiscount(undefined, 100000).discount, 0);
+});
+
+check('never exceeds the subtotal', () => {
+  assert.ok(resolveDiscount('LUXE10', 100000).discount <= 100000);
+});
+
+check('grants nothing on an empty or negative basket', () => {
+  assert.strictEqual(resolveDiscount('LUXE10', 0).discount, 0);
+  assert.strictEqual(resolveDiscount('LUXE10', -5000).discount, 0);
+});
+
+check('rounds USD discounts to cents', () => {
+  assert.strictEqual(resolveDiscount('LUXE10', 99.99).discount, 10);
+});
+
+check('reports the code it actually honoured', () => {
+  assert.strictEqual(resolveDiscount('luxe10', 100000).couponCode, 'LUXE10');
+  assert.strictEqual(resolveDiscount('NOPE', 100000).couponCode, '');
 });
 
 console.log(`\n${passed} checks passed\n`);

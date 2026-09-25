@@ -82,6 +82,7 @@ const orderSchema = new mongoose.Schema({
     subtotal: { type: Number, required: true },
     shippingFee: { type: Number, default: 0 },
     discount: { type: Number, default: 0 },
+    couponCode: { type: String, default: '' },
     total: { type: Number, required: true },
     currency: { type: String, default: 'NGN' },
     baseTotalNgn: { type: Number, default: 0 } // original NGN value if converted to USD

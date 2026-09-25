@@ -2,6 +2,19 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext(null);
 
+/**
+ * Mirrors MAX_QUANTITY_PER_ITEM in backend/routes/orderRoutes.js. The server
+ * clamps regardless; matching it here keeps the basket from showing a total the
+ * customer will not actually be charged.
+ */
+export const MAX_QUANTITY_PER_ITEM = 10;
+
+const clampQuantity = (n) => {
+  const q = Math.floor(Number(n));
+  if (!Number.isFinite(q) || q < 1) return 1;
+  return Math.min(q, MAX_QUANTITY_PER_ITEM);
+};
+
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
     try {
@@ -27,9 +40,15 @@ export const CartProvider = ({ children }) => {
     setCartItems(prev => {
       const existingIndex = prev.findIndex(item => item.cartItemId === variantKey);
       if (existingIndex > -1) {
-        const updated = [...prev];
-        updated[existingIndex].quantity += quantity;
-        return updated;
+        // Replace the item rather than mutating it. The spread above copies the
+        // array but not the objects inside it, so `+=` was editing the previous
+        // state directly -- which StrictMode's double-invoked updater turned
+        // into a double increment.
+        return prev.map((item, i) =>
+          i === existingIndex
+            ? { ...item, quantity: clampQuantity(item.quantity + quantity) }
+            : item
+        );
       } else {
         return [
           ...prev,
@@ -41,7 +60,7 @@ export const CartProvider = ({ children }) => {
             image: product.images?.[0] || '',
             price: unitPrice,
             compareAtPrice: product.compareAtPrice || 0,
-            quantity: quantity,
+            quantity: clampQuantity(quantity),
             selectedVariant: selectedVariant || null
           }
         ];
@@ -58,7 +77,9 @@ export const CartProvider = ({ children }) => {
     }
     setCartItems(prev =>
       prev.map(item =>
-        item.cartItemId === cartItemId ? { ...item, quantity: newQty } : item
+        item.cartItemId === cartItemId
+          ? { ...item, quantity: clampQuantity(newQty) }
+          : item
       )
     );
   };
@@ -73,6 +94,12 @@ export const CartProvider = ({ children }) => {
     setCouponCode('');
   };
 
+  /**
+   * Shows the discount immediately so the basket feels responsive. The
+   * authoritative figure is recalculated by the server from the code alone at
+   * checkout -- keep these percentages in step with `coupons` in
+   * backend/config/brand.js.
+   */
   const applyCoupon = (code) => {
     const clean = code.trim().toUpperCase();
     if (clean === 'LUXE10') {

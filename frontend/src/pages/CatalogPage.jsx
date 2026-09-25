@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { SlidersHorizontal, RotateCcw, X, LayoutGrid, LayoutList, Star } from 'lucide-react';
+import { SlidersHorizontal, RotateCcw, X, LayoutGrid, LayoutList, Star, Sparkles } from 'lucide-react';
 import { BRAND } from '../config/brand';
 import { useCurrency } from '../context/CurrencyContext';
 import { api } from '../services/api';
@@ -40,6 +40,7 @@ export default function CatalogPage() {
   const [localMaxPrice, setLocalMaxPrice] = useState(maxPriceParam || '500000');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [showExtensionGuide, setShowExtensionGuide] = useState(false);
 
   const hasActiveFilters =
     activeCategory !== 'all' ||
@@ -146,7 +147,7 @@ export default function CatalogPage() {
   const categoryTitles = {
     all: 'The Entire Atelier Collection',
     wigs: 'Raw Virgin Wigs & HD Frontals',
-    attachments: 'Couture Attachments & Extensions',
+    attachments: 'Luxury Hair Extensions & Attachments',
     'hair-care': 'Botanical Hair Care Formulations'
   };
 
@@ -192,7 +193,7 @@ export default function CatalogPage() {
           {[
             { id: 'all', label: 'All Creations' },
             { id: 'wigs', label: 'Raw Wigs' },
-            { id: 'attachments', label: 'Attachments' },
+            { id: 'attachments', label: 'Hair Extensions' },
             { id: 'hair-care', label: 'Hair Care' }
           ].map(cat => (
             <button
@@ -216,6 +217,242 @@ export default function CatalogPage() {
             </button>
           ))}
         </div>
+
+        {/* HAUTE EXTENSIONS ATELIER SHOWCASE BANNER & METHOD SELECTOR */}
+        {activeCategory === 'attachments' && (
+          <div style={{
+            position: 'relative',
+            borderRadius: '6px',
+            overflow: 'hidden',
+            marginBottom: '36px',
+            border: '1px solid var(--border-gold)',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
+          }}>
+            {/* Background image & gradient */}
+            <div style={{
+              position: 'relative',
+              padding: 'clamp(28px, 4vw, 44px) clamp(20px, 4vw, 36px)',
+              backgroundImage: 'linear-gradient(to right, rgba(14,13,12,0.95) 0%, rgba(14,13,12,0.85) 55%, rgba(14,13,12,0.65) 100%), url(/images/banners/banner-attachments.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px'
+            }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', alignSelf: 'flex-start' }}>
+                <span style={{
+                  backgroundColor: 'rgba(201,168,118,0.15)',
+                  border: '1px solid var(--border-gold)',
+                  color: 'var(--gold-primary)',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  padding: '4px 10px',
+                  borderRadius: '2px'
+                }}>
+                  Haute Extensions Atelier
+                </span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>• 100% Single-Donor Virgin Hair</span>
+              </div>
+
+              <h2 style={{
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontSize: 'clamp(28px, 4vw, 40px)',
+                fontWeight: 300,
+                color: '#F2EFEA',
+                margin: 0,
+                lineHeight: 1.15
+              }}>
+                Hair Extensions &amp; Attachments
+              </h2>
+
+              <p style={{
+                color: 'var(--text-secondary)',
+                fontSize: '14px',
+                maxWidth: '680px',
+                lineHeight: 1.65,
+                margin: 0
+              }}>
+                Zero-damage volume, instant red-carpet length, and seamless salon blending. Whether you seek 5-minute clip-and-go convenience, undetectable medical-grade tape-ins, hand-tied secret wefts, Italian keratin fusion bonds, or a snatched runway wrap ponytail — each set is hand-crafted from 100% cuticle-aligned virgin human hair.
+              </p>
+
+              {/* 4 Value Pillars */}
+              <div style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '10px',
+                marginTop: '4px'
+              }}>
+                {[
+                  '✦ 100% Cuticle Intact Virgin Hair',
+                  '✦ Zero-Damage Scalp Architecture',
+                  '✦ Reusable Up To 2–3 Years',
+                  '✦ Color-Match Salon Guarantee'
+                ].map((item, idx) => (
+                  <span key={idx} style={{
+                    fontSize: '11px',
+                    color: 'var(--gold-primary)',
+                    backgroundColor: 'rgba(14,13,12,0.6)',
+                    padding: '4px 10px',
+                    borderRadius: '2px',
+                    border: '1px solid rgba(201,168,118,0.2)'
+                  }}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+
+              {/* Method Quick Filter Bar */}
+              <div style={{
+                marginTop: '10px',
+                paddingTop: '16px',
+                borderTop: '1px solid rgba(201,168,118,0.2)',
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginRight: '4px' }}>
+                  Filter Method:
+                </span>
+                {[
+                  { id: 'all', label: 'All Methods' },
+                  { id: 'Clip-In', label: 'Clip-In Sets' },
+                  { id: 'Tape-In', label: 'Tape-In Wefts' },
+                  { id: 'Weft', label: 'Secret Wefts' },
+                  { id: 'Keratin', label: 'Keratin K-Tips' },
+                  { id: 'Nano-Tip', label: 'Nano-Tip Rings' },
+                  { id: 'Ponytail', label: 'Wrap Ponytails' }
+                ].map(m => {
+                  const isSelected = (activeType === m.id) || (m.id === 'all' && activeType === 'all');
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => updateParam('type', m.id)}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '11px',
+                        fontWeight: isSelected ? 600 : 400,
+                        letterSpacing: '0.06em',
+                        borderRadius: '2px',
+                        border: isSelected ? '1px solid var(--gold-primary)' : '1px solid rgba(255,255,255,0.15)',
+                        backgroundColor: isSelected ? 'var(--gold-primary)' : 'rgba(0,0,0,0.5)',
+                        color: isSelected ? '#0E0D0C' : '#F2EFEA',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      {m.label}
+                    </button>
+                  );
+                })}
+
+                {/* Toggle Guide Button */}
+                <button
+                  onClick={() => setShowExtensionGuide(!showExtensionGuide)}
+                  style={{
+                    marginLeft: 'auto',
+                    padding: '6px 14px',
+                    fontSize: '11px',
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: 'var(--gold-primary)',
+                    backgroundColor: 'rgba(201,168,118,0.1)',
+                    border: '1px solid var(--border-gold)',
+                    borderRadius: '2px',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Sparkles size={12} />
+                  <span>{showExtensionGuide ? 'Hide Method Guide' : 'Extension Method Guide'}</span>
+                </button>
+              </div>
+
+              {/* Expandable Extension Method Comparison Guide */}
+              {showExtensionGuide && (
+                <div style={{
+                  marginTop: '16px',
+                  padding: '20px',
+                  backgroundColor: 'rgba(14,13,12,0.92)',
+                  borderRadius: '4px',
+                  border: '1px solid var(--border-subtle)',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                  gap: '14px'
+                }}>
+                  {[
+                    {
+                      name: 'Genius Clip-In Sets',
+                      time: '5–10 Minutes (DIY)',
+                      longevity: '1–2 Years',
+                      wear: 'Daily / Remove at Night',
+                      bestFor: 'Ultimate flexibility, special occasions & instant red-carpet volume with zero salon visit.'
+                    },
+                    {
+                      name: 'Express Tape-In Wefts',
+                      time: '30–45 Mins (Salon)',
+                      longevity: '6–8 Weeks / Reusable 3x',
+                      wear: 'Semi-Permanent',
+                      bestFor: 'Fine to medium hair seeking razor-flat, seamless, weightless root integration.'
+                    },
+                    {
+                      name: 'Secret & Machine Wefts',
+                      time: '1.5–2 Hours (Salon)',
+                      longevity: '2–3 Years (Re-install 6-8wks)',
+                      wear: 'Sew-In or Beaded Row',
+                      bestFor: 'Maximum full-head density and fullness with zero return-hair bulk or bumps.'
+                    },
+                    {
+                      name: 'Italian Keratin K-Tips',
+                      time: '2–3 Hours (Salon)',
+                      longevity: '3–6 Months Wear',
+                      wear: 'Strand-by-Strand Fusion',
+                      bestFor: '360° free natural movement, high ponytails & active luxury lifestyle.'
+                    },
+                    {
+                      name: 'Nano-Tip Micro Rings',
+                      time: '1.5–2 Hours (Salon)',
+                      longevity: '3–4 Months / Reusable',
+                      wear: '2mm Cold Micro Ring',
+                      bestFor: 'Delicate hair; zero heat, zero adhesive, virtually invisible micro attachments.'
+                    },
+                    {
+                      name: 'Wrap-Around Ponytail',
+                      time: '2 Minutes (DIY)',
+                      longevity: '2+ Years',
+                      wear: 'Built-in Comb & Wrap',
+                      bestFor: 'Instant dramatic snatched high or low ponytail without salon appointment.'
+                    }
+                  ].map((guide, idx) => (
+                    <div key={idx} style={{
+                      padding: '14px',
+                      backgroundColor: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(201,168,118,0.15)',
+                      borderRadius: '3px'
+                    }}>
+                      <div style={{ color: 'var(--gold-primary)', fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}>
+                        {guide.name}
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                        <strong style={{ color: '#F2EFEA' }}>Install:</strong> {guide.time}
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                        <strong style={{ color: '#F2EFEA' }}>Wear:</strong> {guide.wear} ({guide.longevity})
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1.4, marginTop: '6px' }}>
+                        {guide.bestFor}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Toolbar: Count, Mobile Toggle, Sort Dropdown */}
         <div className="catalog-toolbar" style={{

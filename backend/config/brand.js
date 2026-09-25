@@ -47,6 +47,17 @@ module.exports = {
     USD: 200
   },
 
+  /**
+   * Promo codes. The server owns these because the discount changes what a
+   * customer is charged -- a browser only ever sends the code, never a
+   * percentage or an amount. Keep in sync with the copy in the Navbar banner,
+   * the Footer signup, and the Account tier benefits.
+   */
+  coupons: [
+    { code: 'LUXE10',    percentOff: 10, label: '10% Couture VIP discount applied.' },
+    { code: 'FIRSTLUXE', percentOff: 15, label: '15% Welcome privilege applied.' }
+  ],
+
   contact: {
     email: 'concierge@luxehairco.com',
     phone: '+234 800 589 3424',
