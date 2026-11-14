@@ -7,14 +7,33 @@
     <meta name="description" content="LUXE HAIR CO — Exclusive Raw Virgin Hair, Bespoke HD Frontal Wigs, Seamless Attachments and Couture Botanical Formulations." />
     <meta name="theme-color" content="#0E0D0C" />
     <title>LUXE HAIR CO | Haute Coiffure & Virgin Hair</title>
-    
+    <meta name="og:title" content="LUXE HAIR CO | Haute Coiffure & Virgin Hair" />
+    <meta name="og:description" content="Exclusive Raw Virgin Hair, Bespoke HD Frontal Wigs, Seamless Attachments and Couture Botanical Formulations." />
+    <meta name="og:type" content="website" />
+
     <!-- Google Fonts: Cormorant Garamond, Cinzel, and Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- First-paint splash: shown instantly from static HTML, removed the
+         moment React mounts. Replaces the blank white screen with the brand. -->
+    <style>
+      #luxe-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;gap:18px;background:#0E0D0C;
+        font-family:'Cinzel',serif;transition:opacity .4s ease}
+      #luxe-splash .mark{font-size:46px;color:#C9A876;animation:luxe-pulse 1.3s ease-in-out infinite}
+      #luxe-splash .word{color:#C9A876;letter-spacing:.42em;font-size:13px;padding-left:.42em;opacity:.85}
+      @keyframes luxe-pulse{0%,100%{opacity:.35;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
+    </style>
   </head>
-  <body>
-    <div id="root"></div>
+  <body style="background:#0E0D0C">
+    <div id="root">
+      <div id="luxe-splash">
+        <div class="mark">✦</div>
+        <div class="word">LUXE HAIR CO</div>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
